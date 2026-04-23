@@ -1,4 +1,21 @@
 (function () {
+  const toggle = document.querySelector('.v2-nav-toggle');
+  const nav = document.querySelector('.v2-nav');
+  if (toggle && nav) {
+    toggle.addEventListener('click', () => {
+      const open = nav.classList.toggle('is-open');
+      toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+    });
+    nav.querySelectorAll('.v2-nav-links a, .v2-nav-actions a').forEach(a => {
+      a.addEventListener('click', () => {
+        nav.classList.remove('is-open');
+        toggle.setAttribute('aria-expanded', 'false');
+      });
+    });
+  }
+})();
+
+(function () {
   const nums = document.querySelectorAll('.v2-stat-number');
   if (!nums.length) return;
 
