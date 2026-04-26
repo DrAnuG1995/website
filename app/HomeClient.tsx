@@ -1,58 +1,57 @@
 "use client";
-import { useEffect, useRef, useState } from "react";
-import { motion, useScroll, useTransform, useSpring, AnimatePresence, useInView } from "framer-motion";
-import Image from "next/image";
+import { useEffect, useRef, useState, MouseEvent } from "react";
+import {
+  motion,
+  useScroll,
+  useTransform,
+  useSpring,
+  AnimatePresence,
+  useMotionValue,
+} from "framer-motion";
 import Link from "next/link";
-import SplitText from "@/components/SplitText";
 import MagneticButton from "@/components/MagneticButton";
-import VideoSlot from "@/components/VideoSlot";
-import Counter from "@/components/Counter";
 
 /* =========================================================
-   HOMEPAGE — 5 Chapters
-   00 Cold Open · 01 Founder · 02 Reckoning · 03 Product · 04 Doctors · 05 Invitation
+   HOMEPAGE
+   01 Hero · 02 Logos · 03 Agency tax (scroll bar) ·
+   04 How it works (pinned phone) · 05 First month roadmap ·
+   06 Doctor voices (auto carousel) · 07 Comparison · 08 FAQ · 09 CTA
    ========================================================= */
 
-const SHIFTS = [
-  { specialty: "ED Registrar", place: "Royal Melbourne", meta: "Tonight · 8h", rate: "$145/hr" },
-  { specialty: "GP Locum", place: "Bendigo Health", meta: "Sat · 10h", rate: "$180/hr" },
-  { specialty: "Anaesthetics", place: "St Vincent's Sydney", meta: "Mon · 12h", rate: "$210/hr" },
-  { specialty: "Paediatrics", place: "Queensland Children's", meta: "Fri · 8h", rate: "$165/hr" },
-  { specialty: "Psychiatry", place: "Cairns Base", meta: "Wed · 6h", rate: "$190/hr" },
-  { specialty: "Surgical Reg", place: "Geelong Hospital", meta: "Thu · 10h", rate: "$175/hr" },
-  { specialty: "ICU Fellow", place: "Royal Perth", meta: "Sun · 12h", rate: "$225/hr" },
-  { specialty: "Obstetrics", place: "Mater Brisbane", meta: "Tue · 10h", rate: "$200/hr" },
-  { specialty: "ED SHO", place: "Box Hill Hospital", meta: "Fri · 10h", rate: "$155/hr" },
-  { specialty: "General Med", place: "Alfred Hospital", meta: "Sat · 8h", rate: "$150/hr" },
+const SHIFTS_SAMPLE = [
+  { specialty: "ED Registrar", place: "Royal Melbourne", rate: 145 },
+  { specialty: "GP Locum", place: "Bendigo Health", rate: 180 },
+  { specialty: "Anaesthetics", place: "St Vincent's Sydney", rate: 210 },
+  { specialty: "Paediatrics", place: "Queensland Children's", rate: 165 },
 ];
 
 const DOCTORS = [
   {
     name: "Dr Layth Samari",
-    credential: "MD · ACEM Trainee",
+    credential: "ACEM Trainee",
     city: "Melbourne",
     img: "/doctors/dr-layth.png",
-    quote: "A great initiative to help doctors be in charge of their own work-life balance with the ease of picking up shifts on demand.",
-    body:
-      "Layth has been a StatDoctor user for 14 months. He covers weekend ED shifts across regional Victoria, splitting time between his ACEM training program and locum work on his own terms.",
+    quote:
+      "A great initiative to help doctors take charge of their own work-life balance.",
+    detail: "14 months on StatDoctor · weekend ED shifts across regional Victoria",
   },
   {
     name: "Dr Priya Shah",
-    credential: "MD · GP Fellow",
+    credential: "GP Fellow",
     city: "Sydney",
     img: "/doctors/dr-priya.png",
-    quote: "StatDoctor enables me to see available shifts on my own terms. No annoying phone calls from managing reps.",
-    body:
-      "Priya booked her first shift within 48 hours of signing up. She uses the app to supplement her salaried GP role with higher-paying locum shifts across metropolitan Sydney — without ever speaking to an agency.",
+    quote:
+      "I see available shifts on my own terms. No phone calls from agency reps.",
+    detail: "First shift booked within 48 hours of signing up",
   },
   {
     name: "Dr David Burton",
-    credential: "MD · Emergency Medicine",
+    credential: "Emergency Medicine",
     city: "Brisbane",
     img: "/doctors/dr-david.png",
-    quote: "Easy and clear to use. I've been able to communicate my shifts and availability efficiently with multiple hospitals.",
-    body:
-      "David works with four different Queensland hospitals through StatDoctor. He estimates the platform has saved him roughly eight hours a week previously spent on agency phone calls and paperwork.",
+    quote:
+      "Easy and clear. I communicate shifts and availability across multiple hospitals.",
+    detail: "Works with four Queensland hospitals · saved ~8 hrs/week on agency calls",
   },
 ];
 
@@ -71,310 +70,149 @@ const LOGOS = [
   "https://cdn.prod.website-files.com/688db6d677516719c3925d01/69a79f6b8e767399e5f8ad70_4.png",
 ];
 
+/* Word-stagger reveal — replaces the per-character SplitText gimmick */
+function Words({ children, className = "", delay = 0 }: { children: string; className?: string; delay?: number }) {
+  const words = children.split(" ");
+  return (
+    <span className={className}>
+      {words.map((w, i) => (
+        <span key={i} className="inline-block overflow-hidden align-bottom">
+          <motion.span
+            className="inline-block"
+            initial={{ y: "110%" }}
+            animate={{ y: 0 }}
+            transition={{
+              duration: 0.85,
+              delay: delay + i * 0.06,
+              ease: [0.2, 0.8, 0.2, 1],
+            }}
+          >
+            {w}
+            {i < words.length - 1 && " "}
+          </motion.span>
+        </span>
+      ))}
+    </span>
+  );
+}
+
 export default function HomeClient() {
   return (
     <>
-      <ChapterCold />
-      <ChapterFounder />
-      <ChapterReckoning />
-      <ChapterProduct />
-      <LiveTicker />
-      <TrustLogos />
-      <ChapterDoctors />
-      <Numbers />
-      <ChapterInvitation />
+      <Hero />
+      <LogosStrip />
+      <AgencyTax />
+      <HowItWorks />
+      <Roadmap />
+      <DoctorVoices />
+      <Comparison />
+      <FAQ />
+      <AppCTA />
     </>
   );
 }
 
-/* ============ CHAPTER 00 — COLD OPEN ============ */
-function ChapterCold() {
-  const [phase, setPhase] = useState(0);
-  useEffect(() => {
-    const t1 = setTimeout(() => setPhase(1), 2800);
-    return () => clearTimeout(t1);
-  }, []);
-
-  return (
-    <section className="min-h-screen grid place-items-center relative pt-32 pb-20 px-6">
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 1.2 }}
-        className="absolute top-28 left-1/2 -translate-x-1/2 mono text-[10px] tracking-[0.3em] text-muted"
-      >
-        CHAPTER 00 · COLD OPEN
-      </motion.div>
-
-      <div className="max-w-5xl text-center">
-        <AnimatePresence mode="wait">
-          {phase === 0 ? (
-            <motion.h1
-              key="a"
-              exit={{ opacity: 0, y: -20 }}
-              transition={{ duration: 0.6 }}
-              className="display text-[clamp(40px,7vw,112px)]"
-            >
-              <SplitText stagger={0.028}>It&apos;s 2:04am. Your phone buzzes.</SplitText>
-              <br />
-              <SplitText stagger={0.028} start={1.2} className="italic text-ocean">
-                Another agency shift.
-              </SplitText>
-              <span className="inline-block w-1 h-[0.85em] bg-ink align-baseline animate-blink ml-1 translate-y-1.5" />
-            </motion.h1>
-          ) : (
-            <motion.h1
-              key="b"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, ease: [0.2, 0.8, 0.2, 1] }}
-              className="display text-[clamp(40px,7vw,112px)]"
-              data-mascot="Welcome. Scroll down — the founder has something to say first."
-            >
-              We built a <em className="italic text-ocean">better</em> way.
-              <br />
-              <span className="text-muted italic text-[0.55em] font-sans not-italic tracking-normal mt-8 block">
-                For doctors. By doctors.
-              </span>
-            </motion.h1>
-          )}
-        </AnimatePresence>
-      </div>
-
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: phase === 1 ? 1 : 0 }}
-        transition={{ duration: 1, delay: 0.5 }}
-        className="absolute bottom-12 left-1/2 -translate-x-1/2 flex flex-col items-center gap-3 mono text-[10px] tracking-[0.3em] text-muted"
-      >
-        <span className="w-px h-10 bg-muted/40 overflow-hidden relative">
-          <span className="absolute inset-0 bg-ink animate-[slideDown_2s_ease-in-out_infinite]" />
-        </span>
-        CONTINUE READING
-      </motion.div>
-      <style jsx>{`
-        @keyframes slideDown {
-          0% { transform: translateY(-100%); }
-          100% { transform: translateY(100%); }
-        }
-      `}</style>
-    </section>
-  );
-}
-
-/* ============ CHAPTER 01 — FOUNDER ============ */
-function ChapterFounder() {
-  return (
-    <section
-      id="founder"
-      className="py-32 px-6 bg-bone-2 border-y border-ink/10 relative"
-    >
-      <div className="max-w-[1280px] mx-auto">
-        <div className="grid md:grid-cols-[280px_1fr] gap-12 md:gap-16">
-          <div className="md:sticky md:top-32 md:self-start">
-            <div className="eyebrow mb-4">Chapter 01</div>
-            <h3 className="display text-4xl mb-8 leading-[1.05]">
-              A message from <em className="italic text-ocean">our founder</em>.
-            </h3>
-            <ul className="border-t border-ink/15 mono text-xs">
-              {[
-                ["00:00", "Why I built StatDoctor"],
-                ["00:22", "What agencies cost you"],
-                ["00:48", "How doctors keep 100%"],
-                ["01:15", "What hospitals get"],
-              ].map(([t, label]) => (
-                <li
-                  key={t}
-                  className="flex justify-between py-3.5 border-b border-ink/15 hover:text-ink text-muted transition-colors cursor-pointer"
-                  data-hover
-                >
-                  <span>{label}</span>
-                  <span className="tracking-widest">{t}</span>
-                </li>
-              ))}
-            </ul>
-            <div className="mt-8 text-sm text-muted">
-              Captions on by default.
-              <br />
-              Press the play pill for the full 90-second message.
-            </div>
-          </div>
-
-          <div data-mascot="This is where our CEO speaks directly to you. Drop your video in — it's ready.">
-            <VideoSlot />
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-/* ============ CHAPTER 02 — THE RECKONING (scroll-driven, pinned) ============ */
-function ChapterReckoning() {
+/* ============ HERO ============ */
+function Hero() {
   const ref = useRef<HTMLDivElement>(null);
-  // Section is 300vh tall with a 100vh sticky inside → sticky is engaged for scroll
-  // from section_top to section_top + 200vh, which maps exactly to useScroll progress 0→1.
-  const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end end"] });
-
-  // 3 beats, NO overlap between them — one clean fade at a time.
-  //   Beat A — The number     (0.00 – 0.33)
-  //   Beat B — The breakdown  (0.33 – 0.66)  (slice fly-off mid-beat at 0.44–0.58)
-  //   Beat C — The punchline  (0.66 – 1.00)
-  const aOpacity = useTransform(scrollYProgress, [0, 0.04, 0.30, 0.34], [0, 1, 1, 0]);
-  const aY       = useTransform(scrollYProgress, [0, 0.04, 0.30, 0.34], [16, 0, 0, -16]);
-
-  const bOpacity = useTransform(scrollYProgress, [0.34, 0.38, 0.62, 0.66], [0, 1, 1, 0]);
-  const bY       = useTransform(scrollYProgress, [0.34, 0.38, 0.62, 0.66], [16, 0, 0, -16]);
-
-  // Slice fly-off happens mid-Beat-B.
-  const sliceX     = useTransform(scrollYProgress, [0.44, 0.58], [0, 520]);
-  const sliceRot   = useTransform(scrollYProgress, [0.44, 0.58], [0, 35]);
-  const sliceOp    = useTransform(scrollYProgress, [0.44, 0.52, 0.6], [1, 1, 0]);
-  const labelOp    = useTransform(scrollYProgress, [0.44, 0.56], [1, 0]);
-
-  const cOpacity = useTransform(scrollYProgress, [0.66, 0.72], [0, 1]);
-  const cY       = useTransform(scrollYProgress, [0.66, 0.72], [16, 0]);
-
-  // Progress dots
-  const [dot, setDot] = useState(0);
-  useEffect(() => {
-    const unsub = scrollYProgress.on("change", (v) => {
-      if (v < 0.34) setDot(0);
-      else if (v < 0.66) setDot(1);
-      else setDot(2);
-    });
-    return () => unsub();
-  }, [scrollYProgress]);
+  const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end start"] });
+  const yStats = useTransform(scrollYProgress, [0, 1], [0, 80]);
+  const yHead = useTransform(scrollYProgress, [0, 1], [0, -40]);
+  const opacityHead = useTransform(scrollYProgress, [0, 1], [1, 0.4]);
 
   return (
-    <section
-      ref={ref}
-      className="bg-ink text-bone relative"
-      style={{ height: "300vh" }}
-    >
+    <section ref={ref} className="min-h-[92vh] flex items-center px-6 pt-32 pb-24 relative overflow-hidden">
+      {/* Soft background tint */}
       <div
         className="pointer-events-none absolute inset-0"
         style={{
           background:
-            "radial-gradient(900px 500px at 20% 20%, rgba(50,50,255,0.15), transparent 60%), radial-gradient(700px 500px at 80% 80%, rgba(205,227,93,0.08), transparent 60%)",
+            "radial-gradient(900px 600px at 80% 0%, rgba(205,227,93,0.18), transparent 60%)",
         }}
       />
 
-      {/* Sticky viewport — stays pinned for the whole 300vh while beats scroll through */}
-      <div className="sticky top-0 h-screen w-full overflow-hidden">
-        {/* Persistent chapter label — always visible at top of viewport */}
-        <div className="absolute top-0 inset-x-0 pt-28 pb-4 text-center z-10 pointer-events-none">
-          <div className="eyebrow text-stat">Chapter 02 · The Reckoning</div>
-        </div>
-
-        {/* Beat stage — each beat fills the full viewport and is centered */}
-        <div className="absolute inset-0">
-          {/* === Beat A — the number === */}
+      <div className="max-w-[1280px] mx-auto w-full grid md:grid-cols-12 gap-10 items-end relative">
+        <motion.div style={{ y: yHead, opacity: opacityHead }} className="md:col-span-9">
           <motion.div
-            style={{ opacity: aOpacity, y: aY }}
-            className="absolute inset-0 flex flex-col items-center justify-center text-center px-6"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.6 }}
+            className="eyebrow mb-7"
           >
-            <div
-              className="display text-[clamp(72px,15vw,220px)] leading-[0.95] tabular-nums"
-              data-mascot="Agencies skim ~20% off every shift. That's billions a year, out of doctors' pockets."
-            >
-              <span className="text-stat">$</span>
-              <Counter to={1.4} decimals={1} duration={1.6} />
-              <span className="text-stat text-[0.5em] align-top ml-1">B</span>
-            </div>
-            <p className="display italic text-2xl md:text-[34px] max-w-2xl mt-8 leading-[1.2] opacity-80">
-              Australian doctor wages quietly diverted to agencies each year.
-            </p>
+            Australia&apos;s locum doctor marketplace
           </motion.div>
-
-          {/* === Beat B — the breakdown === */}
-          <motion.div
-            style={{ opacity: bOpacity, y: bY }}
-            className="absolute inset-0 flex flex-col items-center justify-center text-center px-6"
-          >
-            <div className="eyebrow text-stat mb-6">THE AGENCY TAX</div>
-            <p className="display italic text-[clamp(28px,4.2vw,52px)] max-w-3xl leading-[1.15] opacity-90">
-              For every shift, agencies quietly
-              <br />
-              skim <em className="not-italic text-stat font-semibold">20%</em> off the top.
-            </p>
-
-            <div className="relative w-full max-w-2xl mt-14">
-              <svg viewBox="0 0 800 80" className="w-full h-auto">
-                <defs>
-                  <linearGradient id="reckoning-grad" x1="0" x2="1">
-                    <stop offset="0%" stopColor="#cde35d" />
-                    <stop offset="100%" stopColor="#3232ff" />
-                  </linearGradient>
-                </defs>
-                <rect x="0" y="20" width="800" height="40" rx="20" fill="url(#reckoning-grad)" opacity="0.25" />
-                <rect x="0" y="20" width="640" height="40" rx="20" fill="url(#reckoning-grad)" />
-                <motion.rect
-                  x="640"
-                  y="20"
-                  width="160"
-                  height="40"
-                  rx="20"
-                  fill="#FF5A36"
-                  style={{ x: sliceX, rotate: sliceRot, opacity: sliceOp, originX: "50%", originY: "50%" }}
-                />
-              </svg>
-              <div className="flex justify-between mono text-[10px] tracking-widest text-parchment mt-4">
-                <span>DOCTOR WAGES · 100%</span>
-                <motion.span style={{ opacity: labelOp }} className="text-stat">
-                  AGENCY CUT · 20% →
-                </motion.span>
-              </div>
-            </div>
-          </motion.div>
-
-          {/* === Beat C — the punchline === */}
-          <motion.div
-            style={{ opacity: cOpacity, y: cY }}
-            className="absolute inset-0 flex flex-col items-center justify-center text-center px-6"
-          >
-            <div className="eyebrow text-electric mb-6">THE AGENCY TAX ENDS HERE</div>
-            <h2 className="display text-[clamp(40px,7vw,96px)] leading-[0.98] mb-10 max-w-4xl">
-              StatDoctor takes <em className="italic text-electric">0%</em>.
-              <br />
-              Doctors keep <em className="italic text-electric">100%</em>.
-            </h2>
-            <div className="mono text-xs tracking-widest text-parchment">
-              NO AGENCY · NO MIDDLEMAN · NO HIDDEN FEES
-            </div>
-          </motion.div>
-        </div>
-
-        {/* Bottom strip — progress dots + scroll hint */}
-        <div className="absolute bottom-10 inset-x-0 flex flex-col items-center gap-4 z-10">
-          <div className="flex items-center gap-2 mono text-[10px] tracking-widest text-parchment">
-            {[0, 1, 2].map((i) => (
-              <div
-                key={i}
-                className="h-[2px] rounded-full transition-all duration-500"
-                style={{
-                  width: dot === i ? 40 : 14,
-                  background: dot >= i ? "#cde35d" : "rgba(245,241,232,0.25)",
-                }}
-              />
-            ))}
-            <span className="ml-3">{String(dot + 1).padStart(2, "0")} / 03</span>
-          </div>
-
-          <motion.div
-            style={{ opacity: aOpacity }}
-            className="mono text-[10px] tracking-[0.3em] text-parchment/60 flex flex-col items-center gap-2"
-          >
-            <span>KEEP SCROLLING</span>
-            <span className="inline-block w-px h-6 bg-parchment/30 overflow-hidden relative">
-              <span className="absolute inset-0 bg-electric animate-[slideDownReck_1.8s_ease-in-out_infinite]" />
+          <h1 className="display text-[clamp(48px,8.5vw,140px)] leading-[0.95] tracking-tight">
+            <Words>Shifts that pay</Words>
+            <br />
+            <Words delay={0.2}>you fully.</Words>
+            <br />
+            <span className="italic">
+              <Words delay={0.45}>No agency in the middle.</Words>
             </span>
+          </h1>
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 1.05, ease: [0.2, 0.8, 0.2, 1] }}
+            className="mt-8 max-w-2xl text-lg md:text-xl text-ink/75 leading-relaxed"
+          >
+            StatDoctor connects Australian doctors directly with hospitals and clinics. You see the
+            full rate, you keep the full rate, and you book on your own terms.
+          </motion.p>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, delay: 1.25 }}
+            className="mt-10 flex flex-wrap items-center gap-4"
+          >
+            <MagneticButton href="https://linktr.ee/statdoctorau" variant="primary" external>
+              Download StatDoctor →
+            </MagneticButton>
+            <MagneticButton href="/hospitals" variant="ghost">
+              For hospitals
+            </MagneticButton>
           </motion.div>
-        </div>
+        </motion.div>
+
+        <motion.div
+          style={{ y: yStats }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 1, delay: 1.4 }}
+          className="md:col-span-3 grid grid-cols-3 md:grid-cols-1 gap-6 md:gap-8 md:border-l md:border-ink/15 md:pl-8"
+        >
+          {[
+            { v: "300+", l: "Doctors on the platform" },
+            { v: "60+", l: "Partner hospitals & clinics" },
+            { v: "0%", l: "Commission, ever" },
+          ].map((s, i) => (
+            <motion.div
+              key={s.l}
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.7, delay: 1.5 + i * 0.12 }}
+            >
+              <div className="display text-4xl md:text-5xl leading-none">{s.v}</div>
+              <div className="text-xs text-muted mt-2 leading-snug">{s.l}</div>
+            </motion.div>
+          ))}
+        </motion.div>
       </div>
 
+      {/* Scroll cue */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 1, delay: 1.7 }}
+        className="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-3 text-[10px] tracking-[0.3em] text-muted"
+      >
+        <span>SCROLL</span>
+        <span className="block w-px h-12 bg-ink/15 overflow-hidden relative">
+          <span className="absolute inset-0 bg-ink animate-[scrollLine_2s_ease-in-out_infinite]" />
+        </span>
+      </motion.div>
       <style jsx>{`
-        @keyframes slideDownReck {
+        @keyframes scrollLine {
           0% { transform: translateY(-100%); }
           100% { transform: translateY(100%); }
         }
@@ -383,262 +221,472 @@ function ChapterReckoning() {
   );
 }
 
-/* ============ CHAPTER 03 — PRODUCT TOUR (pinned, scrubbed) ============ */
-function ChapterProduct() {
+/* ============ LOGOS STRIP ============ */
+function LogosStrip() {
+  return (
+    <section className="py-16 px-6 border-y border-line bg-bone">
+      <div className="max-w-[1280px] mx-auto">
+        <div className="text-center text-xs tracking-[0.2em] uppercase text-muted mb-8">
+          Trusted by 60+ healthcare facilities across Australia
+        </div>
+        <div className="marquee-mask">
+          <div className="flex gap-16 w-max animate-marquee-slow items-center hover:[animation-play-state:paused]">
+            {[...LOGOS, ...LOGOS].map((src, i) => (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img key={i} src={src} alt="" className="h-12 w-auto opacity-90 hover:opacity-100 transition" />
+            ))}
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ============ AGENCY TAX — scroll-driven bar visual ============ */
+function AgencyTax() {
   const ref = useRef<HTMLDivElement>(null);
-  // Pin the entire tour inside the section.
+  const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end end"] });
+
+  // Bar starts full-width green. From 0.2-0.5 a 22% chunk slides off (orange).
+  // At 0.7-1.0 the bar refills with a sweep of lime ("StatDoctor takes 0%").
+  const sliceX = useTransform(scrollYProgress, [0.2, 0.5], [0, 320]);
+  const sliceRot = useTransform(scrollYProgress, [0.2, 0.5], [0, 30]);
+  const sliceOp = useTransform(scrollYProgress, [0.45, 0.6], [1, 0]);
+  const refillW = useTransform(scrollYProgress, [0.7, 0.95], [78, 100]);
+  const refillOp = useTransform(scrollYProgress, [0.65, 0.78], [0, 1]);
+  const headOpacity = useTransform(scrollYProgress, [0, 0.05, 0.85, 1], [0, 1, 1, 0.4]);
+
+  // Headline shifts subtly through phases
+  const headline = useTransform(scrollYProgress, (v) => {
+    if (v < 0.45) return "Australian doctors lose ~$1.4B a year to agencies.";
+    if (v < 0.7) return "Roughly 20% of every locum shift skimmed off the top.";
+    return "We don't take a cent. Doctors keep 100%.";
+  });
+  const [headText, setHeadText] = useState("Australian doctors lose ~$1.4B a year to agencies.");
+  useEffect(() => headline.on("change", setHeadText), [headline]);
+
+  return (
+    <section ref={ref} className="bg-ink text-bone relative" style={{ height: "260vh" }}>
+      <div className="sticky top-0 h-screen flex flex-col justify-center px-6 overflow-hidden">
+        <div className="max-w-[1100px] mx-auto w-full">
+          <motion.div style={{ opacity: headOpacity }}>
+            <div className="text-xs tracking-[0.2em] uppercase text-bone/50 mb-6">
+              The agency tax
+            </div>
+            <AnimatePresence mode="wait">
+              <motion.h2
+                key={headText}
+                initial={{ opacity: 0, y: 16 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -16 }}
+                transition={{ duration: 0.6, ease: [0.2, 0.8, 0.2, 1] }}
+                className="display text-[clamp(40px,6.5vw,96px)] leading-[1.0] max-w-5xl"
+              >
+                {headText}
+              </motion.h2>
+            </AnimatePresence>
+          </motion.div>
+
+          <div className="mt-16 max-w-3xl">
+            <div className="flex justify-between items-end mb-3 text-xs tracking-widest uppercase">
+              <span className="text-bone/60">Doctor wages — 100% of the rate</span>
+              <motion.span style={{ opacity: useTransform(sliceOp, [0, 1], [0.3, 1]) }} className="text-electric">
+                Agency cut · 22% →
+              </motion.span>
+            </div>
+            <div className="relative h-14">
+              {/* Refill (success) bar — fades in at the end */}
+              <motion.div
+                style={{ width: useTransform(refillW, (v) => `${v}%`), opacity: refillOp }}
+                className="absolute inset-y-0 left-0 rounded-full bg-electric"
+              />
+              {/* Base bar */}
+              <motion.div
+                style={{ opacity: useTransform(refillOp, [0, 1], [1, 0]) }}
+                className="absolute inset-0 rounded-full overflow-hidden"
+              >
+                <div className="absolute inset-y-0 left-0 w-[78%] bg-electric/80" />
+                <div className="absolute inset-y-0 right-0 w-[22%] bg-electric/15" />
+              </motion.div>
+              {/* Slice fly-off */}
+              <motion.div
+                style={{
+                  x: sliceX,
+                  rotate: sliceRot,
+                  opacity: sliceOp,
+                  width: "22%",
+                }}
+                className="absolute right-0 inset-y-0 rounded-full bg-[#FF8A65] origin-center"
+              />
+            </div>
+            <motion.div
+              style={{ opacity: refillOp }}
+              className="mt-6 inline-flex items-center gap-2 px-4 py-2 rounded-full bg-electric text-ink text-xs tracking-widest uppercase font-semibold"
+            >
+              Agency cut · removed
+            </motion.div>
+          </div>
+        </div>
+
+        <div className="absolute bottom-10 inset-x-0 flex justify-center text-[10px] tracking-[0.3em] text-bone/40">
+          KEEP SCROLLING
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ============ HOW IT WORKS — sticky pinned phone ============ */
+function HowItWorks() {
+  const ref = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end end"] });
   const [step, setStep] = useState(0);
 
   const steps = [
-    { tag: "01", eyebrow: "DISCOVER", title: "See every shift in your state.", body: "Real-time feed of open shifts across Australia. Filter by specialty, rate, location, and date. No phone tag with agency reps.", color: "#cde35d", rates: [145, 160, 175, 190] },
-    { tag: "02", eyebrow: "DETAILS", title: "Know your rate upfront.", body: "Every shift shows exactly what you'll earn before you apply. Break times, travel, penalty rates — no surprises, no negotiation loops.", color: "#7b7bf4", rates: [180, 200, 215, 225] },
-    { tag: "03", eyebrow: "BOOKED", title: "Book in two taps.", body: "Upload your credentials once — AHPRA, insurance, CV. Apply with a single tap. Hospitals confirm instantly.", color: "#3232ff", rates: [165, 185, 195, 210] },
-    { tag: "04", eyebrow: "PAID", title: "Paid in 48 hours.", body: "Work your shift, get paid. No invoicing, no chasing finance departments, no 6-week agency waits.", color: "#1a1a2e", rates: [155, 170, 180, 200] },
+    {
+      tag: "01",
+      title: "See every shift in your state.",
+      body: "Real-time feed of open shifts. Filter by specialty, rate, location and date.",
+    },
+    {
+      tag: "02",
+      title: "Know the rate upfront.",
+      body: "Every shift shows what you'll earn before you apply. No negotiation loops.",
+    },
+    {
+      tag: "03",
+      title: "Book in two taps.",
+      body: "Upload your credentials once. Apply with one tap. Hospitals confirm instantly.",
+    },
+    {
+      tag: "04",
+      title: "Paid in 48 hours.",
+      body: "Work the shift, get paid. No invoicing, no chasing, no six-week waits.",
+    },
   ];
 
   useEffect(() => {
     const unsub = scrollYProgress.on("change", (v) => {
-      // Map 0-1 progress across 4 steps. Give step 1 a buffer at the start.
-      // 0-0.15 = intro (step 0 prep), 0.15-0.38 = step 0, 0.38-0.58 = step 1, 0.58-0.78 = step 2, 0.78-1.0 = step 3
-      let s = 0;
-      if (v < 0.15) s = 0;
-      else if (v < 0.38) s = 0;
-      else if (v < 0.58) s = 1;
-      else if (v < 0.78) s = 2;
-      else s = 3;
-      setStep(s);
+      if (v < 0.20) setStep(0);
+      else if (v < 0.45) setStep(1);
+      else if (v < 0.70) setStep(2);
+      else setStep(3);
     });
     return () => unsub();
   }, [scrollYProgress]);
 
+  // Phone tilts and floats subtly with progress
+  const phoneRotate = useTransform(scrollYProgress, [0, 1], [-3, 3]);
+  const phoneY = useTransform(scrollYProgress, [0, 0.5, 1], [40, -10, 20]);
+  const phoneScale = useTransform(scrollYProgress, [0, 0.1, 0.9, 1], [0.92, 1, 1, 0.96]);
+  const headerOpacity = useTransform(scrollYProgress, [0, 0.06, 0.12], [1, 1, 0]);
+
   const current = steps[step];
 
   return (
-    <section
-      ref={ref}
-      className="bg-bone relative"
-      // 4 steps × 100vh + 100vh intro/outro cushion = 500vh so each step has real scroll room
-      style={{ height: "500vh" }}
-      data-mascot="Here's the app. Scroll — I'll walk you through each screen."
-    >
+    <section ref={ref} className="bg-bone relative" style={{ height: "500vh" }}>
       <div className="sticky top-0 h-screen flex items-center px-6 overflow-hidden">
-        <div className="max-w-[1280px] mx-auto w-full">
-          {/* Header — centered in the viewport; fades out when tour begins */}
+        <div className="max-w-[1280px] mx-auto w-full relative">
+          {/* Intro header — fades out as tour begins */}
           <motion.div
-            style={{ opacity: useTransform(scrollYProgress, [0, 0.08, 0.15], [1, 1, 0]) }}
-            className="absolute inset-0 flex flex-col items-center justify-center text-center px-6"
+            style={{ opacity: headerOpacity }}
+            className="absolute inset-0 flex flex-col items-center justify-center text-center pointer-events-none px-6"
           >
-            <div className="max-w-3xl">
-              <div className="eyebrow mb-3">Chapter 03 · The Product</div>
-              <h2 className="display text-[clamp(40px,7vw,84px)] leading-[0.98]">
-                Four screens. <em className="italic text-ocean">That&apos;s the whole app.</em>
-              </h2>
-              <p className="mt-5 text-base text-muted">Scroll slowly — each screen earns its keep.</p>
-            </div>
+            <div className="eyebrow mb-3">How it works</div>
+            <h2 className="display text-[clamp(40px,7vw,96px)] leading-[1.0] max-w-3xl">
+              Four screens. <span className="italic">That&apos;s the whole app.</span>
+            </h2>
+            <p className="mt-5 text-sm tracking-widest uppercase text-muted">Scroll to walk through</p>
           </motion.div>
 
           {/* Tour grid */}
-          <motion.div
-            style={{ opacity: useTransform(scrollYProgress, [0.1, 0.2], [0, 1]) }}
-            className="grid md:grid-cols-[1fr_340px_1fr] gap-10 items-center"
-          >
-            {/* Steps left */}
-            <ul className="flex flex-col gap-3">
+          <div className="grid md:grid-cols-[1fr_320px_1fr] gap-12 items-center">
+            {/* Step list */}
+            <ul className="flex flex-col gap-1">
               {steps.map((s, i) => (
                 <motion.li
-                  key={i}
-                  animate={{
-                    borderColor: step === i ? "#1a1a2e" : "rgba(26,26,46,0.08)",
-                    backgroundColor: step === i ? "#E8DFCB" : "rgba(232,223,203,0)",
-                    x: step === i ? 8 : 0,
-                    opacity: step === i ? 1 : 0.45,
-                  }}
-                  transition={{ duration: 0.5, ease: [0.2, 0.8, 0.2, 1] }}
-                  className="border rounded-2xl p-4"
+                  key={s.tag}
+                  animate={{ opacity: step === i ? 1 : 0.35 }}
+                  transition={{ duration: 0.5 }}
+                  className="border-t border-ink/15 py-5"
                 >
-                  <div className="flex items-center justify-between">
-                    <div className="mono text-[10px] tracking-widest text-muted">STEP {s.tag}</div>
-                    {step === i && (
-                      <motion.span
-                        layoutId="step-dot"
-                        className="w-2 h-2 rounded-full"
-                        style={{ background: s.color }}
-                      />
-                    )}
+                  <div className="flex items-baseline gap-4">
+                    <span className="text-xs tracking-widest text-muted shrink-0">{s.tag}</span>
+                    <h4 className="display text-2xl md:text-3xl leading-tight">{s.title}</h4>
                   </div>
-                  <h4 className="display text-xl mt-2 leading-tight">{s.title}</h4>
-                  {step === i && (
-                    <motion.p
-                      initial={{ opacity: 0, height: 0 }}
-                      animate={{ opacity: 1, height: "auto" }}
-                      transition={{ duration: 0.4 }}
-                      className="text-[13px] text-muted leading-relaxed mt-2 overflow-hidden"
-                    >
-                      {s.body}
-                    </motion.p>
-                  )}
+                  <AnimatePresence>
+                    {step === i && (
+                      <motion.p
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: "auto" }}
+                        exit={{ opacity: 0, height: 0 }}
+                        transition={{ duration: 0.4 }}
+                        className="text-sm text-muted mt-2 ml-9 leading-relaxed overflow-hidden max-w-md"
+                      >
+                        {s.body}
+                      </motion.p>
+                    )}
+                  </AnimatePresence>
                 </motion.li>
               ))}
             </ul>
 
-            {/* Phone — stays in place, screen crossfades */}
-            <div className="relative mx-auto w-full max-w-[320px] aspect-[9/18.5] bg-ink rounded-[44px] p-3 shadow-[0_50px_90px_-30px_rgba(26,26,46,0.45)]">
-              <div className="absolute top-4 left-1/2 -translate-x-1/2 w-24 h-6 bg-ink rounded-full z-20" />
-              <div className="relative w-full h-full rounded-[34px] overflow-hidden bg-bone">
-                {steps.map((s, i) => (
-                  <motion.div
-                    key={i}
-                    animate={{ opacity: step === i ? 1 : 0 }}
-                    transition={{ duration: 0.5, ease: "easeInOut" }}
-                    className="absolute inset-0"
-                  >
-                    <div
-                      className="absolute inset-0"
-                      style={{
-                        background: `linear-gradient(180deg, ${s.color} 0%, #F5F1E8 32%)`,
-                      }}
-                    />
-                    <div className="relative p-4 pt-14 text-ink h-full">
-                      <div className="mono text-[9px] tracking-widest opacity-70">
-                        {`STEP ${s.tag} · ${s.eyebrow}`}
-                      </div>
-                      <div className="display text-xl mt-3 leading-tight pr-4">
-                        {s.title.split(".")[0]}.
-                      </div>
-                      <div className="mt-5 space-y-2">
-                        {s.rates.map((rate, k) => (
-                          <motion.div
-                            key={`${i}-${k}`}
-                            initial={{ opacity: 0, x: 20 }}
-                            animate={step === i ? { opacity: 1, x: 0 } : { opacity: 0, x: 20 }}
-                            transition={{ duration: 0.35, delay: step === i ? k * 0.08 : 0 }}
-                            className="rounded-xl bg-bone-2 border border-ink/10 p-3"
-                          >
-                            <div className="flex justify-between items-start">
-                              <div>
-                                <div className="mono text-[9px] tracking-widest text-ocean">
-                                  {["ED REG", "GP", "ANAES", "PSYCH"][k % 4]}
-                                </div>
-                                <div className="display text-sm mt-1">
-                                  {["Royal Melb", "Bendigo", "St Vincent", "Mater"][k % 4]}
-                                </div>
-                              </div>
-                              <div className="mono text-xs font-semibold">${rate}</div>
-                            </div>
-                          </motion.div>
-                        ))}
-                      </div>
-                    </div>
-                  </motion.div>
-                ))}
-              </div>
-            </div>
+            {/* Phone with motion */}
+            <motion.div style={{ rotate: phoneRotate, y: phoneY, scale: phoneScale }}>
+              <PhoneMock step={step} />
+            </motion.div>
 
-            {/* Right: step-specific callout card */}
-            <div className="relative h-[380px]">
+            {/* Right callout */}
+            <div className="hidden md:block self-center pl-2">
               <AnimatePresence mode="wait">
                 <motion.div
                   key={step}
                   initial={{ opacity: 0, x: 30 }}
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: -30 }}
-                  transition={{ duration: 0.4 }}
-                  className="absolute inset-0 p-6 bg-gauze rounded-3xl border border-ink/10 max-w-[320px]"
+                  transition={{ duration: 0.45, ease: [0.2, 0.8, 0.2, 1] }}
+                  className="border-l-2 border-electric pl-6 max-w-xs"
                 >
-                  <div className="mono text-[10px] tracking-widest text-muted">
-                    {step === 0 && "AVAILABLE NOW"}
-                    {step === 1 && "TRANSPARENT RATE"}
-                    {step === 2 && "APPROVED IN 4 MIN"}
-                    {step === 3 && "PAID OUT"}
+                  <div className="text-xs tracking-widest uppercase text-muted mb-2">
+                    Step {current.tag} · Currently viewing
                   </div>
-                  <div className="display text-5xl mt-3">
-                    ${current.rates[0]}
-                    <span className="text-sm text-muted font-sans ml-1">/hr</span>
-                  </div>
-                  <div className="text-sm mt-3 font-medium">
-                    {step === 0 && "ED Registrar · Tonight"}
-                    {step === 1 && "GP Locum · Saturday"}
-                    {step === 2 && "Anaesthetics · Monday"}
-                    {step === 3 && "Paid Tuesday 8:30am"}
-                  </div>
-                  <div className="text-xs text-muted mt-1">
-                    {step === 0 && "Royal Melbourne Hospital · 8h shift"}
-                    {step === 1 && "Bendigo Health · 10h shift"}
-                    {step === 2 && "St Vincent's Sydney · 12h shift"}
-                    {step === 3 && "Cleared direct · no invoice"}
-                  </div>
-                  <div
-                    className="inline-flex items-center gap-2 mt-5 px-3 py-1.5 rounded-full text-bone mono text-[10px] tracking-widest"
-                    style={{ background: current.color, color: step === 3 ? "#cde35d" : "#1a1a2e" }}
-                  >
-                    <span className="w-1.5 h-1.5 rounded-full bg-stat animate-pulse-dot" />
-                    {step === 0 && "LIVE · 3 OTHERS VIEWING"}
-                    {step === 1 && "YOUR RATE · CONFIRMED"}
-                    {step === 2 && "BOOKED · CALENDAR UPDATED"}
-                    {step === 3 && "CLEARED · IN YOUR ACCOUNT"}
-                  </div>
+                  <div className="display text-3xl leading-tight mb-3">{current.title}</div>
+                  <p className="text-sm text-muted leading-relaxed">{current.body}</p>
                 </motion.div>
               </AnimatePresence>
+              <div className="mt-10 flex items-center gap-2">
+                {steps.map((_, i) => (
+                  <span
+                    key={i}
+                    className="h-[2px] rounded-full transition-all duration-500"
+                    style={{
+                      width: step === i ? 36 : 14,
+                      background: step >= i ? "#1a1a2e" : "rgba(26,26,46,0.18)",
+                    }}
+                  />
+                ))}
+                <span className="ml-3 text-xs tracking-widest text-muted">
+                  {String(step + 1).padStart(2, "0")} / 04
+                </span>
+              </div>
             </div>
-          </motion.div>
-
-          {/* Progress bar */}
-          <motion.div
-            style={{ opacity: useTransform(scrollYProgress, [0.1, 0.2], [0, 1]) }}
-            className="absolute bottom-[8vh] left-1/2 -translate-x-1/2 flex items-center gap-2 mono text-[10px] tracking-widest text-muted"
-          >
-            {steps.map((_, i) => (
-              <div
-                key={i}
-                className="h-[2px] rounded-full transition-all duration-500"
-                style={{
-                  width: step === i ? 48 : 20,
-                  background: step >= i ? "#1a1a2e" : "rgba(26,26,46,0.2)",
-                }}
-              />
-            ))}
-            <span className="ml-3">
-              {String(step + 1).padStart(2, "0")} / 04
-            </span>
-          </motion.div>
+          </div>
         </div>
       </div>
     </section>
   );
 }
 
-/* ============ LIVE TICKER ============ */
-function LiveTicker() {
-  const cards = [...SHIFTS, ...SHIFTS];
+function PhoneMock({ step }: { step: number }) {
+  const labels = ["Browse", "Details", "Confirm", "Earnings"];
+  const titles = ["Shifts near you", "Rate & details", "Book this shift", "Cleared & paid"];
   return (
-    <section className="py-20 px-6 bg-bone border-t border-ink/10" data-mascot="These are real shifts on the platform right now.">
-      <div className="max-w-[1280px] mx-auto mb-8 flex items-end justify-between flex-wrap gap-4">
-        <div>
-          <div className="eyebrow mb-2">Live Feed</div>
-          <h3 className="display text-3xl md:text-5xl">Shifts booking <em className="italic text-ocean">right now</em>.</h3>
+    <div className="relative mx-auto w-full max-w-[300px] aspect-[9/18.5] bg-ink rounded-[40px] p-2.5 shadow-[0_50px_100px_-30px_rgba(26,26,46,0.55)]">
+      <div className="absolute top-3 left-1/2 -translate-x-1/2 w-20 h-5 bg-ink rounded-full z-20" />
+      <div className="relative w-full h-full rounded-[32px] overflow-hidden bg-bone">
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={step}
+            initial={{ opacity: 0, scale: 0.96 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 1.02 }}
+            transition={{ duration: 0.45, ease: [0.2, 0.8, 0.2, 1] }}
+            className="absolute inset-0 p-4 pt-12 text-ink"
+          >
+            <div className="text-[9px] tracking-widest uppercase text-muted">
+              StatDoctor · {labels[step]}
+            </div>
+            <div className="display text-lg mt-3 leading-tight">{titles[step]}</div>
+            <div className="mt-4 space-y-2">
+              {SHIFTS_SAMPLE.slice(0, step === 3 ? 2 : 4).map((s, k) => (
+                <motion.div
+                  key={k}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.3, delay: k * 0.06 }}
+                  className="rounded-xl border border-ink/10 p-2.5 bg-bone"
+                >
+                  <div className="flex justify-between items-baseline">
+                    <div className="text-[10px] font-medium">{s.specialty}</div>
+                    <div className="text-xs font-semibold">${s.rate}/hr</div>
+                  </div>
+                  <div className="text-[10px] text-muted mt-0.5">{s.place}</div>
+                </motion.div>
+              ))}
+            </div>
+            {step === 3 && (
+              <motion.div
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.4, delay: 0.2 }}
+                className="mt-3 inline-flex items-center gap-2 px-2.5 py-1 rounded-full bg-electric text-ink text-[9px] font-semibold tracking-widest"
+              >
+                PAID · 48 HOURS
+              </motion.div>
+            )}
+          </motion.div>
+        </AnimatePresence>
+      </div>
+    </div>
+  );
+}
+
+/* ============ ROADMAP — vertical timeline with scroll fill ============ */
+function Roadmap() {
+  const ref = useRef<HTMLDivElement>(null);
+  const { scrollYProgress } = useScroll({ target: ref, offset: ["start 80%", "end 30%"] });
+  const lineH = useSpring(useTransform(scrollYProgress, [0, 1], [0, 100]), { damping: 30, stiffness: 100 });
+
+  const milestones = [
+    {
+      day: "Day 1",
+      title: "Sign up & upload credentials",
+      body: "AHPRA, indemnity, CV. Five minutes once, then never again.",
+    },
+    {
+      day: "Day 2",
+      title: "Verified",
+      body: "Our team verifies overnight. You get a notification when you're live.",
+    },
+    {
+      day: "Day 3",
+      title: "First shift booked",
+      body: "Browse the live feed, tap apply, hospital confirms. Most doctors find their first shift within 48 hours of being verified.",
+    },
+    {
+      day: "Week 1",
+      title: "First payout",
+      body: "Shift worked, payment cleared. 48 hours from clock-out to cash in your account.",
+    },
+    {
+      day: "Month 1",
+      title: "Eight shifts and counting",
+      body: "Average StatDoctor user books 8 shifts in their first month — earning ~$3,400 more than they would have through an agency.",
+    },
+  ];
+
+  return (
+    <section ref={ref} className="py-32 px-6 bg-bone">
+      <div className="max-w-[1100px] mx-auto">
+        <motion.div
+          initial={{ opacity: 0, y: 24 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-100px" }}
+          transition={{ duration: 0.7 }}
+          className="mb-20"
+        >
+          <div className="eyebrow mb-3">Your first month</div>
+          <h2 className="display text-[clamp(36px,5.5vw,72px)] leading-[1.0] max-w-3xl">
+            From signup to your first <span className="italic">$3,400 in earnings</span>.
+          </h2>
+        </motion.div>
+
+        <div className="relative grid md:grid-cols-[200px_1fr] gap-6 md:gap-12">
+          {/* Vertical fill line */}
+          <div className="hidden md:block absolute left-[200px] top-3 bottom-3 w-px bg-ink/10">
+            <motion.div
+              style={{ height: useTransform(lineH, (v) => `${v}%`) }}
+              className="absolute top-0 left-0 right-0 bg-ink"
+            />
+          </div>
+
+          <div className="md:col-start-2">
+            {milestones.map((m, i) => {
+              const segStart = i / milestones.length;
+              const segEnd = (i + 0.6) / milestones.length;
+              return <Milestone key={m.day} m={m} segStart={segStart} segEnd={segEnd} progress={scrollYProgress} />;
+            })}
+          </div>
+
+          <div className="hidden md:flex md:row-start-1 flex-col gap-0 md:col-start-1 relative">
+            {milestones.map((m, i) => (
+              <div key={m.day} className="h-[180px] flex items-start pt-2">
+                <div className="text-sm font-medium tracking-wide">{m.day}</div>
+              </div>
+            ))}
+          </div>
         </div>
-        <div className="inline-flex items-center gap-2 mono text-xs text-muted">
-          <span className="w-2 h-2 rounded-full bg-stat animate-pulse-dot" />
-          UPDATING EVERY 60s
-        </div>
+      </div>
+    </section>
+  );
+}
+
+function Milestone({
+  m,
+  segStart,
+  segEnd,
+  progress,
+}: {
+  m: { day: string; title: string; body: string };
+  segStart: number;
+  segEnd: number;
+  progress: ReturnType<typeof useScroll>["scrollYProgress"];
+}) {
+  const op = useTransform(progress, [segStart - 0.05, segStart, segEnd], [0.25, 0.55, 1]);
+  const dotScale = useTransform(progress, [segStart - 0.05, segStart, segStart + 0.02], [0.6, 1, 1.2]);
+  return (
+    <motion.div style={{ opacity: op }} className="h-[180px] relative">
+      <div className="md:hidden text-xs tracking-widest uppercase text-muted mb-2">{m.day}</div>
+      <motion.div
+        style={{ scale: dotScale }}
+        className="hidden md:block absolute -left-[58px] top-3 w-3 h-3 rounded-full bg-ink ring-4 ring-bone"
+      />
+      <div className="display text-2xl md:text-3xl leading-tight max-w-xl">{m.title}</div>
+      <p className="text-sm md:text-base text-muted mt-3 leading-relaxed max-w-2xl">{m.body}</p>
+    </motion.div>
+  );
+}
+
+/* ============ DOCTOR VOICES — auto-scrolling marquee carousel ============ */
+function DoctorVoices() {
+  const cards = [...DOCTORS, ...DOCTORS]; // duplicate for seamless loop
+  return (
+    <section className="py-32 border-y border-line bg-bone overflow-hidden">
+      <div className="max-w-[1280px] mx-auto px-6 mb-14">
+        <motion.div
+          initial={{ opacity: 0, y: 24 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-100px" }}
+          transition={{ duration: 0.7 }}
+          className="flex items-end justify-between flex-wrap gap-6"
+        >
+          <div>
+            <div className="eyebrow mb-3">Doctors using StatDoctor</div>
+            <h2 className="display text-[clamp(36px,5vw,68px)] leading-[1.0] max-w-2xl">
+              Verified by AHPRA. <span className="italic">Earning more</span>, calling fewer agencies.
+            </h2>
+          </div>
+          <div className="text-sm text-muted">Hover to pause →</div>
+        </motion.div>
       </div>
 
       <div className="marquee-mask">
-        <div className="flex gap-4 w-max animate-marquee hover:[animation-play-state:paused]">
-          {cards.map((s, i) => (
-            <div
+        <div className="flex gap-6 w-max animate-marquee hover:[animation-play-state:paused]">
+          {cards.map((d, i) => (
+            <article
               key={i}
-              className="w-[300px] shrink-0 p-5 bg-bone-2 border border-ink/10 rounded-2xl hover:border-ink hover:-translate-y-1 transition-all duration-300 cursor-pointer"
+              className="shrink-0 w-[420px] bg-bone border border-ink/10 rounded-2xl overflow-hidden hover:scale-[1.02] hover:shadow-2xl transition-all duration-400"
               data-hover
             >
-              <div className="mono text-[10px] tracking-widest text-ocean uppercase">{s.specialty}</div>
-              <div className="display text-xl mt-2 leading-tight">{s.place}</div>
-              <div className="flex justify-between items-baseline mt-2">
-                <div className="text-sm text-muted">{s.meta}</div>
-                <div className="mono text-sm font-semibold">{s.rate}</div>
+              <div className="aspect-[5/4] overflow-hidden bg-line">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={d.img}
+                  alt={d.name}
+                  className="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-700"
+                />
               </div>
-            </div>
+              <div className="p-7">
+                <p className="display text-xl leading-snug">&ldquo;{d.quote}&rdquo;</p>
+                <div className="mt-6 pt-5 border-t border-ink/10">
+                  <div className="font-semibold text-sm">{d.name}</div>
+                  <div className="text-xs text-muted mt-1">
+                    {d.credential} · {d.city}
+                  </div>
+                  <div className="text-xs text-muted mt-3 leading-relaxed">{d.detail}</div>
+                </div>
+              </div>
+            </article>
           ))}
         </div>
       </div>
@@ -646,190 +694,244 @@ function LiveTicker() {
   );
 }
 
-/* ============ TRUST LOGOS ============ */
-function TrustLogos() {
+/* ============ COMPARISON TABLE ============ */
+function Comparison() {
+  const rows: Array<[string, string, string]> = [
+    ["Commission on each shift", "18–22% to the agency", "0%"],
+    ["Time from signup to first shift", "1–3 weeks", "Often under 48 hours"],
+    ["Payout speed", "10–14 days, then chase finance", "Within 48 hours"],
+    ["Rate visibility before booking", "Quoted by agency rep", "Shown upfront, every time"],
+    ["Communication", "Phone calls and reps", "In-app, direct with the hospital"],
+  ];
   return (
-    <section className="py-16 px-6">
-      <div className="max-w-[1280px] mx-auto">
-        <div className="text-center mono text-[11px] tracking-[0.2em] uppercase text-muted mb-8">
-          Trusted by 60+ healthcare facilities across Australia
-        </div>
-        <div className="marquee-mask">
-          <div className="flex gap-16 w-max animate-marquee-slow items-center">
-            {[...LOGOS, ...LOGOS].map((src, i) => (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                key={i}
-                src={src}
-                alt=""
-                className="h-14 w-auto hover:scale-110 transition-transform duration-300"
-              />
-            ))}
+    <section className="py-32 px-6 bg-bone">
+      <div className="max-w-[1100px] mx-auto">
+        <motion.div
+          initial={{ opacity: 0, y: 24 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-100px" }}
+          transition={{ duration: 0.7 }}
+        >
+          <div className="eyebrow mb-3">Side by side</div>
+          <h2 className="display text-[clamp(36px,5vw,64px)] leading-[1.0] max-w-2xl mb-12">
+            How a StatDoctor shift compares.
+          </h2>
+        </motion.div>
+        <div className="border-t border-ink/15">
+          <div className="grid grid-cols-[1.4fr_1fr_1fr] py-4 text-xs tracking-widest uppercase text-muted">
+            <div></div>
+            <div>Traditional agency</div>
+            <div className="text-ink font-medium">StatDoctor</div>
           </div>
+          {rows.map(([label, agency, stat], i) => (
+            <motion.div
+              key={label}
+              initial={{ opacity: 0, y: 16 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-50px" }}
+              transition={{ duration: 0.6, delay: i * 0.06 }}
+              className="grid grid-cols-[1.4fr_1fr_1fr] py-6 border-t border-ink/10 items-baseline group hover:bg-line/40 transition-colors duration-300"
+            >
+              <div className="text-sm md:text-base font-medium">{label}</div>
+              <div className="text-sm text-muted">{agency}</div>
+              <div className="text-sm md:text-base font-medium relative">
+                <span className="relative z-10">{stat}</span>
+                <span className="absolute inset-x-0 bottom-1 h-2 bg-electric/40 -z-0 origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-500" />
+              </div>
+            </motion.div>
+          ))}
         </div>
       </div>
     </section>
   );
 }
 
-/* ============ CHAPTER 04 — THE DOCTORS ============ */
-function ChapterDoctors() {
+/* ============ FAQ ============ */
+function FAQ() {
+  const items = [
+    {
+      q: "Is StatDoctor free for doctors?",
+      a: "Yes. There are no signup fees, no platform fees, and no commission taken from your rate. The full rate the hospital pays is what you receive.",
+    },
+    {
+      q: "How does StatDoctor make money if you don't charge a commission?",
+      a: "Hospitals pay a flat platform fee per shift filled — significantly less than the 18–22% they would have lost to an agency. Doctors are never charged.",
+    },
+    {
+      q: "Which states are you live in?",
+      a: "VIC, NSW, QLD and SA, with active partner hospitals in WA. We're rolling out across all states and territories through 2026.",
+    },
+    {
+      q: "What credentials do I need to upload?",
+      a: "AHPRA registration, indemnity insurance certificate, and a current CV. Upload once and apply to every shift with a single tap.",
+    },
+    {
+      q: "How quickly do hospitals confirm a booking?",
+      a: "Most shifts are confirmed within hours. Urgent same-day shifts are typically confirmed in under 30 minutes.",
+    },
+    {
+      q: "What if a hospital cancels my shift?",
+      a: "If a hospital cancels within 24 hours of the shift, StatDoctor's cancellation policy guarantees a partial payout. Full terms in the app.",
+    },
+  ];
+  const [open, setOpen] = useState<number | null>(0);
   return (
-    <section className="py-32 px-6 bg-bone-2 border-y border-ink/10">
-      <div className="max-w-[1280px] mx-auto">
+    <section className="py-32 px-6 border-y border-line bg-bone">
+      <div className="max-w-[900px] mx-auto">
+        <motion.div
+          initial={{ opacity: 0, y: 24 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-100px" }}
+          transition={{ duration: 0.7 }}
+        >
+          <div className="eyebrow mb-3">Frequently asked</div>
+          <h2 className="display text-[clamp(36px,5vw,64px)] leading-[1.0] mb-12">
+            Questions doctors ask first.
+          </h2>
+        </motion.div>
+        <div className="border-t border-ink/15">
+          {items.map((item, i) => {
+            const isOpen = open === i;
+            return (
+              <div key={item.q} className="border-b border-ink/15">
+                <button
+                  onClick={() => setOpen(isOpen ? null : i)}
+                  className="w-full flex justify-between items-center text-left py-6 hover:opacity-80 transition-opacity"
+                  aria-expanded={isOpen}
+                  data-hover
+                >
+                  <span className="display text-xl md:text-2xl pr-6">{item.q}</span>
+                  <motion.span
+                    animate={{ rotate: isOpen ? 45 : 0 }}
+                    transition={{ duration: 0.35, ease: [0.2, 0.8, 0.2, 1] }}
+                    className="text-2xl text-muted shrink-0"
+                    aria-hidden
+                  >
+                    +
+                  </motion.span>
+                </button>
+                <AnimatePresence initial={false}>
+                  {isOpen && (
+                    <motion.div
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ height: "auto", opacity: 1 }}
+                      exit={{ height: 0, opacity: 0 }}
+                      transition={{ duration: 0.35, ease: [0.2, 0.8, 0.2, 1] }}
+                      className="overflow-hidden"
+                    >
+                      <p className="pb-6 text-base text-muted leading-relaxed max-w-2xl">
+                        {item.a}
+                      </p>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ============ APP CTA — magnetic + spotlight ============ */
+function AppCTA() {
+  const ref = useRef<HTMLDivElement>(null);
+  const x = useMotionValue(0);
+  const y = useMotionValue(0);
+  const sx = useSpring(x, { damping: 20, stiffness: 120 });
+  const sy = useSpring(y, { damping: 20, stiffness: 120 });
+
+  const onMove = (e: MouseEvent<HTMLDivElement>) => {
+    if (!ref.current) return;
+    const r = ref.current.getBoundingClientRect();
+    x.set(e.clientX - r.left);
+    y.set(e.clientY - r.top);
+  };
+
+  return (
+    <section
+      ref={ref}
+      onMouseMove={onMove}
+      className="py-40 px-6 bg-ink text-bone relative overflow-hidden"
+    >
+      {/* Cursor-following spotlight */}
+      <motion.div
+        style={{
+          x: sx,
+          y: sy,
+          translateX: "-50%",
+          translateY: "-50%",
+        }}
+        className="absolute top-0 left-0 w-[600px] h-[600px] rounded-full pointer-events-none"
+      >
+        <div
+          className="w-full h-full"
+          style={{
+            background: "radial-gradient(circle, rgba(205,227,93,0.18), transparent 60%)",
+          }}
+        />
+      </motion.div>
+
+      <div className="max-w-[1100px] mx-auto text-center relative">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.8 }}
-          className="text-center mb-20"
+          viewport={{ once: true, margin: "-100px" }}
+          transition={{ duration: 0.9, ease: [0.2, 0.8, 0.2, 1] }}
         >
-          <div className="eyebrow">Chapter 04 · The Doctors</div>
-          <h2 className="display text-[clamp(48px,8vw,96px)] leading-[0.98] mt-4">
-            Real doctors. <em className="italic text-ocean">Real hours back.</em>
+          <div className="text-xs tracking-[0.3em] uppercase text-bone/50 mb-8">The invitation</div>
+          <h2 className="display text-[clamp(48px,8vw,128px)] leading-[0.98]">
+            <span className="block">If you&apos;re a doctor,</span>
+            <span className="block italic text-electric">this is for you.</span>
           </h2>
-        </motion.div>
-
-        {DOCTORS.map((d, i) => (
-          <motion.article
-            key={d.name}
-            initial={{ opacity: 0, y: 60 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "200px" }}
-            transition={{ duration: 0.9, ease: [0.2, 0.8, 0.2, 1] }}
-            className={`grid md:grid-cols-[340px_1fr] gap-10 md:gap-20 items-start max-w-5xl mx-auto mb-32 ${
-              i % 2 === 1 ? "md:[direction:rtl]" : ""
-            }`}
-            data-mascot={i === 0 ? "Hover the portrait. See them come alive." : undefined}
-          >
-            <motion.div
-              whileHover={{ scale: 1.02 }}
-              transition={{ duration: 0.4 }}
-              className="aspect-[4/5] rounded-lg overflow-hidden bg-gauze ltr"
-              style={{ direction: "ltr" }}
+          <p className="text-lg text-bone/70 max-w-xl mx-auto mt-8 leading-relaxed">
+            Free for doctors. Always. Download the app, upload your credentials once, and your next
+            shift is one tap away.
+          </p>
+          <div className="mt-12 flex flex-wrap gap-4 justify-center items-center">
+            <MagneticButton href="https://linktr.ee/statdoctorau" variant="electric" external>
+              Download StatDoctor →
+            </MagneticButton>
+            <MagneticButton href="/hospitals" variant="ghost">
+              I&apos;m a hospital
+            </MagneticButton>
+          </div>
+          <div className="mt-10 flex gap-4 justify-center items-center">
+            <a
+              href="https://apps.apple.com/au/app/statdoctor/id6452677138"
+              target="_blank"
+              rel="noopener"
+              className="hover:opacity-80 transition-opacity"
+              data-hover
             >
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
-                src={d.img}
-                alt={d.name}
-                className="w-full h-full object-cover grayscale hover:grayscale-0 contrast-105 transition-all duration-700"
+                src="https://cdn.prod.website-files.com/688db6d677516719c3925d01/68fa0d2a1d41210a78792018_pngegg%20(2).png"
+                alt="App Store"
+                className="h-12"
               />
-            </motion.div>
-
-            <div style={{ direction: "ltr" }}>
-              <p className="display text-[clamp(26px,3.5vw,44px)] leading-[1.15] mb-7">
-                <span className="text-ocean">&ldquo;</span>
-                {d.quote}
-                <span className="text-ocean">&rdquo;</span>
-              </p>
-              <p className="text-base text-ink-soft max-w-lg mb-6 leading-relaxed">{d.body}</p>
-              <div className="flex items-center gap-4 flex-wrap">
-                <div>
-                  <strong className="text-base">{d.name}</strong>
-                  <div className="mono text-[11px] tracking-widest text-muted mt-0.5">
-                    {d.credential.toUpperCase()} · {d.city.toUpperCase()}
-                  </div>
-                </div>
-                <span className="inline-block px-3 py-1 bg-ink text-electric mono text-[10px] tracking-widest rounded-full">
-                  VERIFIED ON STATDOCTOR
-                </span>
-              </div>
-            </div>
-          </motion.article>
-        ))}
+            </a>
+            <a
+              href="https://play.google.com/store/apps/details?id=user.statdoctor.app&hl=en_AU"
+              target="_blank"
+              rel="noopener"
+              className="hover:opacity-80 transition-opacity"
+              data-hover
+            >
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="https://cdn.prod.website-files.com/688db6d677516719c3925d01/68fa0d1e7e5d4077dcdbc6e7_pngegg%20(1).png"
+                alt="Google Play"
+                className="h-12"
+              />
+            </a>
+          </div>
+          <div className="mt-12 text-xs tracking-[0.3em] uppercase text-bone/40">
+            247 doctors joined this month
+          </div>
+        </motion.div>
       </div>
-    </section>
-  );
-}
-
-/* ============ NUMBERS BAND ============ */
-function Numbers() {
-  return (
-    <section className="py-24 px-6 border-y border-ink/10 bg-bone" data-mascot="The numbers — growing every week.">
-      <div className="max-w-[1280px] mx-auto grid grid-cols-2 md:grid-cols-4 gap-8">
-        {[
-          { v: 300, suf: "+", label: "Doctors on the platform" },
-          { v: 60, suf: "+", label: "Partner clinics & hospitals" },
-          { v: 500, pre: "$", suf: "+", label: "More earned per shift" },
-          { v: 0, suf: "%", label: "Agency commission · ever" },
-        ].map((n, i) => (
-          <motion.div
-            key={i}
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "150px" }}
-            transition={{ duration: 0.6, delay: i * 0.1 }}
-            className="pl-6 border-l border-ink/15"
-          >
-            <div className="display text-[clamp(48px,6vw,84px)] leading-none">
-              <Counter to={n.v} prefix={n.pre} suffix="" />
-              <sup className="text-[0.45em] text-ocean align-top ml-0.5">{n.suf}</sup>
-            </div>
-            <div className="mono text-[10px] tracking-widest uppercase text-muted mt-3">{n.label}</div>
-          </motion.div>
-        ))}
-      </div>
-    </section>
-  );
-}
-
-/* ============ CHAPTER 05 — INVITATION ============ */
-function ChapterInvitation() {
-  return (
-    <section className="py-40 px-6 text-center relative" data-mascot="You made it. Your next shift is one tap away.">
-      <div className="absolute inset-0 pointer-events-none overflow-hidden">
-        <motion.div
-          animate={{ rotate: 360 }}
-          transition={{ duration: 60, repeat: Infinity, ease: "linear" }}
-          className="absolute top-1/4 left-1/4 w-96 h-96 rounded-full opacity-20"
-          style={{ background: "radial-gradient(circle, #cde35d, transparent 70%)" }}
-        />
-        <motion.div
-          animate={{ rotate: -360 }}
-          transition={{ duration: 80, repeat: Infinity, ease: "linear" }}
-          className="absolute bottom-1/4 right-1/4 w-96 h-96 rounded-full opacity-15"
-          style={{ background: "radial-gradient(circle, #3232ff, transparent 70%)" }}
-        />
-      </div>
-
-      <motion.div
-        initial={{ opacity: 0, y: 40 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true }}
-        transition={{ duration: 1 }}
-        className="relative max-w-4xl mx-auto"
-      >
-        <div className="eyebrow mb-4">Chapter 05 · The Invitation</div>
-        <h2 className="display text-[clamp(48px,7.5vw,112px)] leading-[0.98]">
-          If you&apos;re a doctor,
-          <br />
-          <em className="italic text-ocean">this is for you.</em>
-        </h2>
-
-        <div className="flex flex-wrap gap-4 justify-center mt-12">
-          <MagneticButton href="https://linktr.ee/statdoctorau" variant="primary" external>
-            Download StatDoctor →
-          </MagneticButton>
-          <MagneticButton href="/hospitals" variant="ghost">
-            I&apos;m a hospital
-          </MagneticButton>
-        </div>
-
-        <div className="flex gap-4 justify-center mt-10">
-          <a href="https://apps.apple.com/au/app/statdoctor/id6452677138" target="_blank" rel="noopener" data-hover>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="https://cdn.prod.website-files.com/688db6d677516719c3925d01/68fa0d2a1d41210a78792018_pngegg%20(2).png" alt="App Store" className="h-12 hover:scale-105 transition" />
-          </a>
-          <a href="https://play.google.com/store/apps/details?id=user.statdoctor.app&hl=en_AU" target="_blank" rel="noopener" data-hover>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="https://cdn.prod.website-files.com/688db6d677516719c3925d01/68fa0d1e7e5d4077dcdbc6e7_pngegg%20(1).png" alt="Google Play" className="h-12 hover:scale-105 transition" />
-          </a>
-        </div>
-
-        <div className="mt-10 mono text-xs tracking-widest text-muted">
-          <strong className="text-ink">247 doctors</strong> joined this month
-        </div>
-      </motion.div>
     </section>
   );
 }

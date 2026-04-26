@@ -4,7 +4,6 @@ import LenisProvider from "@/components/LenisProvider";
 import Cursor from "@/components/Cursor";
 import Nav from "@/components/Nav";
 import Footer from "@/components/Footer";
-import Mascot from "@/components/Mascot";
 
 export const metadata: Metadata = {
   title: "StatDoctor — The Locum Marketplace for Australian Doctors",
@@ -22,8 +21,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <LenisProvider>
           <Cursor />
           <Nav />
-          <Mascot />
-          <main className="relative z-[2]">{children}</main>
+          <main className="relative">{children}</main>
           <Footer />
         </LenisProvider>
       </body>
