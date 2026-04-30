@@ -4,91 +4,139 @@ import { motion } from "framer-motion";
 
 export default function Footer() {
   return (
-    <footer className="bg-ink text-bone pt-20 pb-10 relative z-10">
-      <div className="max-w-[1280px] mx-auto px-8">
+    <footer className="relative bg-ink text-bone overflow-hidden">
+      {/* Soft electric halo top-right */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute -top-40 -right-40 w-[640px] h-[640px] rounded-full opacity-30"
+        style={{
+          background:
+            "radial-gradient(circle, rgba(205,227,93,0.4), transparent 65%)",
+        }}
+      />
+
+      {/* Top: massive editorial wordmark */}
+      <div className="relative max-w-[1320px] mx-auto px-6 md:px-8 pt-24 md:pt-32 pb-16 border-b border-bone/10">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "150px" }}
-          transition={{ duration: 0.8 }}
-          className="grid md:grid-cols-[1.4fr_2fr] gap-16 pb-12 border-b border-bone/12"
+          viewport={{ once: true, margin: "-100px" }}
+          transition={{ duration: 0.9, ease: [0.2, 0.8, 0.2, 1] }}
+          className="grid md:grid-cols-[2fr_1fr] gap-10 md:gap-16 items-end"
         >
           <div>
-            <div className="flex items-center gap-2 mb-4">
-              <span className="display text-3xl tracking-tight">StatDoctor</span>
-              <span className="w-2 h-2 rounded-full bg-electric animate-pulse-dot" />
+            <div className="text-[10px] tracking-[0.22em] uppercase text-bone/50 mb-4">
+              Built by doctors, for doctors
             </div>
-            <p className="text-parchment text-sm max-w-xs leading-relaxed">
-              Australia's first locum doctor marketplace. Built by doctors, for doctors. No agencies, no hidden fees.
+            <h2 className="display text-[clamp(40px,7.5vw,120px)] leading-[0.92] tracking-tight">
+              StatDoctor.
+            </h2>
+            <p className="mt-5 max-w-md text-sm text-bone/70 leading-relaxed">
+              Australia&apos;s first locum doctor marketplace. No agencies, no hidden fees, zero commission — ever.
             </p>
-            <div className="flex gap-3 mt-6">
-              <a
-                href="https://apps.apple.com/au/app/statdoctor/id6452677138"
-                target="_blank"
-                rel="noopener"
-                className="px-4 py-2 rounded-full border border-bone/20 text-xs mono tracking-widest hover:bg-bone hover:text-ink transition"
-                data-hover
-              >
-                APP STORE →
-              </a>
-              <a
-                href="https://play.google.com/store/apps/details?id=user.statdoctor.app&hl=en_AU"
-                target="_blank"
-                rel="noopener"
-                className="px-4 py-2 rounded-full border border-bone/20 text-xs mono tracking-widest hover:bg-bone hover:text-ink transition"
-                data-hover
-              >
-                GOOGLE PLAY →
-              </a>
-            </div>
           </div>
-
-          <div className="grid grid-cols-3 gap-8">
-            <FooterCol
-              title="Platform"
-              links={[
-                { href: "/#platform", label: "For Doctors" },
-                { href: "/hospitals", label: "For Hospitals" },
-                { href: "/partners", label: "Partners" },
-              ]}
-            />
-            <FooterCol
-              title="Resources"
-              links={[
-                { href: "/blog", label: "Blog" },
-                { href: "/contact", label: "Contact" },
-              ]}
-            />
-            <FooterCol
-              title="Legal"
-              links={[
-                { href: "/terms-of-use", label: "Terms" },
-                { href: "/privacy-policy", label: "Privacy" },
-              ]}
-            />
+          <div className="flex flex-col gap-2 md:items-end">
+            <Link
+              href="https://linktr.ee/statdoctorau"
+              className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-full bg-electric text-ink text-xs md:text-sm font-semibold hover:bg-ocean hover:text-white transition-colors"
+              data-hover
+            >
+              Join as a doctor →
+            </Link>
+            <Link
+              href="/hospitals"
+              className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-full border border-bone/25 text-bone text-xs md:text-sm font-medium hover:bg-bone hover:text-ink hover:border-bone transition-colors"
+              data-hover
+            >
+              Join as a hospital →
+            </Link>
           </div>
         </motion.div>
+      </div>
 
-        <div className="flex flex-col sm:flex-row justify-between gap-4 mt-6 mono text-xs tracking-widest text-parchment">
-          <span>© 2026 STATDOCTOR · ABN 00 000 000 000</span>
-          <span>MADE IN AUSTRALIA 🇦🇺</span>
+      {/* Sitemap grid */}
+      <div className="relative max-w-[1320px] mx-auto px-6 md:px-8 py-16 grid grid-cols-2 md:grid-cols-4 gap-10">
+        <FooterCol
+          title="Platform"
+          links={[
+            { href: "/", label: "For Doctors" },
+            { href: "/hospitals", label: "For Hospitals" },
+            { href: "/partners", label: "Partners" },
+          ]}
+        />
+        <FooterCol
+          title="Resources"
+          links={[
+            { href: "/blog", label: "Blog" },
+            { href: "/contact", label: "Contact" },
+            { href: "https://linktr.ee/statdoctorau", label: "Download app", external: true },
+          ]}
+        />
+        <FooterCol
+          title="Legal"
+          links={[
+            { href: "/terms-of-use", label: "Terms of use" },
+            { href: "/privacy-policy", label: "Privacy policy" },
+          ]}
+        />
+        <FooterCol
+          title="Get the app"
+          links={[
+            { href: "https://apps.apple.com/au/app/statdoctor/id6452677138", label: "App Store", external: true },
+            { href: "https://play.google.com/store/apps/details?id=user.statdoctor.app&hl=en_AU", label: "Google Play", external: true },
+          ]}
+        />
+      </div>
+
+      {/* Bottom bar */}
+      <div className="relative max-w-[1320px] mx-auto px-6 md:px-8 pb-10 pt-6 border-t border-bone/10 flex flex-col md:flex-row items-start md:items-center justify-between gap-3 text-xs tracking-[0.22em] uppercase text-bone/50">
+        <span>© 2026 StatDoctor</span>
+        <span>Made in Australia</span>
+        <span>Verified by AHPRA · ABN 00 000 000 000</span>
+      </div>
+
+      {/* Quiet accent strip */}
+      <div className="relative border-t border-bone/10 overflow-hidden">
+        <div className="flex gap-8 py-3 w-max animate-marquee-slow">
+          {Array.from({ length: 14 }).map((_, i) => (
+            <span
+              key={i}
+              className="text-[10px] tracking-[0.28em] uppercase text-bone/30 whitespace-nowrap"
+            >
+              No agencies · Zero commission · Doctors keep 100% ·
+            </span>
+          ))}
         </div>
       </div>
     </footer>
   );
 }
 
-function FooterCol({ title, links }: { title: string; links: { href: string; label: string }[] }) {
+function FooterCol({
+  title,
+  links,
+}: {
+  title: string;
+  links: { href: string; label: string; external?: boolean }[];
+}) {
   return (
     <div>
-      <h5 className="mono text-xs tracking-widest text-parchment uppercase mb-4">{title}</h5>
-      <div className="flex flex-col gap-2">
+      <h5 className="text-[11px] tracking-[0.22em] uppercase text-bone/45 mb-5">{title}</h5>
+      <ul className="flex flex-col gap-3">
         {links.map((l) => (
-          <Link key={l.href} href={l.href} className="text-sm opacity-80 hover:opacity-100 hover:text-electric transition-colors" data-hover>
-            {l.label}
-          </Link>
+          <li key={l.href}>
+            <Link
+              href={l.href}
+              {...(l.external ? { target: "_blank", rel: "noopener" } : {})}
+              className="text-sm text-bone/85 hover:text-electric transition-colors inline-flex items-center gap-2 group"
+              data-hover
+            >
+              <span>{l.label}</span>
+              <span className="opacity-0 group-hover:opacity-100 transition-opacity">→</span>
+            </Link>
+          </li>
         ))}
-      </div>
+      </ul>
     </div>
   );
 }

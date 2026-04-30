@@ -6,3 +6,15 @@ out
 .env*.local
 .vercel
 scripts/screens/
+
+# Build artefacts
+tsconfig.tsbuildinfo
+
+# Source video (100MB+) — only the compressed MP4 in public/ ships
+*.mov
+
+# Sensitive partner data (contact emails, fallback pricing)
+StatDoctor Hospitals*.csv
+
+# One-off references not part of the running site
+public/dna-reference.png
