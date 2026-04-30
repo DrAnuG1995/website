@@ -47,8 +47,9 @@ const LOGOS = [
 ];
 
 function LogosStrip() {
-  const half = LOGOS.slice(0, Math.ceil(LOGOS.length / 2));
-  const otherHalf = LOGOS.slice(Math.ceil(LOGOS.length / 2));
+  // Full array doubled — 24 logos per row guarantees the strip is wider than
+  // any viewport, so the seamless -50% loop never reveals empty trailing space.
+  const reversed = LOGOS.slice().reverse();
   return (
     <section className="py-14 md:py-16 border-y border-ink/8 bg-white">
       <div className="max-w-[1280px] mx-auto px-6 mb-10">
@@ -72,9 +73,8 @@ function LogosStrip() {
       </div>
 
       <div className="space-y-4">
-        {/* 2-copy duplication = seamless loop with translateX(-50%) — 3 copies caused a snap-back */}
-        <LogosRow logos={[...half, ...half]} reverse={false} />
-        <LogosRow logos={[...otherHalf, ...otherHalf]} reverse />
+        <LogosRow logos={[...LOGOS, ...LOGOS]} reverse={false} />
+        <LogosRow logos={[...reversed, ...reversed]} reverse />
       </div>
     </section>
   );
