@@ -14,33 +14,87 @@ const OVERVIEW_VIEW = {
   bearing: 0,
 };
 
-// Top-down loop: cycles through every hospital in HOSPITALS array,
-// stays flat (no pitch), comfortable city-level zoom.
-const TOUR_INTERVAL_MS = 3500;
-const HOSPITAL_ZOOM = 9;
-const HOSPITAL_PITCH = 0;
-const FLY_DURATION_MS = 2800;
+// Slow + cinematic on click. Same Mapbox SKU — no cost change.
+const HOSPITAL_ZOOM = 16.5;
+const HOSPITAL_PITCH = 60;
+const FLY_DURATION_MS = 7500;
+const ORBIT_STEP_DEG = 6;
+const ORBIT_STEP_MS = 4500;
+const OVERVIEW_DURATION_MS = 3500;
 
 export default function HeroMap() {
   const sectionRef = useRef<HTMLDivElement>(null);
   const mapContainer = useRef<HTMLDivElement>(null);
   const mapRef = useRef<mapboxgl.Map | null>(null);
   const markersRef = useRef<mapboxgl.Marker[]>([]);
-  const [activeIdx, setActiveIdx] = useState<number>(0); // index into HOSPITALS — loop starts on the first one
-  const [paused, setPaused] = useState(false);
-  const [inView, setInView] = useState(true);
+  const orbitTimerRef = useRef<number | null>(null);
+  const orbitBearingRef = useRef<number>(0);
+  const activeIdxRef = useRef<number>(-1);
+
+  const [activeIdx, setActiveIdx] = useState<number>(-1); // currently focused hospital
+  const [hoverIdx, setHoverIdx] = useState<number>(-1);   // currently hovered pin
   const [ready, setReady] = useState(false);
 
-  // Off-screen pause — saves Mapbox tile fetches when hero is not visible
-  useEffect(() => {
-    if (!sectionRef.current) return;
-    const io = new IntersectionObserver(
-      (entries) => setInView(entries[0]?.isIntersecting ?? true),
-      { threshold: 0.05 }
-    );
-    io.observe(sectionRef.current);
-    return () => io.disconnect();
-  }, []);
+  const stopOrbit = () => {
+    if (orbitTimerRef.current !== null) {
+      window.clearTimeout(orbitTimerRef.current);
+      orbitTimerRef.current = null;
+    }
+  };
+
+  const startOrbit = (lng: number, lat: number, expectIdx: number) => {
+    stopOrbit();
+    orbitBearingRef.current = 0;
+    const tick = () => {
+      if (!mapRef.current) return;
+      if (activeIdxRef.current !== expectIdx) return;
+      orbitBearingRef.current = (orbitBearingRef.current + ORBIT_STEP_DEG) % 360;
+      mapRef.current.easeTo({
+        center: [lng, lat],
+        zoom: HOSPITAL_ZOOM,
+        pitch: HOSPITAL_PITCH,
+        bearing: orbitBearingRef.current,
+        duration: ORBIT_STEP_MS,
+        easing: (t) => t, // linear, no extra acceleration → calm
+      });
+      orbitTimerRef.current = window.setTimeout(tick, ORBIT_STEP_MS);
+    };
+    tick();
+  };
+
+  const focusHospital = (i: number) => {
+    if (!mapRef.current) return;
+    stopOrbit();
+    activeIdxRef.current = i;
+    setActiveIdx(i);
+    const h = HOSPITALS[i];
+    mapRef.current.flyTo({
+      center: [h.lng, h.lat],
+      zoom: HOSPITAL_ZOOM,
+      pitch: HOSPITAL_PITCH,
+      bearing: 0,
+      duration: FLY_DURATION_MS,
+      curve: 1.5,
+      essential: true,
+    });
+    // Start gentle orbit after the fly-in lands
+    window.setTimeout(() => {
+      if (activeIdxRef.current === i) startOrbit(h.lng, h.lat, i);
+    }, FLY_DURATION_MS + 200);
+  };
+
+  const goOverview = () => {
+    if (!mapRef.current) return;
+    stopOrbit();
+    activeIdxRef.current = -1;
+    setActiveIdx(-1);
+    mapRef.current.flyTo({
+      ...OVERVIEW_VIEW,
+      duration: OVERVIEW_DURATION_MS,
+      curve: 1.4,
+      essential: true,
+    });
+  };
 
   // Init map (once)
   useEffect(() => {
@@ -49,8 +103,9 @@ export default function HeroMap() {
 
     const map = new mapboxgl.Map({
       container: mapContainer.current,
-      // outdoors-v12 → green landmass, blue water, terrain shading. Reads "real map" not "blank SaaS canvas".
-      style: "mapbox://styles/mapbox/outdoors-v12",
+      // satellite-streets-v12 → real photographic satellite + roads/labels.
+      // The Google Earth feel without leaving the free tier.
+      style: "mapbox://styles/mapbox/satellite-streets-v12",
       ...OVERVIEW_VIEW,
       attributionControl: false,
       cooperativeGestures: false,
@@ -62,37 +117,31 @@ export default function HeroMap() {
     mapRef.current = map;
 
     map.on("load", () => {
-      const style = map.getStyle();
-      const layers = style?.layers ?? [];
-      layers.forEach((l) => {
-        if (l.type === "symbol" && /label|place|poi/.test(l.id) && !/country|state|continent/.test(l.id)) {
-          try { map.setLayoutProperty(l.id, "visibility", "none"); } catch {}
-        }
-      });
-
-
       HOSPITALS.forEach((h, i) => {
         const el = document.createElement("button");
         el.className = "sd-marker group relative grid place-items-center cursor-pointer";
         el.setAttribute("aria-label", h.name);
         el.innerHTML = `
-          <span class="sd-marker__halo absolute inset-0 -m-3 rounded-full"></span>
-          <span class="sd-marker__dot relative w-[10px] h-[10px] rounded-full bg-[#1a1a2e] ring-2 ring-white shadow-[0_4px_10px_rgba(26,26,46,0.3)] transition-all"></span>
+          <span class="sd-marker__halo absolute inset-0 -m-4 rounded-full"></span>
+          <span class="sd-marker__dot relative w-3 h-3 rounded-full bg-[#cde35d] ring-2 ring-[#1a1a2e] shadow-[0_4px_10px_rgba(26,26,46,0.45)] transition-all"></span>
         `;
-        el.onclick = () => {
-          setPaused(true);
-          setActiveIdx(i);
+        el.onclick = (e) => {
+          e.stopPropagation();
+          focusHospital(i);
         };
+        el.onmouseenter = () => setHoverIdx(i);
+        el.onmouseleave = () => setHoverIdx(-1);
+
         const marker = new mapboxgl.Marker({ element: el, anchor: "center" })
           .setLngLat([h.lng, h.lat])
           .addTo(map);
         markersRef.current.push(marker);
       });
-
       setReady(true);
     });
 
     return () => {
+      stopOrbit();
       markersRef.current.forEach((m) => m.remove());
       markersRef.current = [];
       map.remove();
@@ -100,62 +149,42 @@ export default function HeroMap() {
     };
   }, []);
 
-  // Auto-cycle through every hospital in order, looping forever.
+  // Pause orbit when section scrolls off-screen — saves tile fetches
   useEffect(() => {
-    if (!ready || paused || !inView) return;
-    const id = window.setInterval(() => {
-      setActiveIdx((prev) => (prev + 1) % HOSPITALS.length);
-    }, TOUR_INTERVAL_MS);
-    return () => window.clearInterval(id);
-  }, [ready, paused, inView]);
+    if (!sectionRef.current) return;
+    const io = new IntersectionObserver(
+      (entries) => {
+        const inView = entries[0]?.isIntersecting ?? true;
+        if (!inView && orbitTimerRef.current !== null) stopOrbit();
+        else if (inView && activeIdxRef.current >= 0 && orbitTimerRef.current === null) {
+          const h = HOSPITALS[activeIdxRef.current];
+          startOrbit(h.lng, h.lat, activeIdxRef.current);
+        }
+      },
+      { threshold: 0.05 },
+    );
+    io.observe(sectionRef.current);
+    return () => io.disconnect();
+  }, []);
 
-  // Drive flyTo + marker active styling when activeIdx changes
+  // Apply active styling to markers
   useEffect(() => {
-    if (!ready || !mapRef.current) return;
-    const map = mapRef.current;
-
+    if (!ready) return;
     markersRef.current.forEach((m, i) => {
       const el = m.getElement();
-      if (i === activeIdx) el.classList.add("is-active");
-      else el.classList.remove("is-active");
+      el.classList.toggle("is-active", i === activeIdx);
+      el.classList.toggle("is-hover", i === hoverIdx && i !== activeIdx);
     });
+  }, [activeIdx, hoverIdx, ready]);
 
-    if (activeIdx === -1) {
-      map.flyTo({
-        ...OVERVIEW_VIEW,
-        duration: 2800,
-        essential: true,
-        curve: 1.4,
-      });
-      return;
-    }
-
-    const h = HOSPITALS[activeIdx];
-    const bearings = [-22, 18, -10, 28, -32, 14, -18, 24];
-    map.flyTo({
-      center: [h.lng, h.lat],
-      zoom: HOSPITAL_ZOOM,
-      pitch: HOSPITAL_PITCH,
-      bearing: bearings[activeIdx % bearings.length],
-      duration: FLY_DURATION_MS,
-      essential: true,
-      curve: 1.7,
-    });
-  }, [activeIdx, ready]);
-
-  // Auto-resume the tour 8s after a manual marker click
-  useEffect(() => {
-    if (!paused) return;
-    const id = window.setTimeout(() => setPaused(false), 8000);
-    return () => window.clearTimeout(id);
-  }, [paused, activeIdx]);
-
-  const active = activeIdx >= 0 ? HOSPITALS[activeIdx] : null;
+  // The chip showing hospital info — hover takes priority, falls back to active
+  const chipIdx = hoverIdx >= 0 ? hoverIdx : activeIdx;
+  const chipHospital = chipIdx >= 0 ? HOSPITALS[chipIdx] : null;
   const tokenMissing = !TOKEN;
 
   return (
     <section ref={sectionRef} className="relative bg-white pt-24 md:pt-28 pb-16 md:pb-24 px-4 md:px-6">
-      {/* soft ocean halo behind the frame */}
+      {/* soft halo behind the frame */}
       <div
         aria-hidden
         className="pointer-events-none absolute left-1/2 top-[15%] -translate-x-1/2 w-[92%] max-w-[1320px] h-[88%] rounded-[40px] blur-3xl opacity-30"
@@ -166,7 +195,7 @@ export default function HeroMap() {
       />
 
       <div className="relative max-w-[1320px] mx-auto">
-        {/* eyebrow row */}
+        {/* eyebrow */}
         <div className="flex items-center justify-between mb-3 px-1">
           <div className="text-[10px] md:text-[11px] tracking-[0.22em] uppercase text-muted font-medium">
             Australia&apos;s locum doctor marketplace
@@ -176,7 +205,7 @@ export default function HeroMap() {
               <span className="absolute inline-flex h-full w-full rounded-full bg-electric opacity-75 animate-ping-slow" />
               <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-electric" />
             </span>
-            Live tour · {HOSPITALS.length} partners
+            {HOSPITALS.length} partners · interactive
           </div>
         </div>
 
@@ -190,7 +219,7 @@ export default function HeroMap() {
           {tokenMissing && (
             <div className="absolute inset-0 grid place-items-center bg-bone">
               <div className="text-center max-w-md px-6">
-                <div className="eyebrow mb-3">Map disabled</div>
+                <div className="text-[10px] tracking-[0.22em] uppercase text-muted mb-2">Map disabled</div>
                 <p className="text-sm text-muted">
                   Add <code className="px-1.5 py-0.5 rounded bg-white border border-ink/15">NEXT_PUBLIC_MAPBOX_TOKEN</code> to <code className="px-1.5 py-0.5 rounded bg-white border border-ink/15">.env.local</code> and restart.
                 </p>
@@ -198,21 +227,21 @@ export default function HeroMap() {
             </div>
           )}
 
-          {/* Top-right active label */}
+          {/* Hospital info chip — top-right, follows hover (priority) or active */}
           <AnimatePresence mode="wait">
-            {active && (
+            {chipHospital && (
               <motion.div
-                key={active.name}
+                key={chipHospital.name}
                 initial={{ opacity: 0, y: -8 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -8 }}
-                transition={{ duration: 0.4, ease: [0.2, 0.8, 0.2, 1] }}
-                className="absolute top-4 right-4 md:top-5 md:right-5 z-10 flex items-center gap-2.5 px-4 py-2.5 rounded-full bg-white/92 backdrop-blur-md border border-ink/10 shadow-sm max-w-[88vw]"
+                transition={{ duration: 0.3, ease: [0.2, 0.8, 0.2, 1] }}
+                className="absolute top-4 right-4 md:top-5 md:right-5 z-10 flex items-center gap-2.5 px-4 py-2.5 rounded-full bg-white/95 backdrop-blur-md border border-ink/10 shadow-lg max-w-[88vw]"
               >
                 <span className="w-2 h-2 rounded-full bg-electric shrink-0" />
                 <div className="text-[13px] md:text-[14px] truncate leading-tight">
-                  <span className="font-semibold">{active.name}</span>
-                  <span className="text-muted text-[11px] md:text-[12px]"> · {active.state} · {active.type}</span>
+                  <span className="font-semibold">{chipHospital.name}</span>
+                  <span className="text-muted text-[11px] md:text-[12px]"> · {chipHospital.state} · {chipHospital.type}</span>
                 </div>
               </motion.div>
             )}
@@ -258,12 +287,33 @@ export default function HeroMap() {
             </div>
           </motion.div>
 
+          {/* Back to Australia — top-left, only when zoomed in */}
+          <AnimatePresence>
+            {activeIdx >= 0 && (
+              <motion.button
+                initial={{ opacity: 0, x: -12 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -12 }}
+                transition={{ duration: 0.3 }}
+                onClick={goOverview}
+                className="absolute top-4 left-4 md:top-5 md:left-5 z-10 inline-flex items-center gap-2 px-4 py-2.5 rounded-full bg-ink text-white text-xs md:text-sm font-semibold shadow-lg hover:bg-ocean transition-colors"
+                data-hover
+              >
+                <span aria-hidden>←</span>
+                Back to Australia
+              </motion.button>
+            )}
+          </AnimatePresence>
         </div>
 
-        {/* Caption row */}
+        {/* Caption */}
         <div className="mt-4 flex items-center justify-between px-1 text-[10px] tracking-[0.22em] uppercase text-muted">
-          <span>Looping through {HOSPITALS.length} partners across Australia</span>
-          <span className="hidden md:inline">Click any pin to focus</span>
+          <span>
+            {activeIdx >= 0
+              ? "Drag back or hit ← to see all 44 partners"
+              : "Click any pin to see our partner"}
+          </span>
+          <span className="hidden md:inline">Hover for details</span>
         </div>
       </div>
 
@@ -274,23 +324,33 @@ export default function HeroMap() {
           background: radial-gradient(circle, rgba(205,227,93,0.55), rgba(205,227,93,0) 65%);
           opacity: 0;
           transform: scale(0.6);
-          transition: opacity 0.4s ease, transform 0.6s ease;
+          transition: opacity 0.35s ease, transform 0.5s ease;
         }
-        .sd-marker.is-active .sd-marker__halo {
+        .sd-marker:hover .sd-marker__dot,
+        .sd-marker.is-hover .sd-marker__dot {
+          transform: scale(1.35);
+          background: #cde35d;
+          box-shadow: 0 0 0 3px #1a1a2e, 0 6px 18px rgba(26,26,46,0.45);
+        }
+        .sd-marker:hover .sd-marker__halo,
+        .sd-marker.is-hover .sd-marker__halo {
           opacity: 1;
-          transform: scale(1.4);
-          animation: sd-marker-pulse 2.2s ease-out infinite;
+          transform: scale(1.2);
         }
         .sd-marker.is-active .sd-marker__dot {
           background: #cde35d;
-          box-shadow: 0 0 0 3px #1a1a2e, 0 6px 18px rgba(26,26,46,0.35);
-          transform: scale(1.4);
+          box-shadow: 0 0 0 3px #1a1a2e, 0 6px 22px rgba(205,227,93,0.65);
+          transform: scale(1.5);
         }
-        .sd-marker:hover .sd-marker__dot { transform: scale(1.25); }
+        .sd-marker.is-active .sd-marker__halo {
+          opacity: 1;
+          transform: scale(1.5);
+          animation: sd-marker-pulse 2.6s ease-out infinite;
+        }
         @keyframes sd-marker-pulse {
           0%   { opacity: 0.85; transform: scale(0.9); }
-          70%  { opacity: 0;    transform: scale(2.4); }
-          100% { opacity: 0;    transform: scale(2.4); }
+          70%  { opacity: 0;    transform: scale(2.6); }
+          100% { opacity: 0;    transform: scale(2.6); }
         }
         .mapboxgl-canvas:focus { outline: none; }
         .mapboxgl-ctrl-logo, .mapboxgl-ctrl-attrib { display: none !important; }

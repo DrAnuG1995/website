@@ -130,6 +130,61 @@ const STEPS = [
 ];
 
 function HowItWorksDNA() {
+  return (
+    <>
+      <HowItWorksDNAMobile />
+      <HowItWorksDNADesktop />
+    </>
+  );
+}
+
+function HowItWorksDNAMobile() {
+  return (
+    <section className="md:hidden bg-white py-16 px-6">
+      <div className="max-w-md mx-auto">
+        <div className="text-center mb-10">
+          <div className="text-[10px] tracking-[0.22em] uppercase text-muted mb-2">
+            How StatDoctor works
+          </div>
+          <h2 className="display text-[28px] leading-[1.05]">
+            Four steps. <span className="italic text-ocean">No agency in the middle.</span>
+          </h2>
+        </div>
+        <ol className="relative space-y-4 pl-6 border-l-2 border-ocean/15">
+          {STEPS.map((s, i) => (
+            <motion.li
+              key={s.n}
+              initial={{ opacity: 0, x: -12 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true, margin: "-50px" }}
+              transition={{ duration: 0.5, delay: i * 0.08, ease: [0.2, 0.8, 0.2, 1] }}
+              className="relative"
+            >
+              <span
+                aria-hidden
+                className="absolute -left-[33px] top-2 w-4 h-4 rounded-full bg-white border-2 border-ocean ring-4 ring-ocean/10"
+              >
+                <span className="absolute inset-1 rounded-full bg-electric" />
+              </span>
+              <div className="rounded-2xl bg-white border border-ink/10 p-4 shadow-sm">
+                <div className="flex items-center justify-between mb-2">
+                  <div className="text-[10px] tracking-[0.22em] uppercase text-muted">Step {s.n}</div>
+                  <div className="w-5 h-5 rounded-full bg-ocean/10 grid place-items-center text-[10px] font-bold text-ocean">
+                    {i + 1}
+                  </div>
+                </div>
+                <h3 className="display text-xl mb-1.5 leading-tight">{s.title}.</h3>
+                <p className="text-[13px] text-muted leading-relaxed">{s.body}</p>
+              </div>
+            </motion.li>
+          ))}
+        </ol>
+      </div>
+    </section>
+  );
+}
+
+function HowItWorksDNADesktop() {
   const ref = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({
     target: ref,
@@ -192,7 +247,7 @@ function HowItWorksDNA() {
   });
 
   return (
-    <section ref={ref} className="relative bg-white" style={{ height: "280vh" }}>
+    <section ref={ref} className="hidden md:block relative bg-white" style={{ height: "280vh" }}>
       <div className="sticky top-0 h-screen flex flex-col justify-center overflow-hidden">
         {/* soft tinted backdrop */}
         <div
