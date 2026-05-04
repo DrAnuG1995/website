@@ -2,7 +2,7 @@
 // For each hospital, search Nominatim by exact name + state. Only propose
 // an update if the Nominatim display_name actually contains a strong match
 // for the hospital name (token overlap), and the result is within 30 km of
-// the existing coord. Skip everything else — don't guess.
+// the existing coord. Skip everything else, don't guess.
 //
 // Usage:
 //   node scripts/check-pins-strict.mjs            # dry run
@@ -37,7 +37,7 @@ const STOP = new Set([
   "multipurpose","plaza","group","care","corp","corporation"
 ]);
 function tokens(s) {
-  return s.toLowerCase().replace(/[—–\-–_,.()]/g, " ").split(/\s+/).filter((t) => t && !STOP.has(t) && t.length > 2);
+  return s.toLowerCase().replace(/[,–\-–_,.()]/g, " ").split(/\s+/).filter((t) => t && !STOP.has(t) && t.length > 2);
 }
 function overlapScore(hospitalName, displayName) {
   const a = tokens(hospitalName);
@@ -62,15 +62,15 @@ const proposals = [];
 const skipped = [];
 
 for (const h of rows) {
-  // Strip "ED" / "—" suffixes that confuse Nominatim
-  const cleanName = h.name.replace(/\s*[—–-]\s*/g, " ").replace(/\bED\b/g, "").trim();
+  // Strip "ED" / "," suffixes that confuse Nominatim
+  const cleanName = h.name.replace(/\s*[,–-]\s*/g, " ").replace(/\bED\b/g, "").trim();
   const q = encodeURIComponent(`${cleanName}, ${stateFull[h.state]}, Australia`);
   const url = `https://nominatim.openstreetmap.org/search?format=jsonv2&q=${q}&limit=8&countrycodes=au&addressdetails=0`;
   let chosen = null;
   let allMatches = [];
   try {
     const res = await fetch(url, {
-      headers: { "User-Agent": "statdoctor-strict/1.0 (anu@statdoctor.net)" },
+      headers: { "User-Agent": "statdoctor-strict/1.0 (Admin@statdoctor.net)" },
     });
     const matches = await res.json();
     if (Array.isArray(matches)) {

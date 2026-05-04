@@ -3,7 +3,7 @@
 // Usage: node scripts/audit-hospital-pins.mjs
 import { HOSPITALS } from "../components/home/hospitals.ts";
 
-// Tiny TS-stripping import shim — Node 22 ESM can require type stripping.
+// Tiny TS-stripping import shim, Node 22 ESM can require type stripping.
 // Easier: read the data as plain JS via a tiny duplicate. Below we re-import
 // only the array, stripping types through a regex pre-pass.
 import { readFileSync } from "node:fs";
@@ -18,7 +18,7 @@ while ((m = re.exec(file)) !== null) {
   rows.push({ name: m[1], state: m[2], lng: parseFloat(m[3]), lat: parseFloat(m[4]) });
 }
 
-console.log(`Found ${rows.length} hospitals — auditing…\n`);
+console.log(`Found ${rows.length} hospitals, auditing…\n`);
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 const flagged = [];
@@ -27,7 +27,7 @@ for (const h of rows) {
   const url = `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${h.lat}&lon=${h.lng}&zoom=14`;
   try {
     const res = await fetch(url, {
-      headers: { "User-Agent": "statdoctor-audit/1.0 (anu@statdoctor.net)" },
+      headers: { "User-Agent": "statdoctor-audit/1.0 (Admin@statdoctor.net)" },
     });
     const j = await res.json();
     const display = j.display_name ?? "(no result)";

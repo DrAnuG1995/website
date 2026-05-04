@@ -40,7 +40,7 @@ for (const h of rows) {
   let result = null;
   try {
     const res = await fetch(url, {
-      headers: { "User-Agent": "statdoctor-regeocode/1.0 (anu@statdoctor.net)" },
+      headers: { "User-Agent": "statdoctor-regeocode/1.0 (Admin@statdoctor.net)" },
     });
     const matches = await res.json();
     if (Array.isArray(matches) && matches.length) {

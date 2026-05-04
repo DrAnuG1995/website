@@ -38,7 +38,7 @@ const FIXES = [
   ["Noosa Private Hospital", 153.0457, -26.4026],     // Goodchap Street, Noosaville
   ["Yarrawonga Health", 146.0042, -36.0102],          // Belmore Street, Yarrawonga
   ["Portland District Health", 141.6063, -38.3414],   // Bentinck Street, Portland
-  ["Friendly Society Private — Bundaberg", 152.3425, -24.8708], // Crofton St, Bundaberg West
+  ["Friendly Society Private, Bundaberg", 152.3425, -24.8708], // Crofton St, Bundaberg West
 ];
 
 let file = readFileSync(FILE, "utf8");

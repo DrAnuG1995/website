@@ -32,12 +32,12 @@ export default function Footer() {
               StatDoctor.
             </h2>
             <p className="mt-5 max-w-md text-sm text-bone/70 leading-relaxed">
-              Australia&apos;s first locum doctor marketplace. No agencies, no hidden fees, zero commission — ever.
+              Australia&apos;s first locum doctor marketplace. No agencies, no hidden fees, zero commission, ever.
             </p>
           </div>
           <div className="flex flex-col gap-2 md:items-end">
             <Link
-              href="https://linktr.ee/statdoctorau"
+              href="/for-doctors"
               className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-full bg-electric text-ink text-xs md:text-sm font-semibold hover:bg-ocean hover:text-white transition-colors"
               data-hover
             >
@@ -59,8 +59,8 @@ export default function Footer() {
         <FooterCol
           title="Platform"
           links={[
-            { href: "/", label: "For Doctors" },
-            { href: "/hospitals", label: "For Hospitals" },
+            { href: "/for-doctors", label: "For doctors" },
+            { href: "/hospitals", label: "For hospitals" },
             { href: "/partners", label: "Partners" },
           ]}
         />
@@ -69,7 +69,7 @@ export default function Footer() {
           links={[
             { href: "/blog", label: "Blog" },
             { href: "/contact", label: "Contact" },
-            { href: "https://linktr.ee/statdoctorau", label: "Download app", external: true },
+            { href: "mailto:Admin@statdoctor.net", label: "Admin@statdoctor.net" },
           ]}
         />
         <FooterCol
@@ -84,6 +84,8 @@ export default function Footer() {
           links={[
             { href: "https://apps.apple.com/au/app/statdoctor/id6452677138", label: "App Store", external: true },
             { href: "https://play.google.com/store/apps/details?id=user.statdoctor.app&hl=en_AU", label: "Google Play", external: true },
+            { href: "https://www.linkedin.com/company/statdoctor/", label: "LinkedIn", external: true },
+            { href: "https://www.facebook.com/p/StatDoctor-100088461867629/", label: "Facebook", external: true },
           ]}
         />
       </div>
@@ -92,7 +94,7 @@ export default function Footer() {
       <div className="relative max-w-[1320px] mx-auto px-6 md:px-8 pb-10 pt-6 border-t border-bone/10 flex flex-col md:flex-row items-start md:items-center justify-between gap-3 text-xs tracking-[0.22em] uppercase text-bone/50">
         <span>© 2026 StatDoctor</span>
         <span>Made in Australia</span>
-        <span>Verified by AHPRA · ABN 00 000 000 000</span>
+        <span>ABN 63 671 408 692</span>
       </div>
 
       {/* Quiet accent strip */}

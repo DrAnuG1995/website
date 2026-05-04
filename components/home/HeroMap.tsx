@@ -4,6 +4,9 @@ import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 import { motion, AnimatePresence } from "framer-motion";
 import { HOSPITALS } from "./hospitals";
+import Counter from "@/components/Counter";
+
+const IDLE_RETURN_MS = 60_000;
 
 const TOKEN = process.env.NEXT_PUBLIC_MAPBOX_TOKEN ?? "";
 
@@ -16,7 +19,7 @@ const OVERVIEW_VIEW = {
 
 // Page-load intro: globe centred on the Indian Ocean (Asia + Australia
 // hemisphere already visible), at zoom 1.2 so the full atmosphere halo
-// reads against the dark void — matches the Google Earth orbit look.
+// reads against the dark void, matches the Google Earth orbit look.
 const INTRO_START = {
   center: [85, -5] as [number, number],
   zoom: 1.2,
@@ -49,6 +52,7 @@ export default function HeroMap() {
   const mapRef = useRef<mapboxgl.Map | null>(null);
   const markersRef = useRef<mapboxgl.Marker[]>([]);
   const activeIdxRef = useRef<number>(-1);
+  const idleTimerRef = useRef<number | null>(null);
 
   const [activeIdx, setActiveIdx] = useState<number>(-1);   // currently focused hospital
   const [hoverIdx, setHoverIdx] = useState<number>(-1);     // currently hovered pin
@@ -72,7 +76,15 @@ export default function HeroMap() {
     });
   };
 
+  const clearIdleTimer = () => {
+    if (idleTimerRef.current !== null) {
+      window.clearTimeout(idleTimerRef.current);
+      idleTimerRef.current = null;
+    }
+  };
+
   const goOverview = () => {
+    clearIdleTimer();
     if (!mapRef.current) return;
     activeIdxRef.current = -1;
     setActiveIdx(-1);
@@ -94,7 +106,7 @@ export default function HeroMap() {
       // Outdoors style: terrain shading + roads + labels, no satellite imagery.
       // Reads bright at any zoom and works for remote AU sites where satellite is poor.
       style: "mapbox://styles/mapbox/outdoors-v12",
-      // Start as a globe far from Australia — we spin in on load.
+      // Start as a globe far from Australia, we spin in on load.
       projection: { name: "globe" },
       ...INTRO_START,
       attributionControl: false,
@@ -145,11 +157,12 @@ export default function HeroMap() {
     map.on("load", () => {
       HOSPITALS.forEach((h, i) => {
         const el = document.createElement("button");
-        el.className = "sd-marker group relative grid place-items-center cursor-pointer";
+        el.className = "sd-marker group relative cursor-pointer";
         el.setAttribute("aria-label", h.name);
+        // Plain white disc with an ink ring, reads as a clean dot at any zoom.
         el.innerHTML = `
-          <span class="sd-marker__halo absolute inset-0 -m-4 rounded-full"></span>
-          <span class="sd-marker__dot relative w-3 h-3 rounded-full bg-white ring-2 ring-[#1a1a2e] shadow-[0_4px_10px_rgba(26,26,46,0.45)] transition-all"></span>
+          <span class="sd-marker__halo absolute inset-0 -m-3 rounded-full"></span>
+          <span class="sd-marker__pin relative block rounded-full bg-white ring-2 ring-[#1a1a2e] shadow-[0_4px_10px_rgba(26,26,46,0.45)] transition-all"></span>
         `;
         el.onclick = (e) => {
           e.stopPropagation();
@@ -184,6 +197,30 @@ export default function HeroMap() {
     });
   }, [activeIdx, hoverIdx, ready]);
 
+  // Idle return: if a hospital is focused and the user stops interacting for
+  // IDLE_RETURN_MS, fly back to the Australia overview. Any pin click, map
+  // pan/zoom, or hover resets the timer.
+  useEffect(() => {
+    clearIdleTimer();
+    if (activeIdx < 0 || !mapRef.current) return;
+
+    const map = mapRef.current;
+    const reset = () => {
+      clearIdleTimer();
+      idleTimerRef.current = window.setTimeout(() => {
+        if (activeIdxRef.current >= 0) goOverview();
+      }, IDLE_RETURN_MS);
+    };
+    reset();
+    map.on("movestart", reset);
+    map.on("zoomstart", reset);
+    return () => {
+      clearIdleTimer();
+      map.off("movestart", reset);
+      map.off("zoomstart", reset);
+    };
+  }, [activeIdx]);
+
   // Hover takes priority, then active dive.
   const focusIdx = hoverIdx >= 0 ? hoverIdx : activeIdx;
   const focusHospitalData = focusIdx >= 0 ? HOSPITALS[focusIdx] : null;
@@ -212,7 +249,7 @@ export default function HeroMap() {
               <span className="absolute inline-flex h-full w-full rounded-full bg-electric opacity-75 animate-ping-slow" />
               <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-electric" />
             </span>
-            {HOSPITALS.length} partners · interactive
+            Live · {HOSPITALS.length} partners
           </div>
         </div>
 
@@ -234,7 +271,7 @@ export default function HeroMap() {
             </div>
           )}
 
-          {/* Hospital info chip — top-right, on hover or active */}
+          {/* Hospital info chip, top-right, on hover or active */}
           <AnimatePresence mode="wait">
             {focusHospitalData && (
               <motion.div
@@ -254,7 +291,7 @@ export default function HeroMap() {
             )}
           </AnimatePresence>
 
-            {/* Floating glass CTA card — bottom-left, pops in once the camera lands on Australia */}
+            {/* Floating glass CTA card, bottom-left, pops in once the camera lands on Australia */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={introDone ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
@@ -268,11 +305,11 @@ export default function HeroMap() {
               </h1>
 
               <div className="mt-4 flex items-center gap-4 text-[10px] tracking-[0.18em] uppercase">
-                <Stat value={`${HOSPITALS.length}`} label="Hospitals" />
+                <Stat to={HOSPITALS.length} label="Hospitals" play={introDone} />
                 <span className="w-px h-6 bg-ink/15" />
-                <Stat value="300+" label="Doctors" />
+                <Stat to={300} suffix="+" label="Doctors" play={introDone} />
                 <span className="w-px h-6 bg-ink/15" />
-                <Stat value="0%" label="Commission" />
+                <Stat to={500} prefix="$" suffix="+" label="More per shift" play={introDone} />
               </div>
 
               <div className="mt-5 flex flex-col sm:flex-row gap-2">
@@ -295,7 +332,7 @@ export default function HeroMap() {
               </div>
             </motion.div>
 
-            {/* Back to Australia — top-left, only when zoomed in */}
+            {/* Back to Australia, top-left, only when zoomed in */}
             <AnimatePresence>
               {activeIdx >= 0 && (
                 <motion.button
@@ -325,19 +362,20 @@ export default function HeroMap() {
         </div>
       </div>
 
-      {/* Marker styles — white pin, ink ring, electric halo on hover/active */}
+      {/* Marker styles, white disc with the hospital logo inside. The pin
+          itself stays white at every state; hover/active scale + halo. */}
       <style jsx global>{`
-        .sd-marker { transform: translate(-50%, -50%); }
+        .sd-marker { transform: translate(-50%, -50%); padding: 0; background: transparent; border: 0; }
+        .sd-marker__pin { width: 11px; height: 11px; }
         .sd-marker__halo {
           background: radial-gradient(circle, rgba(80,80,255,0.45), rgba(80,80,255,0) 65%);
           opacity: 0;
           transform: scale(0.6);
           transition: opacity 0.35s ease, transform 0.5s ease;
         }
-        .sd-marker:hover .sd-marker__dot,
-        .sd-marker.is-hover .sd-marker__dot {
-          transform: scale(1.35);
-          background: #ffffff;
+        .sd-marker:hover .sd-marker__pin,
+        .sd-marker.is-hover .sd-marker__pin {
+          transform: scale(1.2);
           box-shadow: 0 0 0 3px #1a1a2e, 0 6px 18px rgba(26,26,46,0.45);
         }
         .sd-marker:hover .sd-marker__halo,
@@ -345,10 +383,9 @@ export default function HeroMap() {
           opacity: 1;
           transform: scale(1.2);
         }
-        .sd-marker.is-active .sd-marker__dot {
-          background: #1a1a2e;
-          box-shadow: 0 0 0 3px #ffffff, 0 6px 22px rgba(80,80,255,0.55);
-          transform: scale(1.5);
+        .sd-marker.is-active .sd-marker__pin {
+          box-shadow: 0 0 0 3px #1a1a2e, 0 6px 22px rgba(80,80,255,0.55);
+          transform: scale(1.4);
         }
         .sd-marker.is-active .sd-marker__halo {
           opacity: 1;
@@ -367,11 +404,27 @@ export default function HeroMap() {
   );
 }
 
-function Stat({ value, label }: { value: string; label: string }) {
+function Stat({
+  to,
+  prefix = "",
+  suffix = "",
+  label,
+  play,
+}: {
+  to: number;
+  prefix?: string;
+  suffix?: string;
+  label: string;
+  play: boolean;
+}) {
   return (
     <div>
       <div className="display text-xl md:text-2xl normal-case tracking-tight leading-none">
-        {value}
+        {play ? (
+          <Counter to={to} prefix={prefix} suffix={suffix} duration={1.6} />
+        ) : (
+          <span className="tabular-nums">{prefix}0{suffix}</span>
+        )}
       </div>
       <div className="mt-1 text-[9px] text-muted">{label}</div>
     </div>

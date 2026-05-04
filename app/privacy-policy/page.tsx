@@ -1,5 +1,5 @@
 import LegalPage from "@/components/LegalPage";
-export const metadata = { title: "Privacy Policy — StatDoctor" };
+export const metadata = { title: "Privacy Policy, StatDoctor" };
 
 export default function Page() {
   return (
@@ -35,12 +35,12 @@ export default function Page() {
       <h2>Your rights</h2>
       <p>
         You can access, correct, or delete your data at any time by emailing{" "}
-        <a className="link-underline text-ocean" href="mailto:privacy@statdoctor.net">privacy@statdoctor.net</a>. We&apos;ll respond within 30 days.
+        <a className="link-underline text-ocean" href="mailto:Admin@statdoctor.net">Admin@statdoctor.net</a>. We&apos;ll respond within 30 days.
       </p>
       <h2>Contact</h2>
       <p>
         Questions? Reach the privacy officer at{" "}
-        <a className="link-underline text-ocean" href="mailto:privacy@statdoctor.net">privacy@statdoctor.net</a>.
+        <a className="link-underline text-ocean" href="mailto:Admin@statdoctor.net">Admin@statdoctor.net</a>.
       </p>
     </LegalPage>
   );

@@ -14,6 +14,10 @@ const config: Config = {
         leaf: "#2f8f6e",         // muted medical green — for FAQ + map terrain
         muted: "#6b7a73",
         line: "#E2DCC8",
+        // Lavender — used for the How-It-Works cards. Soft enough to read as
+        // a tint of brand ocean, light enough to keep dark text legible.
+        lavender: "#EFEDFF",
+        "lavender-2": "#E5E1FF",
         // Legacy tokens — kept only for old pages still using them.
         "bone-2": "#EFE9DC",
         gauze: "#E8DFCB",
@@ -24,7 +28,7 @@ const config: Config = {
         stat: "#FF5A36",
       },
       fontFamily: {
-        display: ['"Instrument Serif"', "Georgia", "serif"],
+        display: ['"Cormorant Garamond"', '"Instrument Serif"', "Georgia", "serif"],
         sans: ['"Inter"', "system-ui", "sans-serif"],
         mono: ['"Inter"', "system-ui", "sans-serif"],
       },

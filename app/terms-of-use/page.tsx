@@ -1,5 +1,5 @@
 import LegalPage from "@/components/LegalPage";
-export const metadata = { title: "Terms of Use — StatDoctor" };
+export const metadata = { title: "Terms of Use, StatDoctor" };
 
 export default function Page() {
   return (
@@ -46,7 +46,7 @@ export default function Page() {
       </p>
       <h2>Contact</h2>
       <p>
-        <a className="link-underline text-ocean" href="mailto:legal@statdoctor.net">legal@statdoctor.net</a>
+        <a className="link-underline text-ocean" href="mailto:Admin@statdoctor.net">Admin@statdoctor.net</a>
       </p>
     </LegalPage>
   );

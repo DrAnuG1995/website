@@ -1,18 +1,15 @@
 "use client";
-import { useEffect, useMemo, useRef, useState } from "react";
-import {
-  motion,
-  useScroll,
-  useTransform,
-  useSpring,
-  AnimatePresence,
-} from "framer-motion";
+import { useEffect, useRef, useState } from "react";
+import { motion } from "framer-motion";
 import HeroMap from "@/components/home/HeroMap";
+import AppShowcase from "@/components/home/AppShowcase";
+import AgencyCompare from "@/components/home/AgencyCompare";
+import LiveShiftFeed from "@/components/home/LiveShiftFeed";
 
 /* =========================================================
-   HOMEPAGE — clean rebuild
-   01 Hero map · 02 Logos · 03 DNA · 04 Founder video ·
-   05 Testimonials (Lyra columns) · 06 FAQ
+   HOMEPAGE, doctor-download funnel
+   01 Hero map · 02 Logos · 03 Founder video · 04 App showcase ·
+   05 Doctor voices · 06 FAQ · 07 Final CTA
    ========================================================= */
 
 export default function HomeClient() {
@@ -21,15 +18,18 @@ export default function HomeClient() {
       <HeroMap />
       <LogosStrip />
       <FounderVideo />
-      <HowItWorksDNA />
+      <AppShowcase />
+      <AgencyCompare />
+      <LiveShiftFeed />
       <DoctorVoicesPinned />
       <FAQGrid />
+      <FinalCTA />
     </div>
   );
 }
 
 /* ============================================================
-   02 — LOGOS STRIP
+   02, LOGOS STRIP
    ============================================================ */
 const LOGOS = [
   "https://cdn.prod.website-files.com/688db6d677516719c3925d01/69891c5f64ac3ee08b11eea1_1.png",
@@ -47,11 +47,12 @@ const LOGOS = [
 ];
 
 function LogosStrip() {
-  // Full array doubled — 24 logos per row guarantees the strip is wider than
-  // any viewport, so the seamless -50% loop never reveals empty trailing space.
-  const reversed = LOGOS.slice().reverse();
+  // Single row, doubled for a seamless -50% loop. Each logo sits inside a
+  // fixed-width slot so visible spacing reads identical regardless of the
+  // logo's natural width.
+  const doubled = [...LOGOS, ...LOGOS];
   return (
-    <section className="py-14 md:py-16 border-y border-ink/8 bg-white">
+    <section className="py-12 md:py-14 bg-white">
       <div className="max-w-[1280px] mx-auto px-6 mb-10">
         <motion.div
           initial={{ opacity: 0, y: 18 }}
@@ -67,421 +68,31 @@ function LogosStrip() {
             </h2>
           </div>
           <div className="text-[10px] tracking-[0.22em] uppercase text-muted">
-            44 partners · growing weekly
+            60+ partners · growing weekly
           </div>
         </motion.div>
       </div>
 
-      <div className="space-y-4">
-        <LogosRow logos={[...LOGOS, ...LOGOS]} reverse={false} />
-        <LogosRow logos={[...reversed, ...reversed]} reverse />
-      </div>
-    </section>
-  );
-}
-
-function LogosRow({ logos, reverse }: { logos: string[]; reverse: boolean }) {
-  return (
-    <div className="marquee-mask">
-      <div
-        className={`flex gap-12 md:gap-16 w-max items-center ${
-          reverse ? "animate-marquee-reverse" : "animate-marquee-slow"
-        } hover:[animation-play-state:paused]`}
-      >
-        {logos.map((src, i) => (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            key={i}
-            src={src}
-            alt=""
-            className="h-12 md:h-16 w-auto opacity-60 hover:opacity-100 transition-opacity duration-500 grayscale hover:grayscale-0"
-          />
-        ))}
-      </div>
-    </div>
-  );
-}
-
-/* ============================================================
-   03 — HOW IT WORKS · horizontal dot-particle DNA
-   Sequential reveal: only the active step's card shows
-   ============================================================ */
-const STEPS = [
-  {
-    n: "01",
-    title: "Verify",
-    body: "Upload AHPRA, indemnity and your CV once. Verified overnight.",
-  },
-  {
-    n: "02",
-    title: "Match",
-    body: "See every open shift in your state with the rate shown upfront.",
-  },
-  {
-    n: "03",
-    title: "Book",
-    body: "One tap to apply. The hospital confirms — usually within hours.",
-  },
-  {
-    n: "04",
-    title: "Paid",
-    body: "Money in your account within 48 hours. Zero chasing finance.",
-  },
-];
-
-function HowItWorksDNA() {
-  return (
-    <>
-      <HowItWorksDNAMobile />
-      <HowItWorksDNADesktop />
-    </>
-  );
-}
-
-function HowItWorksDNAMobile() {
-  return (
-    <section className="md:hidden bg-white py-16 px-6">
-      <div className="max-w-md mx-auto">
-        <div className="text-center mb-10">
-          <div className="text-[10px] tracking-[0.22em] uppercase text-muted mb-2">
-            How StatDoctor works
-          </div>
-          <h2 className="display text-[28px] leading-[1.05]">
-            Four steps. <span className="italic text-ocean">No agency in the middle.</span>
-          </h2>
-        </div>
-        <ol className="relative space-y-4 pl-6 border-l-2 border-ocean/15">
-          {STEPS.map((s, i) => (
-            <motion.li
-              key={s.n}
-              initial={{ opacity: 0, x: -12 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true, margin: "-50px" }}
-              transition={{ duration: 0.5, delay: i * 0.08, ease: [0.2, 0.8, 0.2, 1] }}
-              className="relative"
-            >
-              <span
-                aria-hidden
-                className="absolute -left-[33px] top-2 w-4 h-4 rounded-full bg-white border-2 border-ocean ring-4 ring-ocean/10"
-              >
-                <span className="absolute inset-1 rounded-full bg-electric" />
-              </span>
-              <div className="rounded-2xl bg-white border border-ink/10 p-4 shadow-sm">
-                <div className="flex items-center justify-between mb-2">
-                  <div className="text-[10px] tracking-[0.22em] uppercase text-muted">Step {s.n}</div>
-                  <div className="w-5 h-5 rounded-full bg-ocean/10 grid place-items-center text-[10px] font-bold text-ocean">
-                    {i + 1}
-                  </div>
-                </div>
-                <h3 className="display text-xl mb-1.5 leading-tight">{s.title}.</h3>
-                <p className="text-[13px] text-muted leading-relaxed">{s.body}</p>
-              </div>
-            </motion.li>
+      <div className="marquee-mask">
+        <div className="flex w-max items-center gap-10 md:gap-14 animate-marquee-slow hover:[animation-play-state:paused] px-6">
+          {doubled.map((src, i) => (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              key={i}
+              src={src}
+              alt=""
+              className="h-10 md:h-12 w-auto shrink-0 opacity-60 hover:opacity-100 transition-opacity duration-500 grayscale hover:grayscale-0"
+            />
           ))}
-        </ol>
-      </div>
-    </section>
-  );
-}
-
-function HowItWorksDNADesktop() {
-  const ref = useRef<HTMLDivElement>(null);
-  const { scrollYProgress } = useScroll({
-    target: ref,
-    offset: ["start start", "end end"],
-  });
-  const [activeStep, setActiveStep] = useState(0);
-
-  useEffect(() => {
-    const u = scrollYProgress.on("change", (v) => {
-      // 4 step bands across the pinned scroll: 0–0.25, 0.25–0.5, 0.5–0.75, 0.75–1
-      const idx = Math.min(STEPS.length - 1, Math.max(0, Math.floor(v * STEPS.length)));
-      setActiveStep(idx);
-    });
-    return () => u();
-  }, [scrollYProgress]);
-
-  // Helix geometry — horizontal, 4 step nodes
-  const W = 1200;
-  const H = 240;
-  const cy = H / 2;
-  const amp = 70;
-  const turns = 2.5;
-  const dotsPerStrand = 220;
-  const drawProgress = useSpring(scrollYProgress, { damping: 30, stiffness: 80 });
-
-  const strandA = useMemo(
-    () =>
-      Array.from({ length: dotsPerStrand }, (_, i) => {
-        const t = i / (dotsPerStrand - 1);
-        const x = t * W;
-        const phase = t * Math.PI * 2 * turns;
-        const y = cy + Math.sin(phase) * amp;
-        const z = Math.cos(phase); // -1..1, governs perceived depth
-        return { x, y, z, t };
-      }),
-    [],
-  );
-  const strandB = useMemo(
-    () =>
-      Array.from({ length: dotsPerStrand }, (_, i) => {
-        const t = i / (dotsPerStrand - 1);
-        const x = t * W;
-        const phase = t * Math.PI * 2 * turns + Math.PI;
-        const y = cy + Math.sin(phase) * amp;
-        const z = Math.cos(phase);
-        return { x, y, z, t };
-      }),
-    [],
-  );
-
-  const nodeXs = STEPS.map((_, i) => W * (0.12 + i * 0.255));
-  const nodes = nodeXs.map((x) => {
-    const t = x / W;
-    const phase = t * Math.PI * 2 * turns;
-    return {
-      x,
-      yA: cy + Math.sin(phase) * amp,
-      yB: cy + Math.sin(phase + Math.PI) * amp,
-    };
-  });
-
-  return (
-    <section ref={ref} className="hidden md:block relative bg-white" style={{ height: "280vh" }}>
-      <div className="sticky top-0 h-screen flex flex-col justify-center overflow-hidden">
-        {/* soft tinted backdrop */}
-        <div
-          aria-hidden
-          className="absolute inset-0 pointer-events-none"
-          style={{
-            background:
-              "radial-gradient(80% 60% at 50% 40%, rgba(50,50,255,0.06), transparent 70%), radial-gradient(70% 60% at 50% 90%, rgba(205,227,93,0.10), transparent 70%)",
-          }}
-        />
-
-        <div className="relative max-w-[1280px] mx-auto w-full px-6">
-          {/* heading */}
-          <div className="text-center mb-10 md:mb-14">
-            <div className="text-[10px] tracking-[0.22em] uppercase text-muted mb-2">How StatDoctor works</div>
-            <h2 className="display text-[clamp(28px,4.2vw,56px)] leading-[1.0] max-w-3xl mx-auto">
-              Four steps. <span className="italic text-ocean">No agency in the middle.</span>
-            </h2>
-          </div>
-
-          {/* horizontal dot-particle helix */}
-          <div className="relative">
-            <svg viewBox={`0 0 ${W} ${H}`} className="w-full h-auto block">
-              <defs>
-                <radialGradient id="dotA" cx="50%" cy="50%" r="50%">
-                  <stop offset="0%" stopColor="#3232ff" />
-                  <stop offset="100%" stopColor="#1a1a2e" />
-                </radialGradient>
-                <radialGradient id="dotB" cx="50%" cy="50%" r="50%">
-                  <stop offset="0%" stopColor="#cde35d" />
-                  <stop offset="100%" stopColor="#1a1a2e" />
-                </radialGradient>
-              </defs>
-
-              {/* Strand A dots */}
-              {strandA.map((p, i) => (
-                <DotParticle key={`a-${i}`} p={p} progress={drawProgress} fill="url(#dotA)" />
-              ))}
-              {/* Strand B dots */}
-              {strandB.map((p, i) => (
-                <DotParticle key={`b-${i}`} p={p} progress={drawProgress} fill="url(#dotB)" />
-              ))}
-
-              {/* Step nodes */}
-              {nodes.map((n, i) => {
-                const segReveal = i / STEPS.length;
-                return (
-                  <DNANode
-                    key={i}
-                    n={n}
-                    label={STEPS[i].n}
-                    revealAt={segReveal}
-                    progress={scrollYProgress}
-                    active={activeStep === i}
-                  />
-                );
-              })}
-            </svg>
-
-            {/* Sequential card reveal — positioned above each node, anchored
-                to the node's side of the canvas so the last card never spills off-screen */}
-            <div className="absolute inset-0 pointer-events-none">
-              {STEPS.map((s, i) => {
-                const xPct = (nodeXs[i] / W) * 100;
-                // Anchor strategy: first node → left-aligned, last → right-aligned, middle → centered
-                const anchorLeft = i === 0;
-                const anchorRight = i === STEPS.length - 1;
-                const positionStyle: React.CSSProperties = anchorLeft
-                  ? { left: `max(0px, calc(${xPct}% - 40px))`, transform: "translateX(0)" }
-                  : anchorRight
-                  ? { right: `max(0px, calc(${100 - xPct}% - 40px))`, transform: "translateX(0)" }
-                  : { left: `${xPct}%`, transform: "translateX(-50%)" };
-                return (
-                  <AnimatePresence key={s.n}>
-                    {activeStep === i && (
-                      <motion.div
-                        initial={{ opacity: 0, y: 12, scale: 0.95 }}
-                        animate={{ opacity: 1, y: 0, scale: 1 }}
-                        exit={{ opacity: 0, y: 12, scale: 0.95 }}
-                        transition={{ duration: 0.45, ease: [0.2, 0.8, 0.2, 1] }}
-                        className="absolute pointer-events-auto"
-                        style={{
-                          ...positionStyle,
-                          // Always above the helix so timeline pills below stay close
-                          bottom: "calc(50% + 70px)",
-                        }}
-                      >
-                        <StepCard step={s} index={i} />
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                );
-              })}
-            </div>
-          </div>
-
-          {/* progress bar / step counter */}
-          <div className="mt-12 md:mt-14 flex flex-wrap items-center justify-center gap-3 md:gap-4">
-            {STEPS.map((s, i) => (
-              <button
-                key={s.n}
-                onClick={() => {
-                  if (!ref.current) return;
-                  const sectionTop = ref.current.offsetTop;
-                  const sectionHeight = ref.current.offsetHeight - window.innerHeight;
-                  const target = sectionTop + (i + 0.5) / STEPS.length * sectionHeight;
-                  window.scrollTo({ top: target, behavior: "smooth" });
-                }}
-                className="group flex items-center gap-2"
-              >
-                <span
-                  className="block h-[2px] rounded-full transition-all duration-500"
-                  style={{
-                    width: activeStep === i ? 56 : 18,
-                    background: activeStep >= i ? "#3232ff" : "rgba(26,26,46,0.18)",
-                  }}
-                />
-                <span className={`text-[10px] tracking-[0.22em] uppercase transition-colors ${activeStep === i ? "text-ocean" : "text-muted"}`}>
-                  {s.n} · {s.title}
-                </span>
-              </button>
-            ))}
-          </div>
         </div>
       </div>
     </section>
   );
 }
 
-function DotParticle({
-  p,
-  progress,
-  fill,
-}: {
-  p: { x: number; y: number; z: number; t: number };
-  progress: ReturnType<typeof useSpring>;
-  fill: string;
-}) {
-  // Each particle reveals when scroll progress passes its t-position
-  const op = useTransform(progress, [p.t - 0.05, p.t + 0.02], [0, 1]);
-  // Depth: dots in front (z>0) larger & more opaque, dots behind (z<0) smaller & faded
-  const r = 1.4 + (p.z + 1) * 1.4; // 1.4..4.2
-  const dimmer = 0.35 + ((p.z + 1) / 2) * 0.65; // 0.35..1.0
-  return (
-    <motion.circle
-      cx={p.x}
-      cy={p.y}
-      r={r}
-      fill={fill}
-      style={{ opacity: useTransform(op, (v) => v * dimmer) }}
-    />
-  );
-}
-
-function DNANode({
-  n,
-  label,
-  revealAt,
-  progress,
-  active,
-}: {
-  n: { x: number; yA: number; yB: number };
-  label: string;
-  revealAt: number;
-  progress: ReturnType<typeof useScroll>["scrollYProgress"];
-  active: boolean;
-}) {
-  const op = useTransform(progress, [revealAt - 0.03, revealAt + 0.04], [0, 1]);
-  return (
-    <g>
-      {/* connector */}
-      <motion.line
-        x1={n.x}
-        y1={n.yA}
-        x2={n.x}
-        y2={n.yB}
-        stroke="#1a1a2e"
-        strokeWidth="1.5"
-        strokeOpacity="0.35"
-        style={{ opacity: op }}
-      />
-      {/* outer halo */}
-      <motion.circle
-        cx={n.x}
-        cy={(n.yA + n.yB) / 2}
-        r={active ? 22 : 16}
-        fill="rgba(50,50,255,0.12)"
-        style={{ opacity: op }}
-        animate={active ? { r: [16, 26, 16], opacity: [0.6, 0, 0.6] } : { r: 16, opacity: 0 }}
-        transition={{ duration: 2.2, repeat: active ? Infinity : 0, ease: "easeOut" }}
-      />
-      {/* core */}
-      <motion.circle
-        cx={n.x}
-        cy={(n.yA + n.yB) / 2}
-        r={active ? 9 : 6}
-        fill={active ? "#cde35d" : "#3232ff"}
-        stroke="#1a1a2e"
-        strokeWidth="2"
-        style={{ opacity: op }}
-      />
-      <motion.text
-        x={n.x}
-        y={(n.yA + n.yB) / 2 + 38}
-        textAnchor="middle"
-        fontSize="11"
-        className="tracking-widest"
-        fill="#6b7a73"
-        style={{ opacity: op }}
-      >
-        {label}
-      </motion.text>
-    </g>
-  );
-}
-
-function StepCard({ step, index }: { step: (typeof STEPS)[number]; index: number }) {
-  return (
-    <div className="w-[260px] md:w-[300px] rounded-2xl bg-white border border-ink/10 shadow-[0_30px_70px_-20px_rgba(26,26,46,0.25)] p-5 relative overflow-hidden">
-      <span aria-hidden className="absolute inset-x-0 top-0 h-[2px] bg-gradient-to-r from-ocean via-electric to-ocean" />
-      <div className="flex items-center justify-between mb-2">
-        <div className="text-[10px] tracking-[0.22em] uppercase text-muted">Step {step.n}</div>
-        <div className="w-6 h-6 rounded-full bg-ocean/10 grid place-items-center text-[10px] font-bold text-ocean">
-          {index + 1}
-        </div>
-      </div>
-      <h3 className="display text-2xl mb-2 leading-tight">{step.title}.</h3>
-      <p className="text-xs md:text-[13px] text-muted leading-relaxed">{step.body}</p>
-    </div>
-  );
-}
 
 /* ============================================================
-   04 — FOUNDER VIDEO (autoplay-on-scroll)
+   04, FOUNDER VIDEO (autoplay-on-scroll)
    ============================================================ */
 function FounderVideo() {
   const ref = useRef<HTMLDivElement>(null);
@@ -569,7 +180,7 @@ function FounderVideo() {
 
             {/* Founder credit */}
             <div className="absolute bottom-4 left-4 md:bottom-5 md:left-5 px-3 py-1.5 rounded-full bg-white/90 backdrop-blur-md border border-ink/10 text-[11px] font-medium">
-              Anurag G. · Founder, StatDoctor
+              Anurag G. · CEO &amp; Founder, StatDoctor
             </div>
           </div>
         </div>
@@ -579,7 +190,7 @@ function FounderVideo() {
 }
 
 /* ============================================================
-   05 — VOICES · Lyra-style 3-column auto-scrolling wall
+   05, VOICES · Lyra-style 3-column auto-scrolling wall
    Column 1 ↑, Column 2 ↓, Column 3 ↑.  Real testimonies pulled
    from statdoctor.app. Hover any card to pause the column.
    ============================================================ */
@@ -593,7 +204,7 @@ const DOCTORS: {
   {
     name: "Dr Layth Samari",
     credential: "MD · ACEM Trainee",
-    img: "/doctors/dr-layth.png",
+    img: "https://cdn.prod.website-files.com/688db6d677516719c3925d01/697828648e6bd8e828e91b1c_statdocto_doctors_available-07-03.png",
     quote:
       "A great initiative to help doctors be in charge of their own work-life balance with the ease of picking up shifts on demand.",
     accent: "ocean",
@@ -601,7 +212,7 @@ const DOCTORS: {
   {
     name: "Dr Brian Rose",
     credential: "MD · HMO",
-    img: "/doctors/dr-david.png",
+    img: "https://cdn.prod.website-files.com/688db6d677516719c3925d01/69a105632dceffa4f8933daf_Screenshot%202026-02-27%20at%2012.45.10%E2%80%AFpm.png",
     quote:
       "StatDoctor enables me to see all the available shifts on my own device, on my own terms. No annoying phone calls from managing reps trying to push me to do shifts I don't want. It's the stress-free approach to locuming.",
     accent: "electric",
@@ -609,7 +220,7 @@ const DOCTORS: {
   {
     name: "Dr Sophia Dean",
     credential: "MBChB · HMO",
-    img: "/doctors/dr-priya.png",
+    img: "https://cdn.prod.website-files.com/688db6d677516719c3925d01/69a025521b7592495cd25042_Screenshot%202026-02-26%20at%208.49.40%E2%80%AFpm.png",
     quote:
       "As a first-time locum from New Zealand, I've been thoroughly impressed with the efficiency and user-friendliness of this app. The ability to view available shifts, including exact dates and times, has made planning my work so much easier.",
     accent: "leaf",
@@ -617,7 +228,7 @@ const DOCTORS: {
   {
     name: "Dr David Burton",
     credential: "MBChB · FRNZCGP",
-    img: "/doctors/dr-david.png",
+    img: "https://cdn.prod.website-files.com/688db6d677516719c3925d01/69a025c3085be6b4dea58517_Screenshot%202026-02-26%20at%208.51.34%E2%80%AFpm.png",
     quote:
       "StatDoctor is a brilliant solution to the ridiculous financial burden on public hospitals that locum agencies were charging, and the drudgery and admin of locuming. It's better, sleeker, easier to navigate and more invested in making locuming work well for both parties than any locum agency.",
     accent: "ocean",
@@ -625,7 +236,7 @@ const DOCTORS: {
   {
     name: "Dr Alex Patinkin",
     credential: "MD · ACEM Trainee",
-    img: "/doctors/dr-layth.png",
+    img: "https://cdn.prod.website-files.com/688db6d677516719c3925d01/697b6465bfe917b72c1a6d2a_1723897169563.jpeg",
     quote:
       "I'm a full-time emergency registrar and locum frequently on the side through multiple big agencies. It's often difficult to find shifts because their job boards don't let me filter out work that doesn't fit my schedule. I love how much easier StatDoctor is to use.",
     accent: "electric",
@@ -633,7 +244,7 @@ const DOCTORS: {
   {
     name: "Dr Marillo Jayasuriya",
     credential: "MD · FACEM",
-    img: "/doctors/dr-david.png",
+    img: "https://cdn.prod.website-files.com/688db6d677516719c3925d01/697b6440a3f19ada5550b8b8_1702447089847.jpeg",
     quote:
       "Such an easy-to-use platform that gives locum doctors more control of their shifts.",
     accent: "ink",
@@ -641,26 +252,10 @@ const DOCTORS: {
   {
     name: "Dr Greeshma Gopakumar",
     credential: "MD · HMO",
-    img: "/doctors/dr-priya.png",
+    img: "https://cdn.prod.website-files.com/688db6d677516719c3925d01/6978195af46d2753c3e3422d_Adobe%20Express%20-%20file%20(26).png",
     quote:
       "On signing up, the whole process was extremely easy and straightforward. It's transparent with no hidden T&Cs unlike many agencies. Truly a game changer for locum doctors.",
     accent: "leaf",
-  },
-  {
-    name: "Dr Priya Shah",
-    credential: "GP Fellow",
-    img: "/doctors/dr-priya.png",
-    quote:
-      "I see shifts on my own terms. No phone calls from agency reps. The rate is shown before I apply — that alone saves me hours.",
-    accent: "ocean",
-  },
-  {
-    name: "Dr Sarah Chen",
-    credential: "Anaesthetics",
-    img: "/doctors/dr-priya.png",
-    quote:
-      "I picked up three shifts this month I would have never seen otherwise. Confirmed in 20 minutes each.",
-    accent: "electric",
   },
 ];
 
@@ -669,7 +264,7 @@ function DoctorVoicesPinned() {
   DOCTORS.forEach((d, i) => cols[i % 3].push(d));
 
   return (
-    <section className="relative bg-white py-16 md:py-20 px-6 overflow-hidden">
+    <section className="relative bg-white py-20 md:py-24 px-6 overflow-hidden">
       <div
         aria-hidden
         className="pointer-events-none absolute inset-0"
@@ -680,7 +275,7 @@ function DoctorVoicesPinned() {
       />
 
       {/* heading */}
-      <div className="relative max-w-[1280px] mx-auto mb-8 md:mb-12">
+      <div className="relative max-w-[1280px] mx-auto mb-10 md:mb-12">
         <motion.div
           initial={{ opacity: 0, y: 18 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -688,16 +283,16 @@ function DoctorVoicesPinned() {
           transition={{ duration: 0.7 }}
           className="text-center"
         >
-          <div className="text-[10px] tracking-[0.22em] uppercase text-muted mb-2">
+          <div className="text-[10px] tracking-[0.22em] uppercase text-muted mb-3">
             Doctors using StatDoctor
           </div>
-          <h2 className="display text-[clamp(26px,4vw,52px)] leading-[1.0] max-w-3xl mx-auto">
+          <h2 className="display text-[clamp(28px,4.5vw,56px)] leading-[1.0] max-w-3xl mx-auto">
             Verified by AHPRA. <span className="italic text-ocean">Earning more.</span> Calling fewer agencies.
           </h2>
         </motion.div>
       </div>
 
-      {/* Three scrolling columns — 1 up, 2 down, 3 up */}
+      {/* Three scrolling columns, 1 up, 2 down, 3 up */}
       <div className="relative max-w-[1280px] mx-auto h-[520px] md:h-[600px] overflow-hidden">
         {/* fade masks */}
         <div
@@ -799,165 +394,70 @@ function TestimonialCard({ d }: { d: (typeof DOCTORS)[number] }) {
 }
 
 /* ============================================================
-   05 — FAQ · floating bubbles + centered answer panel
-   Bubbles drift in a contained zone. The active answer always
-   appears in a fixed central panel below — they cannot collide.
+   06, FAQ · objection-shaped expandable boxes
    ============================================================ */
-type Tone = "ocean" | "electric" | "ink" | "leaf";
-type AnswerDir = "up" | "down" | "left" | "right";
-const FAQ_ITEMS: {
-  q: string;
-  a: string;
-  tone: Tone;
-  pos: { top: string; left: string };
-  drift: "animate-drift-a" | "animate-drift-b" | "animate-drift-c";
-  size: "sm" | "md" | "lg";
-  answerDir: AnswerDir;
-}[] = [
+const FAQ_ITEMS: { q: string; a: string }[] = [
+  {
+    q: "When do I actually get paid?",
+    a: "Most shifts pay out within 48 hours of completion, straight to your bank account. No invoicing, no agency middleman, no chasing finance on a Friday afternoon.",
+  },
+  {
+    q: "Do you take a commission from my rate?",
+    a: "No. The rate you see in the app is the rate you get paid. Hospitals pay a small platform fee on each accepted shift, over 75% cheaper than any locum agency, but it never comes out of your earnings.",
+  },
   {
     q: "How are doctors verified?",
-    a: "StatDoctor conducts the same checks as any locum agency — confirming your identity, checking your AHPRA registration, and getting references.",
-    tone: "ocean",
-    pos: { top: "4%", left: "8%" },
-    drift: "animate-drift-a",
-    size: "md",
-    answerDir: "down",
+    a: "We run the same checks as any reputable locum agency: identity, AHPRA registration, indemnity, and references. You upload everything once. After that every shift application is a single tap.",
   },
   {
-    q: "Do you charge doctors a fee?",
-    a: "Unlike locum agencies we do not charge hospitals 15–30% on top of your locum rate. We work similar to SEEK — hospitals pay a small fee for accepted shifts (over 75% cheaper than any agency).",
-    tone: "electric",
-    pos: { top: "10%", left: "58%" },
-    drift: "animate-drift-b",
-    size: "lg",
-    answerDir: "down",
+    q: "What credentials do I need to upload?",
+    a: "AHPRA registration, current indemnity certificate, and an up-to-date CV. Hospitals may request specific items (e.g. recent CPR certificate) for certain shifts, those appear before you apply.",
   },
   {
-    q: "Travel and accommodation?",
-    a: "Not usually — most hospitals, particularly rural ones, will cover you for travel and accommodation expenses. This can be easily seen on the app before you apply.",
-    tone: "leaf",
-    pos: { top: "30%", left: "32%" },
-    drift: "animate-drift-c",
-    size: "md",
-    answerDir: "down",
+    q: "How fast do hospitals confirm a shift?",
+    a: "Most shifts confirm within the hour. Urgent same-day shifts are typically confirmed in under 30 minutes, far faster than agencies, because the hospital posts and confirms directly inside the app.",
   },
   {
-    q: "How much do locum doctors earn?",
-    a: "Rates vary by seniority, specialty, location and time of year. Specialists average $2,500–$4,000 per day; HMOs earn $100–$180 per hour. The more rural a doctor is willing to work, the higher the rate.",
-    tone: "ocean",
-    pos: { top: "42%", left: "70%" },
-    drift: "animate-drift-a",
-    size: "lg",
-    answerDir: "left",
+    q: "What about travel and accommodation?",
+    a: "Most rural and regional hospitals reimburse travel and cover accommodation. Each listing shows exactly what's included before you apply, no chasing the hospital after the fact.",
+  },
+  {
+    q: "What happens if a shift is cancelled?",
+    a: "If a hospital cancels within 24 hours of the shift, our cancellation policy guarantees a partial payout. Full terms are visible inside the app before you accept any shift.",
   },
   {
     q: "Which states are you live in?",
-    a: "VIC, NSW, QLD and SA — with active partner hospitals in WA and TAS. Rolling out across the rest through 2026.",
-    tone: "ink",
-    pos: { top: "56%", left: "6%" },
-    drift: "animate-drift-b",
-    size: "sm",
-    answerDir: "right",
-  },
-  {
-    q: "How fast do hospitals confirm?",
-    a: "Most shifts confirm within hours. Urgent same-day shifts are typically confirmed in under 30 minutes — far faster than any agency.",
-    tone: "electric",
-    pos: { top: "70%", left: "44%" },
-    drift: "animate-drift-c",
-    size: "md",
-    answerDir: "up",
-  },
-  {
-    q: "What credentials do I upload?",
-    a: "AHPRA registration, indemnity certificate, and a current CV. Upload once — every shift application after that is one tap.",
-    tone: "ocean",
-    pos: { top: "82%", left: "12%" },
-    drift: "animate-drift-a",
-    size: "md",
-    answerDir: "up",
-  },
-  {
-    q: "What if my shift gets cancelled?",
-    a: "If a hospital cancels within 24 hours of the shift, StatDoctor's cancellation policy guarantees a partial payout. Full terms in the app.",
-    tone: "leaf",
-    pos: { top: "84%", left: "70%" },
-    drift: "animate-drift-b",
-    size: "sm",
-    answerDir: "up",
+    a: "Active partner hospitals across VIC, NSW, QLD, SA, WA and TAS. New hospitals are joining the network weekly.",
   },
 ];
 
 function FAQGrid() {
-  const [activeIdx, setActiveIdx] = useState<number | null>(null);
+  const [openIdx, setOpenIdx] = useState<number | null>(null);
 
   return (
-    <section className="relative bg-white py-16 md:py-20 px-6 overflow-hidden">
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-0"
-        style={{
-          background:
-            "radial-gradient(60% 50% at 20% 30%, rgba(50,50,255,0.06), transparent 70%), radial-gradient(50% 50% at 85% 70%, rgba(205,227,93,0.10), transparent 70%)",
-        }}
-      />
-
-      <div className="relative max-w-[1280px] mx-auto">
+    <section className="relative bg-white py-20 md:py-24 px-6">
+      <div className="relative max-w-[1100px] mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-80px" }}
-          transition={{ duration: 0.7 }}
-          className="text-center mb-12"
+          transition={{ duration: 0.6 }}
+          className="text-center mb-10 md:mb-12"
         >
-          <div className="text-[10px] tracking-[0.22em] uppercase text-muted mb-2">FAQ</div>
-          <h2 className="display text-[clamp(26px,4vw,52px)] leading-[1.0]">
-            Still curious? <span className="italic text-ocean">Hover a question.</span>
+          <div className="text-[10px] tracking-[0.22em] uppercase text-muted mb-3">FAQ</div>
+          <h2 className="display text-[clamp(28px,4.5vw,56px)] leading-[1.0]">
+            The questions doctors <span className="italic text-ocean">ask first</span>.
           </h2>
-          <p className="mt-3 text-[10px] tracking-[0.22em] uppercase text-muted">
-            {FAQ_ITEMS.length} things doctors ask first
-          </p>
         </motion.div>
 
-        {/* Floating bubble field — desktop only. Hover/tap pops the answer next to the bubble. */}
-        <div
-          className="relative h-[760px] md:h-[820px] hidden md:block"
-          onClick={() => setActiveIdx(null)}
-        >
-          <div
-            aria-hidden
-            className="absolute inset-0 opacity-50 pointer-events-none"
-            style={{
-              backgroundImage:
-                "radial-gradient(circle, rgba(26,26,46,0.07) 1px, transparent 1px)",
-              backgroundSize: "24px 24px",
-            }}
-          />
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4 items-start">
           {FAQ_ITEMS.map((item, i) => (
-            <FAQBubble
+            <FAQBox
               key={item.q}
               item={item}
-              index={i}
-              isActive={activeIdx === i}
-              isDimmed={activeIdx !== null && activeIdx !== i}
-              onActivate={() => setActiveIdx(i)}
-              onDeactivate={() => setActiveIdx(null)}
+              open={openIdx === i}
+              onToggle={() => setOpenIdx(openIdx === i ? null : i)}
             />
-          ))}
-        </div>
-
-        {/* Mobile fallback — stacked accordion */}
-        <div className="md:hidden mt-4 space-y-2">
-          {FAQ_ITEMS.map((item) => (
-            <details
-              key={item.q}
-              className="rounded-2xl bg-white border border-ink/10 px-4 py-3"
-            >
-              <summary className="display text-[15px] cursor-pointer">{item.q}</summary>
-              <p className="text-[13px] text-muted leading-relaxed mt-2 pt-2 border-t border-ink/8">
-                {item.a}
-              </p>
-            </details>
           ))}
         </div>
       </div>
@@ -965,111 +465,169 @@ function FAQGrid() {
   );
 }
 
-function FAQBubble({
+function FAQBox({
   item,
-  index,
-  isActive,
-  isDimmed,
-  onActivate,
-  onDeactivate,
+  open,
+  onToggle,
 }: {
-  item: (typeof FAQ_ITEMS)[number];
-  index: number;
-  isActive: boolean;
-  isDimmed: boolean;
-  onActivate: () => void;
-  onDeactivate: () => void;
+  item: { q: string; a: string };
+  open: boolean;
+  onToggle: () => void;
 }) {
-  const sizeClasses =
-    item.size === "lg"
-      ? "px-6 py-4 text-[15px] md:text-base max-w-[300px]"
-      : item.size === "md"
-      ? "px-5 py-3.5 text-sm md:text-[15px] max-w-[260px]"
-      : "px-4 py-3 text-[13px] md:text-sm max-w-[230px]";
-
-  const tone =
-    item.tone === "ocean"
-      ? "bg-ocean text-white border-ocean"
-      : item.tone === "electric"
-      ? "bg-electric text-ink border-electric"
-      : item.tone === "leaf"
-      ? "bg-leaf text-white border-leaf"
-      : "bg-ink text-white border-ink";
-
-  // Where the answer card pops out from the bubble
-  const answerOffset = (() => {
-    switch (item.answerDir) {
-      case "up":    return { bottom: "calc(100% + 14px)", left: "50%", transform: "translateX(-50%)" };
-      case "down":  return { top: "calc(100% + 14px)",    left: "50%", transform: "translateX(-50%)" };
-      case "left":  return { right: "calc(100% + 14px)",  top: "50%",  transform: "translateY(-50%)" };
-      case "right": return { left: "calc(100% + 14px)",   top: "50%",  transform: "translateY(-50%)" };
-    }
-  })();
-
   return (
-    <motion.div
-      initial={{ opacity: 0, scale: 0.6, y: 20 }}
-      whileInView={{ opacity: 1, scale: 1, y: 0 }}
-      viewport={{ once: true, margin: "-50px" }}
-      transition={{
-        duration: 0.7,
-        delay: index * 0.08,
-        ease: [0.2, 0.8, 0.2, 1],
-      }}
-      animate={{
-        opacity: isDimmed ? 0.18 : 1,
-        scale: isDimmed ? 0.94 : 1,
-      }}
-      className={`absolute ${item.drift}`}
-      style={{
-        top: item.pos.top,
-        left: item.pos.left,
-        zIndex: isActive ? 30 : 10,
-        transition: "opacity 0.35s ease, transform 0.35s ease",
-      }}
-      onClick={(e) => e.stopPropagation()}
+    <div
+      className={`rounded-2xl border transition-colors ${
+        open ? "bg-bone border-ink/15" : "bg-white border-ink/10 hover:border-ink/20"
+      }`}
     >
-      <motion.button
-        onMouseEnter={onActivate}
-        onMouseLeave={onDeactivate}
-        onClick={onActivate}
-        animate={{ scale: isActive ? 1.05 : 1 }}
-        whileHover={{ scale: 1.05 }}
-        transition={{ duration: 0.3, ease: [0.2, 0.8, 0.2, 1] }}
-        className={`relative rounded-full border-2 font-medium text-left shadow-[0_18px_50px_-20px_rgba(26,26,46,0.3)] hover:shadow-[0_30px_70px_-20px_rgba(26,26,46,0.4)] transition-shadow ${sizeClasses} ${tone}`}
+      <button
+        onClick={onToggle}
+        className="w-full flex items-center justify-between gap-4 px-5 py-4 md:px-6 md:py-5 text-left"
+        aria-expanded={open}
         data-hover
       >
-        {item.q}
-      </motion.button>
-
-      <AnimatePresence>
-        {isActive && (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.92, y: item.answerDir === "up" ? 8 : item.answerDir === "down" ? -8 : 0, x: item.answerDir === "left" ? 8 : item.answerDir === "right" ? -8 : 0 }}
-            animate={{ opacity: 1, scale: 1, y: 0, x: 0 }}
-            exit={{ opacity: 0, scale: 0.92 }}
-            transition={{ duration: 0.28, ease: [0.2, 0.8, 0.2, 1] }}
-            className="absolute w-[300px] rounded-2xl bg-ink text-white p-5 shadow-[0_30px_70px_-20px_rgba(26,26,46,0.5)] z-40"
-            style={answerOffset}
-            onMouseEnter={onActivate}
-            onMouseLeave={onDeactivate}
-          >
-            <span
-              aria-hidden
-              className={`absolute inset-x-0 top-0 h-[2px] ${
-                item.tone === "electric"
-                  ? "bg-electric"
-                  : item.tone === "leaf"
-                  ? "bg-leaf"
-                  : item.tone === "ink"
-                  ? "bg-white/20"
-                  : "bg-ocean"
-              }`}
-            />
-            <p className="text-[13px] leading-relaxed text-white/85">{item.a}</p>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </motion.div>
+        <span className="display text-[16px] md:text-[18px] leading-[1.25]">
+          {item.q}
+        </span>
+        <span
+          className={`shrink-0 w-7 h-7 grid place-items-center rounded-full border border-ink/15 transition-transform ${
+            open ? "rotate-45 bg-ink text-white border-ink" : "text-ink"
+          }`}
+          aria-hidden
+        >
+          +
+        </span>
+      </button>
+      <div
+        className="grid transition-all duration-300 ease-out"
+        style={{ gridTemplateRows: open ? "1fr" : "0fr" }}
+      >
+        <div className="overflow-hidden">
+          <p className="px-5 md:px-6 pb-5 md:pb-6 text-sm md:text-[15px] text-muted leading-relaxed">
+            {item.a}
+          </p>
+        </div>
+      </div>
+    </div>
   );
 }
+
+/* ============================================================
+   07, FINAL CTA · download band + socials
+   ============================================================ */
+const SOCIALS: { label: string; href: string; Icon: () => JSX.Element }[] = [
+  {
+    label: "LinkedIn",
+    href: "https://www.linkedin.com/company/statdoctor/",
+    Icon: LIIcon,
+  },
+  {
+    label: "Facebook",
+    href: "https://www.facebook.com/p/StatDoctor-100088461867629/",
+    Icon: FBIcon,
+  },
+  { label: "Email", href: "mailto:Admin@statdoctor.net", Icon: MailIcon },
+];
+
+function FinalCTA() {
+  return (
+    <section className="relative bg-white">
+      <div className="relative max-w-[1100px] mx-auto px-6 py-14 md:py-16 text-center">
+        <div className="text-[10px] tracking-[0.22em] uppercase text-muted mb-3">
+          Free · iOS &amp; Android
+        </div>
+        <h2 className="display text-[clamp(28px,4.5vw,56px)] leading-[1.0] max-w-3xl mx-auto">
+          Locum shifts in your pocket.{" "}
+          <span className="italic text-ocean">Two taps to apply.</span>
+        </h2>
+        <p className="mt-4 text-muted max-w-xl mx-auto text-[14px] md:text-[15px] leading-relaxed">
+          Verified by AHPRA. Posted rate visible upfront. Paid in 48 hours.
+        </p>
+
+        <div className="mt-7 grid grid-cols-1 sm:grid-cols-2 gap-3 max-w-[440px] mx-auto">
+          <a
+            href="https://apps.apple.com/au/app/statdoctor/id6452677138"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center justify-center gap-3 px-5 py-3 rounded-2xl bg-ink text-white hover:bg-ocean transition-colors"
+            data-hover
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+              <path d="M16.365 1.43c0 1.14-.43 2.23-1.13 3.04-.85.99-2.23 1.76-3.36 1.66-.14-1.1.41-2.27 1.13-3.05.81-.92 2.27-1.65 3.36-1.65zM20.5 17.4c-.55 1.27-.81 1.83-1.51 2.95-.98 1.55-2.36 3.48-4.07 3.5-1.52.02-1.91-.99-3.97-.97-2.07.01-2.49 1-4.02.98-1.71-.02-3.02-1.77-4-3.32-2.74-4.32-3.03-9.4-1.34-12.1 1.2-1.93 3.1-3.06 4.88-3.06 1.82 0 2.96.99 4.46.99 1.46 0 2.35-.99 4.45-.99 1.59 0 3.27.86 4.47 2.36-3.93 2.16-3.29 7.82.65 9.66z" />
+            </svg>
+            <div className="text-left">
+              <div className="text-[10px] tracking-[0.18em] uppercase opacity-70">
+                Download on the
+              </div>
+              <div className="text-sm font-semibold leading-tight">App Store</div>
+            </div>
+          </a>
+          <a
+            href="https://play.google.com/store/apps/details?id=user.statdoctor.app&hl=en_AU"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center justify-center gap-3 px-5 py-3 rounded-2xl bg-ocean text-white hover:bg-ink transition-colors"
+            data-hover
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" aria-hidden>
+              <path
+                fill="currentColor"
+                d="M3.6 1.5c-.3.3-.5.7-.5 1.3v18.4c0 .6.2 1 .5 1.3l10.7-10.5L3.6 1.5zm12 8.4L5.6 1.4l11.7 6.7-1.7 1.8zm3 1.6l-2.4-1.4-1.9 1.9 1.9 1.9 2.4-1.4c.7-.4.7-1.6 0-2zm-12.7 11l10.1-9.7-1.7-1.8L5.9 22.5z"
+              />
+            </svg>
+            <div className="text-left">
+              <div className="text-[10px] tracking-[0.18em] uppercase opacity-80">
+                Get it on
+              </div>
+              <div className="text-sm font-semibold leading-tight">
+                Google Play
+              </div>
+            </div>
+          </a>
+        </div>
+
+        <div className="mt-10 flex items-center justify-center gap-3">
+          {SOCIALS.map(({ label, href, Icon }) => (
+            <a
+              key={label}
+              href={href}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label={label}
+              className="w-10 h-10 grid place-items-center rounded-full border border-ink/12 text-ink/70 hover:bg-ink hover:text-white hover:border-ink transition-colors"
+              data-hover
+            >
+              <Icon />
+            </a>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function LIIcon() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+      <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-4 0v7h-4v-7a6 6 0 0 1 6-6z" />
+      <rect x="2" y="9" width="4" height="12" />
+      <circle cx="4" cy="4" r="2" />
+    </svg>
+  );
+}
+function FBIcon() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+      <path d="M22 12a10 10 0 1 0-11.56 9.88v-7H7.9V12h2.54V9.8c0-2.5 1.49-3.89 3.77-3.89 1.09 0 2.24.2 2.24.2v2.46h-1.26c-1.24 0-1.63.77-1.63 1.56V12h2.78l-.45 2.89h-2.33v7A10 10 0 0 0 22 12z" />
+    </svg>
+  );
+}
+function MailIcon() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+      <rect x="3" y="5" width="18" height="14" rx="2" />
+      <path d="m3 7 9 6 9-6" />
+    </svg>
+  );
+}
+

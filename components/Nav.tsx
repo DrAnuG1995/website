@@ -1,12 +1,12 @@
 "use client";
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { useEffect, useState } from "react";
+import { motion } from "framer-motion";
+import DownloadModal from "./DownloadModal";
 
 export default function Nav() {
   const [scrolled, setScrolled] = useState(false);
-  const [signupOpen, setSignupOpen] = useState(false);
-  const popRef = useRef<HTMLDivElement>(null);
+  const [downloadOpen, setDownloadOpen] = useState(false);
 
   useEffect(() => {
     const on = () => setScrolled(window.scrollY > 12);
@@ -16,13 +16,10 @@ export default function Nav() {
   }, []);
 
   useEffect(() => {
-    if (!signupOpen) return;
-    const onClick = (e: MouseEvent) => {
-      if (popRef.current && !popRef.current.contains(e.target as Node)) setSignupOpen(false);
-    };
-    document.addEventListener("mousedown", onClick);
-    return () => document.removeEventListener("mousedown", onClick);
-  }, [signupOpen]);
+    const onOpen = () => setDownloadOpen(true);
+    window.addEventListener("open-download-modal", onOpen);
+    return () => window.removeEventListener("open-download-modal", onOpen);
+  }, []);
 
   return (
     <motion.header
@@ -32,8 +29,8 @@ export default function Nav() {
       className="fixed top-3 md:top-5 left-0 right-0 z-[90] flex justify-center px-3 md:px-6"
     >
       <motion.div
+        initial={{ maxWidth: 1280, paddingLeft: 18, paddingRight: 10 }}
         animate={{
-          width: scrolled ? "auto" : "100%",
           maxWidth: scrolled ? 720 : 1280,
           paddingLeft: scrolled ? 14 : 18,
           paddingRight: scrolled ? 8 : 10,
@@ -58,55 +55,17 @@ export default function Nav() {
           >
             Log in
           </Link>
-          <div ref={popRef} className="relative">
-            <button
-              onClick={() => setSignupOpen((v) => !v)}
-              className="px-4 md:px-5 py-2 md:py-2.5 rounded-full bg-ocean text-white text-xs md:text-sm font-semibold hover:bg-ink transition-colors"
-              data-hover
-              aria-expanded={signupOpen}
-            >
-              Sign up
-            </button>
-            <AnimatePresence>
-              {signupOpen && (
-                <motion.div
-                  initial={{ opacity: 0, y: -8, scale: 0.96 }}
-                  animate={{ opacity: 1, y: 0, scale: 1 }}
-                  exit={{ opacity: 0, y: -8, scale: 0.96 }}
-                  transition={{ duration: 0.18, ease: [0.2, 0.8, 0.2, 1] }}
-                  className="absolute right-0 top-full mt-3 w-64 rounded-2xl bg-white border border-ink/10 shadow-[0_30px_80px_-20px_rgba(26,26,46,0.25)] overflow-hidden"
-                >
-                  <div className="px-4 py-3 border-b border-ink/8 bg-bone/40">
-                    <div className="text-[10px] tracking-[0.22em] uppercase text-muted">Sign up as</div>
-                  </div>
-                  <Link
-                    href="https://linktr.ee/statdoctorau"
-                    className="flex items-center justify-between gap-3 px-4 py-3 hover:bg-ocean hover:text-white transition-colors group"
-                    onClick={() => setSignupOpen(false)}
-                  >
-                    <div>
-                      <div className="text-sm font-semibold">I&apos;m a doctor</div>
-                      <div className="text-[11px] text-muted group-hover:text-white/75">Find shifts on your terms</div>
-                    </div>
-                    <span className="text-base">→</span>
-                  </Link>
-                  <Link
-                    href="/hospitals"
-                    className="flex items-center justify-between gap-3 px-4 py-3 border-t border-ink/8 hover:bg-ocean hover:text-white transition-colors group"
-                    onClick={() => setSignupOpen(false)}
-                  >
-                    <div>
-                      <div className="text-sm font-semibold">I&apos;m a hospital</div>
-                      <div className="text-[11px] text-muted group-hover:text-white/75">Fill shifts in 30 minutes</div>
-                    </div>
-                    <span className="text-base">→</span>
-                  </Link>
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </div>
+          <button
+            onClick={() => setDownloadOpen(true)}
+            className="px-4 md:px-5 py-2 md:py-2.5 rounded-full bg-ocean text-white text-xs md:text-sm font-semibold hover:bg-ink transition-colors"
+            data-hover
+          >
+            Download App
+          </button>
         </div>
       </motion.div>
+
+      <DownloadModal open={downloadOpen} onClose={() => setDownloadOpen(false)} />
     </motion.header>
   );
 }

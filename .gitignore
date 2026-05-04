@@ -6,6 +6,7 @@ out
 .env*.local
 .vercel
 scripts/screens/
+scripts/playwright-out/
 
 # Build artefacts
 tsconfig.tsbuildinfo

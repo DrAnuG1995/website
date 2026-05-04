@@ -4,11 +4,11 @@ import SplitText from "@/components/SplitText";
 import { useState } from "react";
 
 const POSTS = [
-  { cat: "Guide", title: "The true cost of agency fees — a breakdown for doctors", date: "Apr 2026", read: "6 min", color: "#cde35d" },
+  { cat: "Guide", title: "The true cost of agency fees, a breakdown for doctors", date: "Apr 2026", read: "6 min", color: "#cde35d" },
   { cat: "Culture", title: "Why we built StatDoctor: a 2am story", date: "Apr 2026", read: "4 min", color: "#3232ff" },
-  { cat: "Market", title: "Locum rates across Australia — Q1 2026 benchmarks", date: "Mar 2026", read: "8 min", color: "#7b7bf4" },
+  { cat: "Market", title: "Locum rates across Australia, Q1 2026 benchmarks", date: "Mar 2026", read: "8 min", color: "#7b7bf4" },
   { cat: "Product", title: "New: direct messaging between doctors and rostering managers", date: "Mar 2026", read: "3 min", color: "#FF5A36" },
-  { cat: "Guide", title: "AHPRA, indemnity, and insurance — what you actually need", date: "Feb 2026", read: "10 min", color: "#cde35d" },
+  { cat: "Guide", title: "AHPRA, indemnity, and insurance, what you actually need", date: "Feb 2026", read: "10 min", color: "#cde35d" },
   { cat: "Market", title: "Regional vs. metro: where locum pay is rising fastest", date: "Feb 2026", read: "7 min", color: "#3232ff" },
 ];
 
@@ -22,7 +22,7 @@ export default function BlogClient() {
     <>
       <section className="pt-40 pb-16 px-6">
         <div className="max-w-[1280px] mx-auto">
-          <div className="eyebrow mb-4" data-mascot="Stories from the field — written by doctors.">The Journal</div>
+          <div className="eyebrow mb-4" data-mascot="Stories from the field, written by doctors.">The Journal</div>
           <h1 className="display text-[clamp(48px,8vw,128px)] leading-[0.92]">
             <SplitText>Notes from</SplitText>
             <br />
