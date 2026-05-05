@@ -71,7 +71,7 @@ function Hero({ onContact }: { onContact: () => void }) {
           <div className="mt-8 flex flex-col sm:flex-row gap-3 justify-center">
             <button
               onClick={onContact}
-              className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-full bg-ocean text-white text-sm font-semibold hover:bg-ink transition-colors"
+              className="inline-flex items-center justify-center gap-2 w-[200px] px-5 py-3 rounded-full bg-ocean text-white text-sm font-semibold hover:bg-ink transition-colors"
               data-hover
             >
               Book a 15-min demo
@@ -79,7 +79,7 @@ function Hero({ onContact }: { onContact: () => void }) {
             </button>
             <a
               href="#how"
-              className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-full border border-ink/20 text-ink text-sm font-medium hover:bg-bone hover:border-ink transition-colors"
+              className="inline-flex items-center justify-center gap-2 w-[200px] px-5 py-3 rounded-full border border-ink/20 text-ink text-sm font-medium hover:bg-bone hover:border-ink transition-colors"
               data-hover
             >
               How it works
@@ -606,7 +606,7 @@ function Pricing({ onContact }: { onContact: () => void }) {
             </ul>
             <button
               onClick={onContact}
-              className="mt-6 inline-flex items-center justify-center gap-2 px-5 py-3 rounded-full bg-ocean text-white text-sm font-semibold hover:bg-ink transition-colors"
+              className="mt-6 inline-flex items-center justify-center gap-2 w-full px-5 py-3 rounded-full bg-ocean text-white text-sm font-semibold hover:bg-ink transition-colors"
               data-hover
             >
               Start posting
@@ -639,7 +639,7 @@ function Pricing({ onContact }: { onContact: () => void }) {
             </ul>
             <button
               onClick={onContact}
-              className="mt-6 inline-flex items-center justify-center gap-2 px-5 py-3 rounded-full bg-electric text-ink text-sm font-semibold hover:bg-bone transition-colors"
+              className="mt-6 inline-flex items-center justify-center gap-2 w-full px-5 py-3 rounded-full bg-electric text-ink text-sm font-semibold hover:bg-bone transition-colors"
               data-hover
             >
               Talk to sales
