@@ -30,12 +30,13 @@ export default function AgencyCompare() {
           </h2>
         </motion.div>
 
+        {/* DESKTOP table */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-80px" }}
           transition={{ duration: 0.7, delay: 0.1 }}
-          className="rounded-3xl bg-lavender border border-ocean/10 overflow-hidden"
+          className="hidden sm:block rounded-3xl bg-lavender border border-ocean/10 overflow-hidden"
         >
           <div className="grid grid-cols-3 bg-white/40 text-[10px] tracking-[0.22em] uppercase font-semibold text-ink">
             <div className="px-5 md:px-7 py-4">Dimension</div>
@@ -63,6 +64,42 @@ export default function AgencyCompare() {
             </motion.div>
           ))}
         </motion.div>
+
+        {/* MOBILE cards */}
+        <div className="sm:hidden flex flex-col gap-3">
+          {ROWS.map((row, i) => (
+            <motion.div
+              key={row.dim}
+              initial={{ opacity: 0, y: 12 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-60px" }}
+              transition={{ duration: 0.5, delay: i * 0.05 }}
+              className="rounded-2xl bg-lavender border border-ocean/10 p-4"
+            >
+              <div className="text-[10px] tracking-[0.22em] uppercase font-semibold text-ink mb-3">
+                {row.dim}
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <div className="text-[9px] tracking-[0.18em] uppercase text-muted mb-1">
+                    Agency
+                  </div>
+                  <div className="text-[13px] text-muted line-through decoration-stat/60">
+                    {row.agency}
+                  </div>
+                </div>
+                <div>
+                  <div className="text-[9px] tracking-[0.18em] uppercase text-ocean/80 mb-1">
+                    StatDoctor
+                  </div>
+                  <div className="text-[13px] text-ocean font-medium">
+                    {row.sd}
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          ))}
+        </div>
       </div>
     </section>
   );

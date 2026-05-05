@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
+import Link from "next/link";
 import { motion } from "framer-motion";
 import HeroMap from "@/components/home/HeroMap";
 import AppShowcase from "@/components/home/AppShowcase";
@@ -67,25 +68,40 @@ function LogosStrip() {
               Trusted by hospitals from <span className="italic text-ocean">Cairns to Hobart</span>.
             </h2>
           </div>
-          <div className="text-[10px] tracking-[0.22em] uppercase text-muted">
+          <Link
+            href="/partners"
+            className="group inline-flex items-center gap-2 text-[10px] tracking-[0.22em] uppercase text-muted hover:text-ocean transition-colors"
+            data-hover
+          >
             60+ partners · growing weekly
-          </div>
+            <span
+              aria-hidden
+              className="inline-block transition-transform group-hover:translate-x-0.5"
+            >
+              →
+            </span>
+          </Link>
         </motion.div>
       </div>
 
       <div className="marquee-mask">
-        <div className="flex w-max items-center gap-10 md:gap-14 animate-marquee-slow hover:[animation-play-state:paused] px-6">
+        <div className="flex w-max items-center animate-marquee-slow hover:[animation-play-state:paused]">
           {doubled.map((src, i) => (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
+            <div
               key={i}
-              src={src}
-              alt=""
-              className="h-10 md:h-12 w-auto shrink-0 opacity-60 hover:opacity-100 transition-opacity duration-500 grayscale hover:grayscale-0"
-            />
+              className="shrink-0 w-[120px] md:w-[140px] flex items-center justify-center"
+            >
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={src}
+                alt=""
+                className="h-[41px] md:h-[49px] w-auto max-w-full opacity-60 hover:opacity-100 transition-opacity duration-500 grayscale hover:grayscale-0"
+              />
+            </div>
           ))}
         </div>
       </div>
+
     </section>
   );
 }
@@ -179,9 +195,15 @@ function FounderVideo() {
             </button>
 
             {/* Founder credit */}
-            <div className="absolute bottom-4 left-4 md:bottom-5 md:left-5 px-3 py-1.5 rounded-full bg-white/90 backdrop-blur-md border border-ink/10 text-[11px] font-medium">
-              Anurag G. · CEO &amp; Founder, StatDoctor
-            </div>
+            <a
+              href="https://www.linkedin.com/in/dr-anu-g-%F0%9F%A9%BA-3b330a248/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="absolute bottom-4 left-4 md:bottom-5 md:left-5 px-3 py-1.5 rounded-full bg-white/90 backdrop-blur-md border border-ink/10 text-[11px] font-medium hover:bg-white hover:text-ocean transition-colors"
+              data-hover
+            >
+              Dr Anu, CEO &amp; Founder StatDoctor
+            </a>
           </div>
         </div>
       </div>
@@ -549,40 +571,44 @@ function FinalCTA() {
             href="https://apps.apple.com/au/app/statdoctor/id6452677138"
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center justify-center gap-3 px-5 py-3 rounded-2xl bg-ink text-white hover:bg-ocean transition-colors"
+            className="flex items-center justify-center px-5 py-3 rounded-2xl bg-ink text-white hover:bg-ocean transition-colors"
             data-hover
           >
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
-              <path d="M16.365 1.43c0 1.14-.43 2.23-1.13 3.04-.85.99-2.23 1.76-3.36 1.66-.14-1.1.41-2.27 1.13-3.05.81-.92 2.27-1.65 3.36-1.65zM20.5 17.4c-.55 1.27-.81 1.83-1.51 2.95-.98 1.55-2.36 3.48-4.07 3.5-1.52.02-1.91-.99-3.97-.97-2.07.01-2.49 1-4.02.98-1.71-.02-3.02-1.77-4-3.32-2.74-4.32-3.03-9.4-1.34-12.1 1.2-1.93 3.1-3.06 4.88-3.06 1.82 0 2.96.99 4.46.99 1.46 0 2.35-.99 4.45-.99 1.59 0 3.27.86 4.47 2.36-3.93 2.16-3.29 7.82.65 9.66z" />
-            </svg>
-            <div className="text-left">
-              <div className="text-[10px] tracking-[0.18em] uppercase opacity-70">
-                Download on the
-              </div>
-              <div className="text-sm font-semibold leading-tight">App Store</div>
-            </div>
+            <span className="inline-flex items-center gap-3 w-[140px]">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden className="shrink-0">
+                <path d="M16.365 1.43c0 1.14-.43 2.23-1.13 3.04-.85.99-2.23 1.76-3.36 1.66-.14-1.1.41-2.27 1.13-3.05.81-.92 2.27-1.65 3.36-1.65zM20.5 17.4c-.55 1.27-.81 1.83-1.51 2.95-.98 1.55-2.36 3.48-4.07 3.5-1.52.02-1.91-.99-3.97-.97-2.07.01-2.49 1-4.02.98-1.71-.02-3.02-1.77-4-3.32-2.74-4.32-3.03-9.4-1.34-12.1 1.2-1.93 3.1-3.06 4.88-3.06 1.82 0 2.96.99 4.46.99 1.46 0 2.35-.99 4.45-.99 1.59 0 3.27.86 4.47 2.36-3.93 2.16-3.29 7.82.65 9.66z" />
+              </svg>
+              <span className="text-left">
+                <span className="block text-[10px] tracking-[0.18em] uppercase opacity-70">
+                  Get it on
+                </span>
+                <span className="block text-sm font-semibold leading-tight">App Store</span>
+              </span>
+            </span>
           </a>
           <a
             href="https://play.google.com/store/apps/details?id=user.statdoctor.app&hl=en_AU"
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center justify-center gap-3 px-5 py-3 rounded-2xl bg-ocean text-white hover:bg-ink transition-colors"
+            className="flex items-center justify-center px-5 py-3 rounded-2xl bg-ocean text-white hover:bg-ink transition-colors"
             data-hover
           >
-            <svg width="20" height="20" viewBox="0 0 24 24" aria-hidden>
-              <path
-                fill="currentColor"
-                d="M3.6 1.5c-.3.3-.5.7-.5 1.3v18.4c0 .6.2 1 .5 1.3l10.7-10.5L3.6 1.5zm12 8.4L5.6 1.4l11.7 6.7-1.7 1.8zm3 1.6l-2.4-1.4-1.9 1.9 1.9 1.9 2.4-1.4c.7-.4.7-1.6 0-2zm-12.7 11l10.1-9.7-1.7-1.8L5.9 22.5z"
-              />
-            </svg>
-            <div className="text-left">
-              <div className="text-[10px] tracking-[0.18em] uppercase opacity-80">
-                Get it on
-              </div>
-              <div className="text-sm font-semibold leading-tight">
-                Google Play
-              </div>
-            </div>
+            <span className="inline-flex items-center gap-3 w-[140px]">
+              <svg width="20" height="20" viewBox="0 0 24 24" aria-hidden className="shrink-0">
+                <path
+                  fill="currentColor"
+                  d="M3.6 1.5c-.3.3-.5.7-.5 1.3v18.4c0 .6.2 1 .5 1.3l10.7-10.5L3.6 1.5zm12 8.4L5.6 1.4l11.7 6.7-1.7 1.8zm3 1.6l-2.4-1.4-1.9 1.9 1.9 1.9 2.4-1.4c.7-.4.7-1.6 0-2zm-12.7 11l10.1-9.7-1.7-1.8L5.9 22.5z"
+                />
+              </svg>
+              <span className="text-left">
+                <span className="block text-[10px] tracking-[0.18em] uppercase opacity-80">
+                  Get it on
+                </span>
+                <span className="block text-sm font-semibold leading-tight">
+                  Google Play
+                </span>
+              </span>
+            </span>
           </a>
         </div>
 

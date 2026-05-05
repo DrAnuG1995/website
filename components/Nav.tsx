@@ -43,18 +43,20 @@ export default function Nav() {
           <img
             src="/statdoctor-logo.png"
             alt="StatDoctor"
-            className="h-7 md:h-8 w-auto"
+            className="h-8 md:h-9 w-auto"
           />
         </Link>
 
         <div className="flex items-center gap-1 md:gap-2">
-          <Link
-            href="https://app.statdoctor.app/login"
+          <a
+            href="https://hospital.statdoctor.app/#/login"
+            target="_blank"
+            rel="noopener noreferrer"
             className="px-3 md:px-4 py-2 text-xs md:text-sm font-medium text-ink/80 hover:text-ocean transition-colors"
             data-hover
           >
             Log in
-          </Link>
+          </a>
           <button
             onClick={() => setDownloadOpen(true)}
             className="px-4 md:px-5 py-2 md:py-2.5 rounded-full bg-ocean text-white text-xs md:text-sm font-semibold hover:bg-ink transition-colors"

@@ -11,7 +11,7 @@ export default function ForDoctorsClient() {
 
   return (
     <div className="bg-white text-ink">
-      <section className="relative pt-28 md:pt-32 pb-8 md:pb-12 px-6">
+      <section className="relative pt-48 md:pt-60 pb-4 md:pb-6 px-6">
         <div
           aria-hidden
           className="pointer-events-none absolute inset-0 opacity-50"
@@ -57,6 +57,39 @@ export default function ForDoctorsClient() {
           </motion.div>
         </div>
       </section>
+
+      {/* Section break: caption sits horizontally centered, with a vertical
+          rail beneath it. A light glides top→bottom along the rail to cue
+          the reader to keep scrolling. */}
+      <div className="relative max-w-[1100px] mx-auto px-6 pt-16 pb-4 md:pt-24 md:pb-8">
+        <div className="flex flex-col items-center gap-4 text-center">
+          <span className="text-[10px] tracking-[0.22em] uppercase text-muted">
+            Inside the app
+          </span>
+          <div aria-hidden className="relative w-px h-12 md:h-14 bg-ink/10 overflow-hidden">
+            <motion.span
+              className="absolute left-1/2 -translate-x-1/2 w-[3px] h-5 rounded-full"
+              style={{
+                background:
+                  "linear-gradient(to bottom, transparent, rgba(50,50,255,0.95), transparent)",
+                boxShadow: "0 0 10px rgba(50,50,255,0.55)",
+              }}
+              initial={{ top: -20, opacity: 0 }}
+              animate={{
+                top: [-20, 56],
+                opacity: [0, 1, 1, 0],
+              }}
+              transition={{
+                duration: 2.2,
+                repeat: Infinity,
+                ease: [0.4, 0, 0.6, 1],
+                times: [0, 0.18, 0.82, 1],
+                repeatDelay: 0.7,
+              }}
+            />
+          </div>
+        </div>
+      </div>
 
       <div id="features">
         <FeatureShowcase />

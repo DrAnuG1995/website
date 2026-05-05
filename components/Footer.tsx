@@ -38,14 +38,14 @@ export default function Footer() {
           <div className="flex flex-col gap-2 md:items-end">
             <Link
               href="/for-doctors"
-              className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-full bg-electric text-ink text-xs md:text-sm font-semibold hover:bg-ocean hover:text-white transition-colors"
+              className="inline-flex items-center justify-center gap-2 w-[210px] px-5 py-3 rounded-full bg-electric text-ink text-xs md:text-sm font-semibold hover:bg-ocean hover:text-white transition-colors"
               data-hover
             >
               Join as a doctor →
             </Link>
             <Link
               href="/hospitals"
-              className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-full border border-bone/25 text-bone text-xs md:text-sm font-medium hover:bg-bone hover:text-ink hover:border-bone transition-colors"
+              className="inline-flex items-center justify-center gap-2 w-[210px] px-5 py-3 rounded-full border border-bone/25 text-bone text-xs md:text-sm font-medium hover:bg-bone hover:text-ink hover:border-bone transition-colors"
               data-hover
             >
               Join as a hospital →

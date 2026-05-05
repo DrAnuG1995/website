@@ -107,7 +107,7 @@ export default function DownloadModal({
                 <AppleGlyph />
                 <div className="flex-1 text-left">
                   <div className="text-[10px] tracking-[0.18em] uppercase opacity-70">
-                    Download on the
+                    Get it on
                   </div>
                   <div className="text-base font-semibold leading-tight">
                     App Store

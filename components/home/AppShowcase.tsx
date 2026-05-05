@@ -80,7 +80,7 @@ export default function AppShowcase() {
   // single horizontal row.
   const { scrollYProgress } = useScroll({
     target: sectionRef,
-    offset: ["start 0.85", "end 0.6"],
+    offset: ["start 0.55", "end 0.4"],
   });
 
   return (
@@ -129,27 +129,31 @@ function StepCard({
   index: number;
   progress: MotionValue<number>;
 }) {
-  // Each card occupies its own scroll-progress window, so they reveal
-  // one-by-one as the user scrolls. 4 cards × 0.18 + small lead-in.
-  const start = 0.05 + index * 0.18;
-  const mid = start + 0.12;
-  const end = start + 0.22;
+  // First card renders fully on entry; cards 2-4 reveal one-by-one as the
+  // user scrolls through the section.
+  const isFirst = index === 0;
+  // First card is fully visible on entry; cards 2-4 reveal one-by-one
+  // as the user scrolls through the section.
+  const start = isFirst ? -1 : 0.32 + (index - 1) * 0.22;
+  const mid = isFirst ? -0.5 : start + 0.14;
+  const end = isFirst ? 0 : start + 0.24;
 
-  const opacity = useTransform(progress, [start, mid], [0, 1]);
-  const y = useTransform(progress, [start, mid], [50, 0]);
-  const pillOpacity = useTransform(progress, [mid, end], [0, 1]);
-  const pillY = useTransform(progress, [mid, end], [10, 0]);
+  const opacity = useTransform(progress, [start, mid], [isFirst ? 1 : 0, 1]);
+  const y = useTransform(progress, [start, mid], [isFirst ? 0 : 12, 0]);
+  const pillOpacity = useTransform(progress, [mid, end], [isFirst ? 1 : 0, 1]);
+  const pillY = useTransform(progress, [mid, end], [isFirst ? 0 : 6, 0]);
 
   return (
     <motion.div
       style={{ opacity, y }}
-      whileHover={{ y: -6 }}
-      className="group relative rounded-3xl bg-lavender border border-ocean/10 overflow-hidden flex flex-col transition-shadow duration-500 hover:shadow-[0_30px_70px_-20px_rgba(50,50,255,0.25)]"
+      whileHover={{ y: -1 }}
+      transition={{ type: "tween", duration: 0.25, ease: [0.2, 0.8, 0.2, 1] }}
+      className="group relative rounded-3xl bg-lavender border border-ocean/10 overflow-hidden flex flex-col transition-shadow duration-300 hover:shadow-[0_20px_50px_-20px_rgba(50,50,255,0.2)]"
     >
-      {/* accent glow that brightens on hover */}
+      {/* steady accent glow, no hover brighten */}
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-x-0 -bottom-32 h-64 blur-3xl opacity-50 group-hover:opacity-90 transition-opacity duration-700"
+        className="pointer-events-none absolute inset-x-0 -bottom-32 h-64 blur-3xl opacity-50"
         style={{ background: ACCENT_GLOW[step.accent] }}
       />
 

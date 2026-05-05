@@ -314,7 +314,7 @@ export default function HeroMap() {
 
               <div className="mt-5 flex flex-col sm:flex-row gap-2">
                 <a
-                  href="https://linktr.ee/statdoctorau"
+                  href="/for-doctors"
                   className="inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-full bg-ocean text-white text-xs md:text-sm font-semibold hover:bg-ink transition-colors"
                   data-hover
                 >

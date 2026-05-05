@@ -142,8 +142,8 @@ export default function LiveShiftFeed() {
           </div>
 
           {/* Feed body */}
-          <div className="rounded-b-3xl bg-bone border-x border-b border-ink/10 shadow-[0_30px_70px_-20px_rgba(26,26,46,0.18)] overflow-hidden">
-            <div className="divide-y divide-ink/8">
+          <div className="rounded-b-3xl bg-lavender border-x border-b border-ocean/10 shadow-[0_30px_70px_-20px_rgba(26,26,46,0.18)] overflow-hidden">
+            <div className="divide-y divide-ocean/10">
               <AnimatePresence initial={false} mode="popLayout">
                 {items.map((item, i) => (
                   <motion.div
@@ -157,7 +157,7 @@ export default function LiveShiftFeed() {
                       opacity: { duration: 0.45, ease: [0.2, 0.8, 0.2, 1] },
                       y: { duration: 0.55, ease: [0.2, 0.8, 0.2, 1] },
                     }}
-                    className="px-5 md:px-6 py-4 flex items-center gap-4 bg-bone min-h-[76px]"
+                    className="px-5 md:px-6 py-4 flex items-center gap-4 bg-lavender min-h-[76px]"
                   >
                     {/* Hospital initials avatar */}
                     <div
@@ -165,7 +165,7 @@ export default function LiveShiftFeed() {
                     >
                       {initials(item.hospital)}
                       {i === 0 && (
-                        <span className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-stat ring-2 ring-bone" />
+                        <span className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-stat ring-2 ring-lavender" />
                       )}
                     </div>
 

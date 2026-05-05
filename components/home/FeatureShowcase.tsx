@@ -64,8 +64,22 @@ const FEATURES: Feature[] = [
 
 export default function FeatureShowcase() {
   return (
-    <section className="relative bg-white">
-      <div className="max-w-[1280px] mx-auto px-6 pt-12 md:pt-16 pb-4">
+    <section className="relative bg-white overflow-hidden">
+      {/* soft lavender wash that fades in from the hero edge and fades out
+          before the feature rows. No hard band, just a hint of separation. */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-x-0 top-0 h-[520px]"
+        style={{
+          background:
+            "radial-gradient(70% 60% at 50% 30%, rgba(239,237,255,0.55), transparent 75%)",
+          maskImage:
+            "linear-gradient(to bottom, transparent 0%, black 25%, black 60%, transparent 100%)",
+          WebkitMaskImage:
+            "linear-gradient(to bottom, transparent 0%, black 25%, black 60%, transparent 100%)",
+        }}
+      />
+      <div className="relative max-w-[1280px] mx-auto px-6 pt-10 md:pt-14 pb-2">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -73,9 +87,6 @@ export default function FeatureShowcase() {
           transition={{ duration: 0.7 }}
           className="text-center max-w-3xl mx-auto"
         >
-          <div className="text-[10px] tracking-[0.22em] uppercase text-muted mb-3">
-            For doctors
-          </div>
           <h2 className="display text-[clamp(28px,4.5vw,56px)] leading-[1.0]">
             Built for the way{" "}
             <span className="italic text-ocean">doctors actually work</span>.

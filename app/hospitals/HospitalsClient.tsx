@@ -186,7 +186,7 @@ function HowItWorks() {
   return (
     <section id="how" className="relative bg-white">
       {/* Header, normal flow, scrolls past as the sticky stack pins below */}
-      <div className="relative max-w-[1100px] mx-auto px-6 pt-20 md:pt-24 pb-10 md:pb-14 text-center">
+      <div className="relative max-w-[1100px] mx-auto px-6 pt-16 md:pt-24 pb-8 md:pb-14 text-center">
         <div className="text-[10px] tracking-[0.22em] uppercase text-muted mb-3">
           How it works
         </div>
@@ -195,15 +195,16 @@ function HowItWorks() {
           <span className="italic text-ocean">in under 24 hours</span>.
         </h2>
         <p className="mt-4 text-muted max-w-xl mx-auto text-[14px] md:text-[15px] leading-relaxed">
-          Four steps. Cards stack as you scroll.
+          Four steps.{" "}
+          <span className="hidden md:inline">Cards stack as you scroll.</span>
         </p>
       </div>
 
-      {/* Sticky card stack, height = N × 100vh so each step gets its own scroll window */}
+      {/* DESKTOP: sticky scroll-pinned card stack, height = N × 100vh */}
       <div
         ref={stickyRef}
         style={{ height: `${STEPS.length * 100}vh` }}
-        className="relative"
+        className="relative hidden md:block"
       >
         <div className="sticky top-0 h-screen flex items-center overflow-hidden px-4 md:px-6">
           <div className="relative w-full max-w-[1100px] mx-auto h-[520px] md:h-[560px]">
@@ -216,12 +217,71 @@ function HowItWorks() {
                 progress={scrollYProgress}
               />
             ))}
-            {/* progress dots, bottom centred, visible across stack */}
             <ProgressDots progress={scrollYProgress} total={STEPS.length} />
           </div>
         </div>
       </div>
+
+      {/* MOBILE: simple vertical card stack, no sticky/scroll mechanics */}
+      <div className="md:hidden px-4 pb-8 space-y-4">
+        {STEPS.map((step, i) => (
+          <MobileStepCard key={step.n} step={step} index={i} />
+        ))}
+      </div>
     </section>
+  );
+}
+
+function MobileStepCard({ step, index }: { step: Step; index: number }) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 24 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: "-60px" }}
+      transition={{ duration: 0.6, delay: 0.05 + index * 0.05, ease: [0.2, 0.8, 0.2, 1] }}
+      className="relative rounded-3xl bg-lavender border border-ocean/15 overflow-hidden"
+    >
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-x-0 -bottom-32 h-48 blur-3xl opacity-50"
+        style={{ background: ACCENT_GLOW[step.accent] }}
+      />
+      <div className="relative p-6">
+        <div className="flex items-center justify-between mb-3">
+          <div className={`display text-[28px] leading-none ${ACCENT_NUM[step.accent]}`}>
+            {step.n}
+          </div>
+          <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white border border-ink/10">
+            <span className={`w-1.5 h-1.5 rounded-full ${ACCENT_DOT[step.accent]}`} />
+            <span className="text-[9px] tracking-[0.22em] uppercase font-semibold text-ink">
+              {step.pill}
+            </span>
+          </span>
+        </div>
+        <h3 className="display text-[20px] leading-[1.15] text-ink">
+          {step.title}
+        </h3>
+        <p className="mt-2 text-[13px] text-ink/65 leading-relaxed">
+          {step.body}
+        </p>
+      </div>
+      <div className="relative px-4 pb-4">
+        <div className="rounded-2xl bg-white border border-ink/12 shadow-[0_15px_40px_-20px_rgba(26,26,46,0.3)] overflow-hidden">
+          <div className="flex items-center gap-1.5 px-3 h-5 bg-bone border-b border-ink/8">
+            <span className="w-1.5 h-1.5 rounded-full bg-stat/55" />
+            <span className="w-1.5 h-1.5 rounded-full bg-electric/80" />
+            <span className="w-1.5 h-1.5 rounded-full bg-leaf/55" />
+          </div>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={step.src}
+            alt={step.title}
+            loading="lazy"
+            className="w-full h-auto block"
+          />
+        </div>
+      </div>
+    </motion.div>
   );
 }
 
@@ -431,7 +491,8 @@ function Comparison() {
           </h2>
         </motion.div>
 
-        <div className="rounded-3xl overflow-hidden border border-bone/15 bg-bone/5 backdrop-blur-sm">
+        {/* DESKTOP table */}
+        <div className="hidden sm:block rounded-3xl overflow-hidden border border-bone/15 bg-bone/5 backdrop-blur-sm">
           <div className="grid grid-cols-3 bg-bone/10 text-bone text-[10px] tracking-[0.22em] uppercase">
             <div className="px-5 py-4 font-semibold">Dimension</div>
             <div className="px-5 py-4 opacity-60">Traditional agency</div>
@@ -452,6 +513,42 @@ function Comparison() {
               </div>
               <div className="px-5 py-4 text-[14px] text-electric font-medium">
                 {row.sd}
+              </div>
+            </motion.div>
+          ))}
+        </div>
+
+        {/* MOBILE cards, one per row */}
+        <div className="sm:hidden flex flex-col gap-3">
+          {COMPARE.map((row, i) => (
+            <motion.div
+              key={row.dim}
+              initial={{ opacity: 0, y: 12 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-60px" }}
+              transition={{ duration: 0.5, delay: i * 0.05 }}
+              className="rounded-2xl border border-bone/15 bg-bone/5 p-4"
+            >
+              <div className="text-[10px] tracking-[0.22em] uppercase text-bone/70 font-semibold mb-3">
+                {row.dim}
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <div className="text-[9px] tracking-[0.18em] uppercase text-bone/45 mb-1">
+                    Agency
+                  </div>
+                  <div className="text-[13px] text-bone/55 line-through decoration-stat/60">
+                    {row.agency}
+                  </div>
+                </div>
+                <div>
+                  <div className="text-[9px] tracking-[0.18em] uppercase text-electric/80 mb-1">
+                    StatDoctor
+                  </div>
+                  <div className="text-[13px] text-electric font-medium">
+                    {row.sd}
+                  </div>
+                </div>
               </div>
             </motion.div>
           ))}
