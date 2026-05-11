@@ -626,8 +626,8 @@ function Pricing({ onContact }: { onContact: () => void }) {
             <div className="text-[10px] tracking-[0.22em] uppercase text-bone/60 mb-3">
               Network · Health districts
             </div>
-            <div className="display text-[clamp(40px,4.5vw,56px)] leading-none">
-              Annual subscription
+            <div className="display text-[clamp(48px,5vw,64px)] leading-none">
+              Custom
             </div>
             <p className="mt-3 text-[13px] md:text-[14px] text-bone/70 leading-relaxed">
               One flat annual fee. Unlimited posting, unlimited doctors,

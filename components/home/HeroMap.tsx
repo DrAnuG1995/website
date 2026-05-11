@@ -436,9 +436,9 @@ function Stat({
 }) {
   return (
     <div>
-      <div className="display text-xl md:text-2xl normal-case tracking-tight leading-none inline-flex items-baseline gap-1">
+      <div className="display text-xl md:text-2xl normal-case tracking-tight leading-none inline-flex items-baseline gap-1 whitespace-nowrap">
         {smallPrefix && (
-          <span className="text-[10px] md:text-[11px] tracking-[0.18em] uppercase text-muted self-center">
+          <span className="text-ink mr-1">
             {smallPrefix}
           </span>
         )}

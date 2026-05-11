@@ -11,6 +11,7 @@ export default function Nav() {
   const pathname = usePathname();
   const onDoctors = pathname?.startsWith("/for-doctors");
   const onHospitals = pathname?.startsWith("/hospitals");
+  const onPartners = pathname?.startsWith("/partners");
 
   useEffect(() => {
     const on = () => setScrolled(window.scrollY > 12);
@@ -70,6 +71,16 @@ export default function Nav() {
             data-hover
           >
             Hospitals
+          </Link>
+          <span aria-hidden className="h-4 w-px bg-ink/25 select-none" />
+          <Link
+            href="/partners"
+            className={`transition-colors text-ink hover:text-ink/70 ${
+              onPartners ? "underline underline-offset-4 decoration-2" : ""
+            }`}
+            data-hover
+          >
+            Partners
           </Link>
         </div>
 
