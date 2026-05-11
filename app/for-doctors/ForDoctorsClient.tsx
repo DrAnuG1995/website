@@ -1,5 +1,6 @@
 "use client";
-import { motion } from "framer-motion";
+import { useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
 import FeatureShowcase from "@/components/home/FeatureShowcase";
 
 export default function ForDoctorsClient() {
@@ -121,20 +122,80 @@ export default function ForDoctorsClient() {
   );
 }
 
+type AusState = "VIC" | "NSW" | "QLD" | "WA" | "SA" | "TAS" | "ACT" | "NT";
+
+const STATES: { code: AusState; label: string }[] = [
+  { code: "VIC", label: "Victoria" },
+  { code: "NSW", label: "New South Wales" },
+  { code: "QLD", label: "Queensland" },
+  { code: "WA", label: "Western Australia" },
+  { code: "SA", label: "South Australia" },
+  { code: "TAS", label: "Tasmania" },
+  { code: "ACT", label: "ACT" },
+  { code: "NT", label: "Northern Territory" },
+];
+
+const PARTNERS: { name: string; state: AusState }[] = [
+  // VIC
+  { name: "Alexandra District Health", state: "VIC" },
+  { name: "Bairnsdale Regional Health Service", state: "VIC" },
+  { name: "Bendigo & District Aboriginal Co-operative", state: "VIC" },
+  { name: "Bendigo Health", state: "VIC" },
+  { name: "Border Urgent Care Centre", state: "VIC" },
+  { name: "CBD Doctors Melbourne", state: "VIC" },
+  { name: "Colac Area Health", state: "VIC" },
+  { name: "Echuca Regional Health", state: "VIC" },
+  { name: "Knox Private Hospital ED", state: "VIC" },
+  { name: "Merri-bek Family Doctors", state: "VIC" },
+  { name: "Portland District Health", state: "VIC" },
+  { name: "Swan Hill District Health", state: "VIC" },
+  { name: "Yarrawonga Health", state: "VIC" },
+  // NSW
+  { name: "HEAL Urgent Care Newcastle", state: "NSW" },
+  { name: "Woodburn Health GP Clinic", state: "NSW" },
+  { name: "Central West Medical Centre", state: "NSW" },
+  // QLD
+  { name: "Biggenden Multipurpose Health Centre", state: "QLD" },
+  { name: "Bundaberg Hospital", state: "QLD" },
+  { name: "Childers Hospital", state: "QLD" },
+  { name: "Eidsvold Multipurpose Health Service", state: "QLD" },
+  { name: "Gayndah Hospital", state: "QLD" },
+  { name: "Gin Gin Hospital", state: "QLD" },
+  { name: "Hervey Bay Hospital", state: "QLD" },
+  { name: "Maryborough Hospital", state: "QLD" },
+  { name: "Mater Private Brisbane", state: "QLD" },
+  { name: "Mater Private Mackay", state: "QLD" },
+  { name: "Mater Private Rockhampton", state: "QLD" },
+  { name: "Mater Private Townsville", state: "QLD" },
+  { name: "Monto Hospital", state: "QLD" },
+  { name: "Noosa Private Hospital", state: "QLD" },
+  { name: "Friendly Society Private Bundaberg", state: "QLD" },
+  // WA
+  { name: "Hollywood Private Hospital", state: "WA" },
+  { name: "Kalgoorlie Hospital", state: "WA" },
+  { name: "Kutjungka Regional Clinic", state: "WA" },
+  { name: "Paraburdoo Medical Centre", state: "WA" },
+  { name: "Tom Price Hospital", state: "WA" },
+  // TAS
+  { name: "Hobart Private Hospital", state: "TAS" },
+  // ACT
+  { name: "Fisher Family Practice", state: "ACT" },
+  { name: "Holder Family Practice", state: "ACT" },
+  { name: "Kingston Plaza Medical Centre", state: "ACT" },
+  // Uncertain state — best-guess pending confirmation
+  { name: "GN Medical Centre", state: "NSW" },
+  { name: "Mercy Family Doctors", state: "VIC" },
+  { name: "MyFast Medical", state: "VIC" },
+  { name: "Saint Lukes Medical Centre", state: "VIC" },
+];
+
 function PartnerNetwork() {
-  // Show a curated sample of well-known partners across states, full list
-  // lives on /partners. Keeps /for-doctors focused on conversion, not the
-  // alphabetical wall.
-  const SAMPLE = [
-    "Bendigo Health",
-    "Mater Private Brisbane",
-    "Knox Private Hospital ED",
-    "Hobart Private Hospital",
-    "Tom Price Hospital",
-    "Hollywood Private Hospital",
-    "HEAL Urgent Care Newcastle",
-    "Bundaberg Hospital",
-  ];
+  const [filter, setFilter] = useState<AusState | "ALL">("ALL");
+  const visible =
+    filter === "ALL" ? PARTNERS : PARTNERS.filter((p) => p.state === filter);
+  const countFor = (code: AusState) =>
+    PARTNERS.filter((p) => p.state === code).length;
+
   return (
     <section className="relative bg-white py-12 md:py-14 px-6">
       <div className="max-w-[1100px] mx-auto">
@@ -155,16 +216,50 @@ function PartnerNetwork() {
             </h2>
           </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 mb-6">
-            {SAMPLE.map((name) => (
-              <div
-                key={name}
-                className="rounded-2xl bg-white border border-ink/8 px-4 py-3 text-[13px] md:text-[14px] text-ink leading-snug text-center"
-              >
-                {name}
-              </div>
-            ))}
+          <div className="flex flex-wrap justify-center gap-2 mb-6">
+            <StatePill
+              active={filter === "ALL"}
+              onClick={() => setFilter("ALL")}
+              label="All states"
+            />
+            {STATES.map((s) => {
+              if (countFor(s.code) === 0) return null;
+              return (
+                <StatePill
+                  key={s.code}
+                  active={filter === s.code}
+                  onClick={() => setFilter(s.code)}
+                  label={s.label}
+                />
+              );
+            })}
           </div>
+
+          <motion.div
+            layout
+            className="flex flex-wrap justify-center gap-3 md:gap-4 mb-6"
+          >
+            <AnimatePresence mode="popLayout">
+              {visible.map((p) => (
+                <motion.div
+                  key={p.name}
+                  layout
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.95 }}
+                  transition={{ duration: 0.25, ease: [0.2, 0.8, 0.2, 1] }}
+                  className="basis-[calc(50%-6px)] md:basis-[calc(25%-12px)] rounded-2xl bg-white border border-ink/8 px-4 py-4 flex flex-col items-center justify-center text-center min-h-[78px]"
+                >
+                  <div className="text-[13px] md:text-[14px] text-ink leading-snug">
+                    {p.name}
+                  </div>
+                  <div className="mt-1 text-[10px] tracking-[0.15em] uppercase text-muted">
+                    {p.state}
+                  </div>
+                </motion.div>
+              ))}
+            </AnimatePresence>
+          </motion.div>
 
           <div className="text-center">
             <a
@@ -179,5 +274,29 @@ function PartnerNetwork() {
         </motion.div>
       </div>
     </section>
+  );
+}
+
+function StatePill({
+  active,
+  onClick,
+  label,
+}: {
+  active: boolean;
+  onClick: () => void;
+  label: string;
+}) {
+  return (
+    <button
+      onClick={onClick}
+      className={`inline-flex items-center px-3.5 py-1.5 rounded-full text-[12px] md:text-[13px] font-medium border transition-colors ${
+        active
+          ? "bg-ocean text-white border-ocean"
+          : "bg-white text-ink border-ink/15 hover:border-ink/40"
+      }`}
+      data-hover
+    >
+      {label}
+    </button>
   );
 }
