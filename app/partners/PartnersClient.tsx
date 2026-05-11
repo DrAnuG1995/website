@@ -68,7 +68,6 @@ export default function PartnersClient() {
   return (
     <div className="bg-white text-ink">
       <Hero />
-      <LogoWall />
       <PerkGrid />
       <ClosingCTA />
     </div>
@@ -140,51 +139,6 @@ function HeroStat({
         {label}
       </div>
     </div>
-  );
-}
-
-/* ---------- LOGO WALL ----------
-   Wordmarks set in the display font. Consistent visual treatment,
-   no dependency on third-party assets. Swap to real SVG logos later
-   by replacing the span content with <img>. */
-function LogoWall() {
-  return (
-    <section className="relative bg-white py-10 md:py-12 px-6">
-      <div className="max-w-[1280px] mx-auto">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-80px" }}
-          transition={{ duration: 0.7 }}
-          className="text-center mb-8"
-        >
-          <div className="text-[10px] tracking-[0.22em] uppercase text-muted">
-            Brands you unlock
-          </div>
-        </motion.div>
-
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-80px" }}
-          transition={{ duration: 0.7, delay: 0.1 }}
-          className="rounded-3xl bg-lavender border border-ocean/10 px-6 md:px-12 py-8 md:py-10"
-        >
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-x-6 gap-y-8 items-center">
-            {PERKS.map((p) => (
-              <div
-                key={p.brand}
-                className="flex items-center justify-center text-center min-h-[44px]"
-              >
-                <span className="display text-[18px] md:text-[20px] leading-tight text-ink/85 tracking-tight">
-                  {p.brand}
-                </span>
-              </div>
-            ))}
-          </div>
-        </motion.div>
-      </div>
-    </section>
   );
 }
 

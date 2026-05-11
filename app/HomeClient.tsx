@@ -32,19 +32,28 @@ export default function HomeClient() {
 /* ============================================================
    02, LOGOS STRIP
    ============================================================ */
-const LOGOS = [
-  "https://cdn.prod.website-files.com/688db6d677516719c3925d01/69891c5f64ac3ee08b11eea1_1.png",
-  "https://cdn.prod.website-files.com/688db6d677516719c3925d01/69a79f6b34e627a6c618835f_16.png",
-  "https://cdn.prod.website-files.com/688db6d677516719c3925d01/6891b90e4261c120b064cabc_Group%201799.svg",
-  "https://cdn.prod.website-files.com/688db6d677516719c3925d01/6891b2ca97d3296f92eecdb3_Group%201797.svg",
-  "https://cdn.prod.website-files.com/688db6d677516719c3925d01/6891b9bdc8ce83d0d774d6a0_Group%201795.svg",
-  "https://cdn.prod.website-files.com/688db6d677516719c3925d01/6989187d91bc7a590978853b_Hospital%20Logos%20(100%20x%20100%20px).png",
-  "https://cdn.prod.website-files.com/688db6d677516719c3925d01/69891c60a412a0902b515580_3.png",
-  "https://cdn.prod.website-files.com/688db6d677516719c3925d01/69891c6022354c21182e964e_5.png",
-  "https://cdn.prod.website-files.com/688db6d677516719c3925d01/697c24083cb29d7af761cd8f_brhs.png",
-  "https://cdn.prod.website-files.com/688db6d677516719c3925d01/697c31849389b03bf00674df_Myfast%20medical%20Logo.png",
-  "https://cdn.prod.website-files.com/688db6d677516719c3925d01/69a79f6bd66a38e7ecd9a248_17.png",
-  "https://cdn.prod.website-files.com/688db6d677516719c3925d01/69a79f6b8e767399e5f8ad70_4.png",
+// Per-logo height (desktop px) tuned to normalise *visual area* across the
+// strip. Source files have inconsistent transparent padding and aspect
+// ratios — wide wordmarks at the same height look enormous next to square
+// icons, and padded PNG icons look tiny. Heights computed off
+// h = sqrt(targetArea / aspect) with target area ≈ 51² = 2601, then nudged
+// up for known-padded icons.
+type Logo = { src: string; h?: number };
+const LOGOS: Logo[] = [
+  // _1.png at index 0 was a dead CDN reference (HTTP 403) — it rendered as
+  // an empty slot, which read as a giant gap between Portland and PEHA at
+  // the marquee wrap. Removed.
+  { src: "https://cdn.prod.website-files.com/688db6d677516719c3925d01/69a79f6b34e627a6c618835f_16.png", h: 60 },
+  { src: "https://cdn.prod.website-files.com/688db6d677516719c3925d01/6891b90e4261c120b064cabc_Group%201799.svg", h: 40 },
+  { src: "https://cdn.prod.website-files.com/688db6d677516719c3925d01/6891b2ca97d3296f92eecdb3_Group%201797.svg", h: 37 },
+  { src: "https://cdn.prod.website-files.com/688db6d677516719c3925d01/6891b9bdc8ce83d0d774d6a0_Group%201795.svg", h: 54 },
+  { src: "https://cdn.prod.website-files.com/688db6d677516719c3925d01/6989187d91bc7a590978853b_Hospital%20Logos%20(100%20x%20100%20px).png", h: 60 },
+  { src: "https://cdn.prod.website-files.com/688db6d677516719c3925d01/69891c60a412a0902b515580_3.png", h: 56 },
+  { src: "https://cdn.prod.website-files.com/688db6d677516719c3925d01/69891c6022354c21182e964e_5.png", h: 56 },
+  { src: "https://cdn.prod.website-files.com/688db6d677516719c3925d01/697c24083cb29d7af761cd8f_brhs.png", h: 36 },
+  { src: "https://cdn.prod.website-files.com/688db6d677516719c3925d01/697c31849389b03bf00674df_Myfast%20medical%20Logo.png", h: 52 },
+  { src: "https://cdn.prod.website-files.com/688db6d677516719c3925d01/69a79f6bd66a38e7ecd9a248_17.png", h: 56 },
+  { src: "https://cdn.prod.website-files.com/688db6d677516719c3925d01/69a79f6b8e767399e5f8ad70_4.png", h: 56 },
 ];
 
 function LogosStrip() {
@@ -90,16 +99,17 @@ function LogosStrip() {
             uneven where source PNGs have heavy transparent padding baked
             in, but the rhythm of the loop is mathematically uniform. */}
         <div className="flex w-max items-center animate-marquee-slow hover:[animation-play-state:paused]">
-          {doubled.map((src, i) => (
+          {doubled.map((logo, i) => (
             <div
               key={i}
               className="shrink-0 w-[150px] md:w-[170px] flex items-center justify-center"
             >
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
-                src={src}
+                src={logo.src}
                 alt=""
-                className="h-[43px] md:h-[51px] w-auto max-w-[110px] md:max-w-[130px] opacity-60 hover:opacity-100 transition-opacity duration-500 grayscale hover:grayscale-0"
+                style={{ height: `${logo.h ?? 51}px` }}
+                className="w-auto max-w-[120px] md:max-w-[140px] opacity-60 hover:opacity-100 transition-opacity duration-500 grayscale hover:grayscale-0"
               />
             </div>
           ))}
@@ -239,8 +249,8 @@ const DOCTORS: {
     quote:
       "A great initiative to help doctors be in charge of their own work-life balance with the ease of picking up shifts on demand.",
     accent: "ocean",
-    imgPos: "50% 30%",
-    imgScale: 1.3,
+    imgPos: "50% 32%",
+    imgScale: 1.0,
   },
   {
     name: "Dr Brian Rose",
@@ -249,8 +259,8 @@ const DOCTORS: {
     quote:
       "StatDoctor enables me to see all the available shifts on my own device, on my own terms. No annoying phone calls from managing reps trying to push me to do shifts I don't want. It's the stress-free approach to locuming.",
     accent: "electric",
-    imgPos: "50% 32%",
-    imgScale: 1.4,
+    imgPos: "50% 30%",
+    imgScale: 1.0,
   },
   {
     name: "Dr Sophia Dean",
@@ -259,8 +269,8 @@ const DOCTORS: {
     quote:
       "As a first-time locum from New Zealand, I've been thoroughly impressed with the efficiency and user-friendliness of this app. The ability to view available shifts, including exact dates and times, has made planning my work so much easier.",
     accent: "leaf",
-    imgPos: "50% 32%",
-    imgScale: 1.4,
+    imgPos: "50% 30%",
+    imgScale: 1.0,
   },
   {
     name: "Dr David Burton",
@@ -269,8 +279,8 @@ const DOCTORS: {
     quote:
       "StatDoctor is a brilliant solution to the ridiculous financial burden on public hospitals that locum agencies were charging, and the drudgery and admin of locuming. It's better, sleeker, easier to navigate and more invested in making locuming work well for both parties than any locum agency.",
     accent: "ocean",
-    imgPos: "50% 32%",
-    imgScale: 1.4,
+    imgPos: "50% 30%",
+    imgScale: 1.0,
   },
   {
     name: "Dr Alex Patinkin",
@@ -280,7 +290,7 @@ const DOCTORS: {
       "I'm a full-time emergency registrar and locum frequently on the side through multiple big agencies. It's often difficult to find shifts because their job boards don't let me filter out work that doesn't fit my schedule. I love how much easier StatDoctor is to use.",
     accent: "electric",
     imgPos: "50% 30%",
-    imgScale: 1.05,
+    imgScale: 1.0,
   },
   {
     name: "Dr Marillo Jayasuriya",
@@ -289,8 +299,8 @@ const DOCTORS: {
     quote:
       "Such an easy-to-use platform that gives locum doctors more control of their shifts.",
     accent: "ink",
-    imgPos: "50% 28%",
-    imgScale: 1.05,
+    imgPos: "50% 30%",
+    imgScale: 1.0,
   },
   {
     name: "Dr Greeshma Gopakumar",
@@ -299,8 +309,8 @@ const DOCTORS: {
     quote:
       "On signing up, the whole process was extremely easy and straightforward. It's transparent with no hidden T&Cs unlike many agencies. Truly a game changer for locum doctors.",
     accent: "leaf",
-    imgPos: "50% 30%",
-    imgScale: 1.2,
+    imgPos: "50% 32%",
+    imgScale: 1.0,
   },
 ];
 
