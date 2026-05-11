@@ -6,7 +6,7 @@ import { useState } from "react";
    /contact, get in touch.
    Mirrors the home design system: Cormorant display, italic-ocean
    accent, lavender form card, eyebrow text-[10px] tracking-[0.22em].
-   All routes funnel into Admin@statdoctor.net.
+   All routes funnel into info@statdoctor.app.
    ============================================================ */
 
 type Role = "doctor" | "hospital" | "press" | "other";
@@ -86,11 +86,11 @@ function ContactInfo() {
           Email
         </div>
         <a
-          href="mailto:Admin@statdoctor.net"
+          href="mailto:info@statdoctor.app"
           className="display text-[clamp(22px,2.6vw,30px)] leading-tight text-ink hover:text-ocean transition-colors"
           data-hover
         >
-          Admin@statdoctor.net
+          info@statdoctor.app
         </a>
         <p className="mt-2 text-[13px] text-muted leading-relaxed">
           Doctors, hospitals, press, partnerships, all welcome. We route

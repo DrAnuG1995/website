@@ -61,7 +61,8 @@ export default function Footer() {
           links={[
             { href: "/for-doctors", label: "For doctors" },
             { href: "/hospitals", label: "For hospitals" },
-            { href: "/partners", label: "Partners" },
+            { href: "/partners", label: "Doctor perks" },
+            { href: "/about", label: "About" },
           ]}
         />
         <FooterCol
@@ -69,7 +70,7 @@ export default function Footer() {
           links={[
             { href: "/blog", label: "Blog" },
             { href: "/contact", label: "Contact" },
-            { href: "mailto:Admin@statdoctor.net", label: "Admin@statdoctor.net" },
+            { href: "mailto:info@statdoctor.app", label: "info@statdoctor.app" },
           ]}
         />
         <FooterCol

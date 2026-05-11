@@ -277,6 +277,7 @@ function MobileStepCard({ step, index }: { step: Step; index: number }) {
             src={step.src}
             alt={step.title}
             loading="lazy"
+            decoding="async"
             className="w-full h-auto block"
           />
         </div>
@@ -406,6 +407,7 @@ function CardContent({ step }: { step: Step }) {
                 src={step.src}
                 alt={step.title}
                 loading="lazy"
+                decoding="async"
                 className="w-full h-auto block"
               />
             </div>
@@ -625,17 +627,16 @@ function Pricing({ onContact }: { onContact: () => void }) {
               Network · Health districts
             </div>
             <div className="display text-[clamp(40px,4.5vw,56px)] leading-none">
-              Custom
+              Annual subscription
             </div>
             <p className="mt-3 text-[13px] md:text-[14px] text-bone/70 leading-relaxed">
-              Multi-site, multi-admin organisations. Volume pricing, dedicated
-              support, integrations with your roster system.
+              One flat annual fee. Unlimited posting, unlimited doctors,
+              every site and admin in your network on the same plan.
             </p>
             <ul className="mt-5 space-y-2.5 text-[13px] md:text-[14px] text-bone/85 flex-1">
-              <Bullet dark>Volume rate per accepted shift</Bullet>
-              <Bullet dark>Dedicated account manager</Bullet>
-              <Bullet dark>Roster integration (CSV, API)</Bullet>
-              <Bullet dark>SLAs and reporting</Bullet>
+              <Bullet dark>Unlimited doctors</Bullet>
+              <Bullet dark>Unlimited shifts</Bullet>
+              <Bullet dark>Multi-site, multi-admin</Bullet>
             </ul>
             <button
               onClick={onContact}

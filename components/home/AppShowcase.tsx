@@ -4,6 +4,8 @@ import {
   motion,
   useScroll,
   useTransform,
+  useSpring,
+  cubicBezier,
   type MotionValue,
 } from "framer-motion";
 
@@ -80,7 +82,15 @@ export default function AppShowcase() {
   // single horizontal row.
   const { scrollYProgress } = useScroll({
     target: sectionRef,
-    offset: ["start 0.55", "end 0.4"],
+    offset: ["start 0.7", "end 0.65"],
+  });
+  // Smooth the raw scroll progress through a spring so the reveal feels
+  // eased rather than tracking every scroll-wheel tick — fixes the jumpy
+  // feel on cards 3 and 4 when the user flicks past quickly.
+  const smoothProgress = useSpring(scrollYProgress, {
+    stiffness: 120,
+    damping: 28,
+    mass: 0.4,
   });
 
   return (
@@ -111,7 +121,7 @@ export default function AppShowcase() {
               key={step.n}
               step={step}
               index={i}
-              progress={scrollYProgress}
+              progress={smoothProgress}
             />
           ))}
         </div>
@@ -130,18 +140,18 @@ function StepCard({
   progress: MotionValue<number>;
 }) {
   // First card renders fully on entry; cards 2-4 reveal one-by-one as the
-  // user scrolls through the section.
+  // user scrolls through the section. Wider, evenly-spaced reveal windows
+  // and a custom ease keep cards 3 and 4 from snapping in.
   const isFirst = index === 0;
-  // First card is fully visible on entry; cards 2-4 reveal one-by-one
-  // as the user scrolls through the section.
-  const start = isFirst ? -1 : 0.32 + (index - 1) * 0.22;
-  const mid = isFirst ? -0.5 : start + 0.14;
-  const end = isFirst ? 0 : start + 0.24;
+  const ease = cubicBezier(0.2, 0.8, 0.2, 1);
+  const start = isFirst ? -1 : 0.18 + (index - 1) * 0.22;
+  const mid = isFirst ? -0.5 : start + 0.22;
+  const end = isFirst ? 0 : start + 0.34;
 
-  const opacity = useTransform(progress, [start, mid], [isFirst ? 1 : 0, 1]);
-  const y = useTransform(progress, [start, mid], [isFirst ? 0 : 12, 0]);
-  const pillOpacity = useTransform(progress, [mid, end], [isFirst ? 1 : 0, 1]);
-  const pillY = useTransform(progress, [mid, end], [isFirst ? 0 : 6, 0]);
+  const opacity = useTransform(progress, [start, mid], [isFirst ? 1 : 0, 1], { ease });
+  const y = useTransform(progress, [start, mid], [isFirst ? 0 : 24, 0], { ease });
+  const pillOpacity = useTransform(progress, [mid, end], [isFirst ? 1 : 0, 1], { ease });
+  const pillY = useTransform(progress, [mid, end], [isFirst ? 0 : 10, 0], { ease });
 
   return (
     <motion.div

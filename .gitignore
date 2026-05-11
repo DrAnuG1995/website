@@ -3,6 +3,7 @@ node_modules
 out
 .DS_Store
 *.log
+.env
 .env*.local
 .vercel
 scripts/screens/
@@ -13,6 +14,8 @@ tsconfig.tsbuildinfo
 
 # Source video (100MB+) — only the compressed MP4 in public/ ships
 *.mov
+# Raw WhatsApp source clips in repo root — only the copy in public/ ships
+/WhatsApp Video*.mp4
 
 # Sensitive partner data (contact emails, fallback pricing)
 StatDoctor Hospitals*.csv

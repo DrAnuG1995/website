@@ -85,17 +85,21 @@ function LogosStrip() {
       </div>
 
       <div className="marquee-mask">
+        {/* Fixed-width slots so every center-to-center distance is identical
+            — including the wrap point. Visible whitespace can still look
+            uneven where source PNGs have heavy transparent padding baked
+            in, but the rhythm of the loop is mathematically uniform. */}
         <div className="flex w-max items-center animate-marquee-slow hover:[animation-play-state:paused]">
           {doubled.map((src, i) => (
             <div
               key={i}
-              className="shrink-0 w-[120px] md:w-[140px] flex items-center justify-center"
+              className="shrink-0 w-[150px] md:w-[170px] flex items-center justify-center"
             >
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={src}
                 alt=""
-                className="h-[41px] md:h-[49px] w-auto max-w-full opacity-60 hover:opacity-100 transition-opacity duration-500 grayscale hover:grayscale-0"
+                className="h-[43px] md:h-[51px] w-auto max-w-[110px] md:max-w-[130px] opacity-60 hover:opacity-100 transition-opacity duration-500 grayscale hover:grayscale-0"
               />
             </div>
           ))}
@@ -154,7 +158,7 @@ function FounderVideo() {
           </h2>
         </motion.div>
 
-        <div ref={ref} className="relative max-w-4xl mx-auto">
+        <div ref={ref} className="relative max-w-[900px] mx-auto">
           {/* electric/ocean glow underneath the frame */}
           <div
             aria-hidden
@@ -222,6 +226,11 @@ const DOCTORS: {
   img: string;
   quote: string;
   accent: "ocean" | "electric" | "leaf" | "ink";
+  // Per-image crop tuning so the face actually centers in the 40x40 avatar.
+  // imgPos = CSS object-position; imgScale = the magnification applied
+  // before cropping. Defaults assume a centered headshot.
+  imgPos?: string;
+  imgScale?: number;
 }[] = [
   {
     name: "Dr Layth Samari",
@@ -230,6 +239,8 @@ const DOCTORS: {
     quote:
       "A great initiative to help doctors be in charge of their own work-life balance with the ease of picking up shifts on demand.",
     accent: "ocean",
+    imgPos: "50% 30%",
+    imgScale: 1.3,
   },
   {
     name: "Dr Brian Rose",
@@ -238,6 +249,8 @@ const DOCTORS: {
     quote:
       "StatDoctor enables me to see all the available shifts on my own device, on my own terms. No annoying phone calls from managing reps trying to push me to do shifts I don't want. It's the stress-free approach to locuming.",
     accent: "electric",
+    imgPos: "50% 32%",
+    imgScale: 1.4,
   },
   {
     name: "Dr Sophia Dean",
@@ -246,6 +259,8 @@ const DOCTORS: {
     quote:
       "As a first-time locum from New Zealand, I've been thoroughly impressed with the efficiency and user-friendliness of this app. The ability to view available shifts, including exact dates and times, has made planning my work so much easier.",
     accent: "leaf",
+    imgPos: "50% 32%",
+    imgScale: 1.4,
   },
   {
     name: "Dr David Burton",
@@ -254,6 +269,8 @@ const DOCTORS: {
     quote:
       "StatDoctor is a brilliant solution to the ridiculous financial burden on public hospitals that locum agencies were charging, and the drudgery and admin of locuming. It's better, sleeker, easier to navigate and more invested in making locuming work well for both parties than any locum agency.",
     accent: "ocean",
+    imgPos: "50% 32%",
+    imgScale: 1.4,
   },
   {
     name: "Dr Alex Patinkin",
@@ -262,6 +279,8 @@ const DOCTORS: {
     quote:
       "I'm a full-time emergency registrar and locum frequently on the side through multiple big agencies. It's often difficult to find shifts because their job boards don't let me filter out work that doesn't fit my schedule. I love how much easier StatDoctor is to use.",
     accent: "electric",
+    imgPos: "50% 30%",
+    imgScale: 1.05,
   },
   {
     name: "Dr Marillo Jayasuriya",
@@ -270,6 +289,8 @@ const DOCTORS: {
     quote:
       "Such an easy-to-use platform that gives locum doctors more control of their shifts.",
     accent: "ink",
+    imgPos: "50% 28%",
+    imgScale: 1.05,
   },
   {
     name: "Dr Greeshma Gopakumar",
@@ -278,15 +299,30 @@ const DOCTORS: {
     quote:
       "On signing up, the whole process was extremely easy and straightforward. It's transparent with no hidden T&Cs unlike many agencies. Truly a game changer for locum doctors.",
     accent: "leaf",
+    imgPos: "50% 30%",
+    imgScale: 1.2,
   },
 ];
 
 function DoctorVoicesPinned() {
   const cols: (typeof DOCTORS)[] = [[], [], []];
   DOCTORS.forEach((d, i) => cols[i % 3].push(d));
+  // Pause the marquee animations when the section is offscreen so they
+  // don't burn CPU/battery on long scrolls.
+  const sectionRef = useRef<HTMLElement>(null);
+  const [inView, setInView] = useState(false);
+  useEffect(() => {
+    if (!sectionRef.current) return;
+    const io = new IntersectionObserver(
+      ([e]) => setInView(e.isIntersecting),
+      { threshold: 0.05 },
+    );
+    io.observe(sectionRef.current);
+    return () => io.disconnect();
+  }, []);
 
   return (
-    <section className="relative bg-white py-20 md:py-24 px-6 overflow-hidden">
+    <section ref={sectionRef} className="relative bg-white py-20 md:py-24 px-6 overflow-hidden">
       <div
         aria-hidden
         className="pointer-events-none absolute inset-0"
@@ -330,7 +366,13 @@ function DoctorVoicesPinned() {
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-5 md:gap-6 h-full">
           {cols.map((col, ci) => (
-            <TestimonialColumn key={ci} cards={col} direction={ci % 2 === 0 ? "up" : "down"} duration={42 + ci * 6} />
+            <TestimonialColumn
+              key={ci}
+              cards={col}
+              direction={ci % 2 === 0 ? "up" : "down"}
+              duration={42 + ci * 6}
+              paused={!inView}
+            />
           ))}
         </div>
       </div>
@@ -342,10 +384,12 @@ function TestimonialColumn({
   cards,
   direction,
   duration,
+  paused,
 }: {
   cards: typeof DOCTORS;
   direction: "up" | "down";
   duration: number;
+  paused?: boolean;
 }) {
   // Duplicate cards so the loop is seamless
   const doubled = [...cards, ...cards];
@@ -355,6 +399,7 @@ function TestimonialColumn({
         className="flex flex-col gap-5 md:gap-6 hover:[animation-play-state:paused]"
         style={{
           animation: `${direction === "up" ? "scrollColUp" : "scrollColDown"} ${duration}s linear infinite`,
+          animationPlayState: paused ? "paused" : "running",
         }}
       >
         {doubled.map((d, i) => (
@@ -402,7 +447,11 @@ function TestimonialCard({ d }: { d: (typeof DOCTORS)[number] }) {
             <img
               src={d.img}
               alt={d.name}
-              className="w-full h-full object-cover scale-[1.6] object-[50%_22%]"
+              className="w-full h-full object-cover"
+              style={{
+                objectPosition: d.imgPos ?? "50% 30%",
+                transform: `scale(${d.imgScale ?? 1.2})`,
+              }}
             />
           </div>
         </div>
@@ -548,7 +597,7 @@ const SOCIALS: { label: string; href: string; Icon: () => JSX.Element }[] = [
     href: "https://www.facebook.com/p/StatDoctor-100088461867629/",
     Icon: FBIcon,
   },
-  { label: "Email", href: "mailto:Admin@statdoctor.net", Icon: MailIcon },
+  { label: "Email", href: "mailto:info@statdoctor.app", Icon: MailIcon },
 ];
 
 function FinalCTA() {

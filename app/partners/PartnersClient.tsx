@@ -1,41 +1,75 @@
 "use client";
 import { motion } from "framer-motion";
-import { HOSPITALS } from "@/components/home/hospitals";
 import Counter from "@/components/Counter";
 
 /* ============================================================
-   /partners, the network page.
+   /partners — doctor perks page.
+   These are the brands StatDoctor doctors get discounts and
+   priority access with. Frame: member benefits, not B2B ecosystem.
    Mirrors the home page design system: Cormorant display,
    italic-ocean accent, lavender card tint, rounded-3xl, eyebrow
    text-[10px] tracking-[0.22em] uppercase text-muted.
    ============================================================ */
 
-type EcosystemPartner = {
-  name: string;
+type Perk = {
+  brand: string;
+  category: "Finance" | "Compliance" | "Career";
   blurb: string;
+  value: string; // the actual member benefit
+  accent: "ocean" | "electric" | "leaf";
 };
 
-const FINANCE: EcosystemPartner[] = [
-  { name: "Hnry", blurb: "All-in-one tax, invoicing, and accounting for sole-trader doctors." },
-  { name: "Acceptance Finance", blurb: "Mortgage broking and lending for medical professionals." },
-  { name: "By Invite Finance", blurb: "Bespoke financing solutions tailored for doctors." },
-];
-
-const COMPLIANCE: EcosystemPartner[] = [
-  { name: "CPD Home", blurb: "CPD tracking and compliance, integrated with the College frameworks." },
-  { name: "Validex", blurb: "Continuous credential verification and AHPRA monitoring." },
-];
-
-const RECRUITMENT: EcosystemPartner[] = [
-  { name: "Milford Specialist Recruitment", blurb: "Permanent specialist placements that complement locum work." },
+const PERKS: Perk[] = [
+  {
+    brand: "Hnry",
+    category: "Finance",
+    blurb: "All-in-one tax, invoicing, and accounting for sole-trader doctors.",
+    value: "First month free + priority onboarding",
+    accent: "ocean",
+  },
+  {
+    brand: "Acceptance Finance",
+    category: "Finance",
+    blurb: "Mortgage broking and lending built around medical professionals.",
+    value: "No-fee broker review for SD members",
+    accent: "ocean",
+  },
+  {
+    brand: "By Invite Finance",
+    category: "Finance",
+    blurb: "Bespoke financing tailored for doctors at every career stage.",
+    value: "Dedicated SD doctor concierge",
+    accent: "ocean",
+  },
+  {
+    brand: "CPD Home",
+    category: "Compliance",
+    blurb: "CPD tracking integrated with the College frameworks.",
+    value: "Complimentary first-year membership",
+    accent: "leaf",
+  },
+  {
+    brand: "Validex",
+    category: "Compliance",
+    blurb: "Continuous credential verification and AHPRA monitoring.",
+    value: "Free credential audit for SD doctors",
+    accent: "leaf",
+  },
+  {
+    brand: "Milford Specialist Recruitment",
+    category: "Career",
+    blurb: "Permanent specialist placements that complement locum work.",
+    value: "Priority placement queue for SD members",
+    accent: "electric",
+  },
 ];
 
 export default function PartnersClient() {
   return (
     <div className="bg-white text-ink">
       <Hero />
-      <HospitalPartners />
-      <EcosystemPartners />
+      <LogoWall />
+      <PerkGrid />
       <ClosingCTA />
     </div>
   );
@@ -60,16 +94,16 @@ function Hero() {
           transition={{ duration: 0.7, ease: [0.2, 0.8, 0.2, 1] }}
         >
           <div className="text-[10px] tracking-[0.22em] uppercase text-muted mb-3">
-            The network
+            Doctor perks
           </div>
           <h1 className="display text-[clamp(36px,6vw,84px)] leading-[0.98]">
-            60+ partners.{" "}
-            <span className="italic text-ocean">Every state</span>.
+            Membership has its{" "}
+            <span className="italic text-ocean">perks</span>.
           </h1>
           <p className="mt-5 text-muted max-w-xl mx-auto text-[15px] md:text-base leading-relaxed">
-            From metro tertiary hospitals to remote rural clinics, with finance,
-            compliance, and credentialing partners that keep working doctors
-            covered end-to-end.
+            StatDoctor doctors get discounts, priority access, and dedicated
+            support across finance, compliance, and career — from the partners
+            we&apos;d use ourselves.
           </p>
         </motion.div>
 
@@ -79,9 +113,9 @@ function Hero() {
           transition={{ duration: 0.8, delay: 0.2 }}
           className="mt-12 md:mt-14 grid grid-cols-3 gap-4 md:gap-6 max-w-2xl mx-auto"
         >
-          <HeroStat to={60} suffix="+" label="Partner clinics" />
-          <HeroStat to={6} label="States" />
-          <HeroStat to={300} suffix="+" label="Verified doctors" />
+          <HeroStat to={6} label="Partner brands" />
+          <HeroStat to={3} label="Perk categories" />
+          <HeroStat to={1} label="Membership" />
         </motion.div>
       </div>
     </section>
@@ -109,22 +143,23 @@ function HeroStat({
   );
 }
 
-/* ---------- HOSPITAL PARTNERS ---------- */
-function HospitalPartners() {
-  // Sort alphabetically and group by state for at-a-glance scanning.
-  const sorted = [...HOSPITALS].sort((a, b) => a.name.localeCompare(b.name));
+/* ---------- LOGO WALL ----------
+   Wordmarks set in the display font. Consistent visual treatment,
+   no dependency on third-party assets. Swap to real SVG logos later
+   by replacing the span content with <img>. */
+function LogoWall() {
   return (
-    <section className="relative bg-white py-12 md:py-16 px-6">
+    <section className="relative bg-white py-10 md:py-12 px-6">
       <div className="max-w-[1280px] mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-80px" }}
           transition={{ duration: 0.7 }}
-          className="text-center max-w-3xl mx-auto mb-8"
+          className="text-center mb-8"
         >
           <div className="text-[10px] tracking-[0.22em] uppercase text-muted">
-            Healthcare partners · tertiary, regional, private, GP
+            Brands you unlock
           </div>
         </motion.div>
 
@@ -133,19 +168,16 @@ function HospitalPartners() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-80px" }}
           transition={{ duration: 0.7, delay: 0.1 }}
-          className="rounded-3xl bg-lavender border border-ocean/10 p-6 md:p-8"
+          className="rounded-3xl bg-lavender border border-ocean/10 px-6 md:px-12 py-8 md:py-10"
         >
-          <div className="columns-1 sm:columns-2 lg:columns-3 gap-x-8 gap-y-2">
-            {sorted.map((h) => (
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-x-6 gap-y-8 items-center">
+            {PERKS.map((p) => (
               <div
-                key={h.name}
-                className="break-inside-avoid mb-2.5 flex items-baseline gap-2"
+                key={p.brand}
+                className="flex items-center justify-center text-center min-h-[44px]"
               >
-                <span className="text-[14px] md:text-[15px] text-ink leading-snug">
-                  {h.name}
-                </span>
-                <span className="ml-auto text-[10px] tracking-[0.2em] uppercase text-muted shrink-0">
-                  {h.state}
+                <span className="display text-[18px] md:text-[20px] leading-tight text-ink/85 tracking-tight">
+                  {p.brand}
                 </span>
               </div>
             ))}
@@ -156,29 +188,8 @@ function HospitalPartners() {
   );
 }
 
-/* ---------- ECOSYSTEM PARTNERS ---------- */
-function EcosystemPartners() {
-  const groups: { eyebrow: string; title: string; partners: EcosystemPartner[]; accent: "ocean" | "electric" | "leaf" }[] = [
-    {
-      eyebrow: "Finance",
-      title: "Tax, invoicing, and lending",
-      partners: FINANCE,
-      accent: "ocean",
-    },
-    {
-      eyebrow: "Compliance",
-      title: "CPD and credentialing",
-      partners: COMPLIANCE,
-      accent: "leaf",
-    },
-    {
-      eyebrow: "Recruitment",
-      title: "Specialist placements",
-      partners: RECRUITMENT,
-      accent: "electric",
-    },
-  ];
-
+/* ---------- PERK GRID ---------- */
+function PerkGrid() {
   return (
     <section className="relative bg-white py-16 md:py-20 px-6">
       <div className="max-w-[1280px] mx-auto">
@@ -190,21 +201,22 @@ function EcosystemPartners() {
           className="text-center max-w-3xl mx-auto mb-10 md:mb-12"
         >
           <div className="text-[10px] tracking-[0.22em] uppercase text-muted mb-3">
-            Ecosystem
+            What you get
           </div>
           <h2 className="display text-[clamp(28px,4.5vw,56px)] leading-[1.0]">
-            The partners that{" "}
-            <span className="italic text-ocean">make it work</span>.
+            Every perk,{" "}
+            <span className="italic text-ocean">unlocked</span> with your
+            account.
           </h2>
           <p className="mt-4 text-muted max-w-xl mx-auto text-[14px] md:text-[15px] leading-relaxed">
-            Beyond hospitals: finance, compliance, and credentialing partners
-            that cover working doctors end-to-end.
+            One membership covers the lot. Activate from inside the app — no
+            promo codes, no hoops.
           </p>
         </motion.div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-5 md:gap-6">
-          {groups.map((g) => (
-            <EcosystemCard key={g.eyebrow} group={g} />
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 md:gap-6">
+          {PERKS.map((p, i) => (
+            <PerkCard key={p.brand} perk={p} delay={i * 0.05} />
           ))}
         </div>
       </div>
@@ -212,20 +224,11 @@ function EcosystemPartners() {
   );
 }
 
-function EcosystemCard({
-  group,
-}: {
-  group: {
-    eyebrow: string;
-    title: string;
-    partners: EcosystemPartner[];
-    accent: "ocean" | "electric" | "leaf";
-  };
-}) {
+function PerkCard({ perk, delay }: { perk: Perk; delay: number }) {
   const dot =
-    group.accent === "ocean"
+    perk.accent === "ocean"
       ? "bg-ocean"
-      : group.accent === "electric"
+      : perk.accent === "electric"
       ? "bg-electric"
       : "bg-leaf";
 
@@ -234,30 +237,29 @@ function EcosystemCard({
       initial={{ opacity: 0, y: 30 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-80px" }}
-      transition={{ duration: 0.7, ease: [0.2, 0.8, 0.2, 1] }}
+      transition={{ duration: 0.7, delay, ease: [0.2, 0.8, 0.2, 1] }}
       className="rounded-3xl bg-lavender border border-ocean/10 p-6 md:p-7 flex flex-col"
     >
       <div className="flex items-center gap-2 mb-4">
         <span className={`w-1.5 h-1.5 rounded-full ${dot}`} />
         <span className="text-[10px] tracking-[0.22em] uppercase font-semibold text-ink">
-          {group.eyebrow}
+          {perk.category}
         </span>
       </div>
-      <h3 className="display text-[20px] md:text-[24px] leading-[1.15] text-ink mb-5">
-        {group.title}
+      <h3 className="display text-[22px] md:text-[26px] leading-[1.15] text-ink mb-3">
+        {perk.brand}
       </h3>
-      <ul className="space-y-4 flex-1">
-        {group.partners.map((p) => (
-          <li key={p.name} className="rounded-2xl bg-white border border-ink/8 px-4 py-3.5">
-            <div className="display text-[15px] md:text-[16px] text-ink leading-tight">
-              {p.name}
-            </div>
-            <p className="mt-1.5 text-[12px] md:text-[13px] text-muted leading-relaxed">
-              {p.blurb}
-            </p>
-          </li>
-        ))}
-      </ul>
+      <p className="text-[13px] md:text-[14px] text-muted leading-relaxed mb-5">
+        {perk.blurb}
+      </p>
+      <div className="mt-auto rounded-2xl bg-white border border-ink/10 px-4 py-3.5">
+        <div className="text-[10px] tracking-[0.2em] uppercase text-muted mb-1">
+          Member perk
+        </div>
+        <div className="text-[14px] md:text-[15px] text-ink font-medium leading-snug">
+          {perk.value}
+        </div>
+      </div>
     </motion.div>
   );
 }
@@ -268,19 +270,19 @@ function ClosingCTA() {
     <section className="relative bg-white">
       <div className="relative max-w-[1100px] mx-auto px-6 py-14 md:py-16 text-center">
         <h2 className="display text-[clamp(28px,4.5vw,56px)] leading-[1.0] max-w-3xl mx-auto">
-          Add your team to the{" "}
-          <span className="italic text-ocean">list</span>.
+          Want your brand in front of Australia&apos;s{" "}
+          <span className="italic text-ocean">locum doctors</span>?
         </h2>
         <p className="mt-4 text-muted max-w-xl mx-auto text-[14px] md:text-[15px] leading-relaxed">
-          Hospital, clinic, finance, compliance, or credentialing partner, get
-          in touch.
+          We partner with brands that genuinely make a working doctor&apos;s
+          life better. Get in touch.
         </p>
         <a
           href="/contact"
           className="mt-7 inline-flex items-center gap-2 px-6 py-3 rounded-full bg-ink text-white text-sm font-semibold hover:bg-ocean transition-colors"
           data-hover
         >
-          Become a partner
+          Become a perks partner
           <span aria-hidden>→</span>
         </a>
       </div>

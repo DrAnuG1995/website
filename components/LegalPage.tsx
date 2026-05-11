@@ -64,6 +64,29 @@ export default function LegalPage({
           color: #1a1a2e;
           margin: 36px 0 12px;
         }
+        .legal-prose h3 {
+          font-family: "Inter", system-ui, sans-serif;
+          font-weight: 600;
+          font-size: 16px;
+          letter-spacing: 0.01em;
+          color: #1a1a2e;
+          margin: 24px 0 8px;
+        }
+        .legal-prose ul, .legal-prose ol {
+          font-family: "Inter", system-ui, sans-serif;
+          font-size: 15px;
+          line-height: 1.75;
+          color: #1a1a2e;
+          margin: 0 0 18px;
+          padding-left: 22px;
+        }
+        .legal-prose li { margin-bottom: 8px; }
+        .legal-prose strong { font-weight: 600; color: #1a1a2e; }
+        .legal-prose hr {
+          border: none;
+          border-top: 1px solid rgba(26,26,46,0.12);
+          margin: 32px 0;
+        }
         .legal-prose a { color: #3232ff; }
         .legal-prose a:hover { text-decoration: underline; }
         .legal-prose .link-underline { text-decoration: underline; text-underline-offset: 3px; }

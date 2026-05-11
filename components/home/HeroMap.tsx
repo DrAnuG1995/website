@@ -111,6 +111,11 @@ export default function HeroMap() {
       ...INTRO_START,
       attributionControl: false,
       cooperativeGestures: false,
+      // Page-scroll wheel events drift the camera off Australia when the
+      // cursor is over the canvas — so the wheel is unbound entirely.
+      // Pan/dive still works via click and touch.
+      scrollZoom: false,
+      boxZoom: false,
       dragRotate: false,
       pitchWithRotate: false,
       touchPitch: false,
@@ -137,6 +142,9 @@ export default function HeroMap() {
 
     // Spin into Australia after the style finishes loading, then lock the
     // camera to Australia bounds so the user can't drift off-country.
+    // The lock is applied via a guaranteed timeout (not the moveend event)
+    // because if the user clicks a pin or scrolls before moveend fires, the
+    // event can be missed and the map stays unlocked.
     map.once("load", () => {
       window.setTimeout(() => {
         map.flyTo({
@@ -145,12 +153,19 @@ export default function HeroMap() {
           curve: 1.6,
           essential: true,
         });
-        map.once("moveend", () => {
+        let locked = false;
+        const lock = () => {
+          if (locked) return;
+          locked = true;
           map.setMaxBounds(AU_BOUNDS);
           map.setMinZoom(MIN_ZOOM);
           map.setMaxZoom(MAX_ZOOM);
           setIntroDone(true);
-        });
+        };
+        map.once("moveend", lock);
+        // Guarantee lock even if moveend never fires (scroll, click,
+        // navigation interrupting the intro animation).
+        window.setTimeout(lock, INTRO_DURATION_MS + 400);
       }, 600);
     });
 
@@ -249,7 +264,7 @@ export default function HeroMap() {
               <span className="absolute inline-flex h-full w-full rounded-full bg-electric opacity-75 animate-ping-slow" />
               <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-electric" />
             </span>
-            Live · {HOSPITALS.length} partners
+            Live · 60 partners
           </div>
         </div>
 
@@ -305,11 +320,11 @@ export default function HeroMap() {
               </h1>
 
               <div className="mt-4 flex items-center gap-4 text-[10px] tracking-[0.18em] uppercase">
-                <Stat to={HOSPITALS.length} label="Hospitals" play={introDone} />
+                <Stat to={60} label="Hospitals" play={introDone} />
                 <span className="w-px h-6 bg-ink/15" />
-                <Stat to={300} suffix="+" label="Doctors" play={introDone} />
+                <Stat to={400} suffix="+" label="Doctors" play={introDone} />
                 <span className="w-px h-6 bg-ink/15" />
-                <Stat to={500} prefix="$" suffix="+" label="More per shift" play={introDone} />
+                <Stat to={500} prefix="$" smallPrefix="Up to" label="More per shift" play={introDone} />
               </div>
 
               <div className="mt-5 flex flex-col sm:flex-row gap-2">
@@ -355,7 +370,7 @@ export default function HeroMap() {
         <div className="mt-4 flex items-center justify-between px-1 text-[10px] tracking-[0.22em] uppercase text-muted">
           <span>
             {activeIdx >= 0
-              ? "Drag back or hit ← to see all 44 partners"
+              ? "Drag back or hit ← to see all 60 partners"
               : "Click any pin to see our partner"}
           </span>
           <span className="hidden md:inline">Hover for details</span>
@@ -408,18 +423,25 @@ function Stat({
   to,
   prefix = "",
   suffix = "",
+  smallPrefix,
   label,
   play,
 }: {
   to: number;
   prefix?: string;
   suffix?: string;
+  smallPrefix?: string;
   label: string;
   play: boolean;
 }) {
   return (
     <div>
-      <div className="display text-xl md:text-2xl normal-case tracking-tight leading-none">
+      <div className="display text-xl md:text-2xl normal-case tracking-tight leading-none inline-flex items-baseline gap-1">
+        {smallPrefix && (
+          <span className="text-[10px] md:text-[11px] tracking-[0.18em] uppercase text-muted self-center">
+            {smallPrefix}
+          </span>
+        )}
         {play ? (
           <Counter to={to} prefix={prefix} suffix={suffix} duration={1.6} />
         ) : (
