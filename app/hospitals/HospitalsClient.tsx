@@ -334,8 +334,10 @@ function HowItWorks() {
 
   return (
     <section id="how" className="relative bg-white">
-      {/* Header, normal flow, scrolls past as the sticky stack pins below */}
-      <div className="relative max-w-[1100px] mx-auto px-6 pt-16 md:pt-24 pb-8 md:pb-14 text-center">
+      {/* Header, normal flow, scrolls past as the sticky stack pins below.
+          Trim pb so the first sticky card sits close to the header
+          instead of leaving a tall gap before the stack starts. */}
+      <div className="relative max-w-[1100px] mx-auto px-6 pt-16 md:pt-24 pb-4 md:pb-6 text-center">
         <div className="text-[10px] tracking-[0.22em] uppercase text-muted mb-3">
           How it works
         </div>
@@ -355,7 +357,12 @@ function HowItWorks() {
         style={{ height: `${STEPS.length * 100}vh` }}
         className="relative hidden md:block"
       >
-        <div className="sticky top-0 h-screen flex items-center overflow-hidden px-4 md:px-6">
+        {/* Anchor the card stack near the top of the viewport (with
+            padding for the fixed navbar) instead of vertically centring
+            it. items-center inside a 100vh sticky region pushed the
+            560px card down by ~170px on tall screens, which read as a
+            big empty band between the header and the first card. */}
+        <div className="sticky top-0 h-screen flex items-start pt-24 overflow-hidden px-4 md:px-6">
           <div className="relative w-full max-w-[1100px] mx-auto h-[520px] md:h-[560px]">
             {STEPS.map((step, i) => (
               <StackedCard
