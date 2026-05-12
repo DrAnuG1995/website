@@ -2,16 +2,20 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import DownloadModal from "./DownloadModal";
+
+const NAV_LINKS = [
+  { href: "/for-doctors", label: "Doctors" },
+  { href: "/hospitals", label: "Hospitals" },
+  { href: "/partners", label: "Partners" },
+];
 
 export default function Nav() {
   const [scrolled, setScrolled] = useState(false);
   const [downloadOpen, setDownloadOpen] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
   const pathname = usePathname();
-  const onDoctors = pathname?.startsWith("/for-doctors");
-  const onHospitals = pathname?.startsWith("/hospitals");
-  const onPartners = pathname?.startsWith("/partners");
 
   useEffect(() => {
     const on = () => setScrolled(window.scrollY > 12);
@@ -26,6 +30,14 @@ export default function Nav() {
     return () => window.removeEventListener("open-download-modal", onOpen);
   }, []);
 
+  // Close mobile menu whenever the route changes.
+  useEffect(() => {
+    setMenuOpen(false);
+  }, [pathname]);
+
+  const isActive = (href: string) =>
+    href === "/" ? pathname === "/" : pathname?.startsWith(href);
+
   return (
     <motion.header
       initial={{ y: -30, opacity: 0 }}
@@ -34,16 +46,18 @@ export default function Nav() {
       className="fixed top-3 md:top-5 left-0 right-0 z-[90] flex justify-center px-3 md:px-6"
     >
       <motion.div
-        initial={{ maxWidth: 1280, paddingLeft: 18, paddingRight: 10 }}
-        animate={{
-          maxWidth: scrolled ? 880 : 1280,
-          paddingLeft: scrolled ? 14 : 18,
-          paddingRight: scrolled ? 8 : 10,
-        }}
+        initial={{ maxWidth: 1280 }}
+        animate={{ maxWidth: scrolled ? 880 : 1280 }}
         transition={{ duration: 0.5, ease: [0.2, 0.8, 0.2, 1] }}
-        className="grid grid-cols-[1fr_auto_1fr] items-center gap-3 rounded-full bg-white/85 backdrop-blur-xl border border-ink/10 shadow-[0_10px_40px_-15px_rgba(26,26,46,0.18)] py-1.5 w-full"
+        className="flex items-center gap-2 md:gap-4 rounded-full bg-white/85 backdrop-blur-xl border border-ink/10 shadow-[0_10px_40px_-15px_rgba(26,26,46,0.18)] px-3 md:px-5 py-1.5 w-full"
       >
-        <Link href="/" className="flex items-center gap-2 pl-1 justify-self-start" data-hover>
+        {/* Logo — always visible */}
+        <Link
+          href="/"
+          className="flex items-center gap-2 shrink-0"
+          data-hover
+          aria-label="StatDoctor home"
+        >
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src="/statdoctor-logo.png"
@@ -52,58 +66,122 @@ export default function Nav() {
           />
         </Link>
 
-        <div className="flex items-center gap-2.5 sm:gap-3 md:gap-4 justify-self-center text-[11px] sm:text-xs md:text-sm font-semibold">
-          <Link
-            href="/for-doctors"
-            className={`transition-colors text-ink hover:text-ink/70 ${
-              onDoctors ? "underline underline-offset-4 decoration-2" : ""
-            }`}
-            data-hover
-          >
-            Doctors
-          </Link>
-          <span aria-hidden className="h-4 w-px bg-ink/25 select-none" />
-          <Link
-            href="/hospitals"
-            className={`transition-colors text-ink hover:text-ink/70 ${
-              onHospitals ? "underline underline-offset-4 decoration-2" : ""
-            }`}
-            data-hover
-          >
-            Hospitals
-          </Link>
-          <span aria-hidden className="h-4 w-px bg-ink/25 select-none" />
-          <Link
-            href="/partners"
-            className={`transition-colors text-ink hover:text-ink/70 ${
-              onPartners ? "underline underline-offset-4 decoration-2" : ""
-            }`}
-            data-hover
-          >
-            Partners
-          </Link>
+        {/* Desktop menu — center-grows, hidden on mobile */}
+        <div className="hidden md:flex items-center gap-5 lg:gap-7 flex-1 justify-center text-sm font-semibold">
+          {NAV_LINKS.map((link) => (
+            <Link
+              key={link.href}
+              href={link.href}
+              className={`relative transition-colors text-ink hover:text-ocean ${
+                isActive(link.href) ? "text-ocean" : ""
+              }`}
+              data-hover
+            >
+              {link.label}
+              {isActive(link.href) && (
+                <span className="absolute -bottom-1 left-0 right-0 h-[2px] rounded-full bg-ocean" />
+              )}
+            </Link>
+          ))}
         </div>
 
-        <div className="flex items-center gap-1 md:gap-2 justify-self-end">
+        {/* Spacer to push the right group to the edge on mobile (where the
+            center menu is hidden). */}
+        <div className="md:hidden flex-1" />
+
+        {/* Right group: Log in (desktop) + Download */}
+        <div className="flex items-center gap-1 md:gap-2 shrink-0">
           <a
             href="https://hospital.statdoctor.app/#/login"
             target="_blank"
             rel="noopener noreferrer"
-            className="hidden sm:inline-flex px-3 md:px-4 py-2 text-xs md:text-sm font-medium text-ink hover:text-ink/70 transition-colors"
+            className="hidden md:inline-flex px-3 lg:px-4 py-2 text-sm font-medium text-ink hover:text-ocean transition-colors"
             data-hover
           >
             Log in
           </a>
           <button
             onClick={() => setDownloadOpen(true)}
-            className="px-3 sm:px-4 md:px-5 py-2 md:py-2.5 rounded-full bg-ocean text-white text-[11px] sm:text-xs md:text-sm font-semibold hover:bg-ink transition-colors whitespace-nowrap"
+            className="px-4 md:px-5 py-2 md:py-2.5 rounded-full bg-ocean text-white text-xs md:text-sm font-semibold hover:bg-ink transition-colors whitespace-nowrap"
             data-hover
           >
-            <span className="sm:hidden">Download</span>
-            <span className="hidden sm:inline">Download App</span>
+            <span className="md:hidden">Download</span>
+            <span className="hidden md:inline">Download App</span>
+          </button>
+          {/* Hamburger — mobile only */}
+          <button
+            onClick={() => setMenuOpen((o) => !o)}
+            aria-label={menuOpen ? "Close menu" : "Open menu"}
+            aria-expanded={menuOpen}
+            className="md:hidden ml-0.5 w-9 h-9 grid place-items-center rounded-full text-ink hover:bg-ink/5 transition-colors"
+            data-hover
+          >
+            <svg
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.2"
+              strokeLinecap="round"
+              aria-hidden
+            >
+              {menuOpen ? (
+                <>
+                  <line x1="6" y1="6" x2="18" y2="18" />
+                  <line x1="18" y1="6" x2="6" y2="18" />
+                </>
+              ) : (
+                <>
+                  <line x1="4" y1="8" x2="20" y2="8" />
+                  <line x1="4" y1="16" x2="20" y2="16" />
+                </>
+              )}
+            </svg>
           </button>
         </div>
       </motion.div>
+
+      {/* Mobile dropdown panel — fixed to the viewport (not the header's
+          flex row) so it appears reliably below the nav pill regardless of
+          the parent's layout context. */}
+      <AnimatePresence>
+        {menuOpen && (
+          <motion.div
+            initial={{ opacity: 0, y: -8, scale: 0.98 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -8, scale: 0.98 }}
+            transition={{ duration: 0.2, ease: [0.2, 0.8, 0.2, 1] }}
+            className="md:hidden fixed top-[68px] left-3 right-3 rounded-2xl bg-white/95 backdrop-blur-xl border border-ink/10 shadow-[0_20px_60px_-15px_rgba(26,26,46,0.2)] p-2"
+          >
+            <nav className="flex flex-col">
+              {NAV_LINKS.map((link) => (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className={`px-4 py-3 rounded-xl text-[15px] font-semibold transition-colors ${
+                    isActive(link.href)
+                      ? "bg-ocean/8 text-ocean"
+                      : "text-ink hover:bg-ink/5"
+                  }`}
+                  data-hover
+                >
+                  {link.label}
+                </Link>
+              ))}
+              <a
+                href="https://hospital.statdoctor.app/#/login"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="px-4 py-3 rounded-xl text-[15px] font-medium text-ink hover:bg-ink/5 transition-colors"
+                data-hover
+              >
+                Log in
+              </a>
+            </nav>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       <DownloadModal open={downloadOpen} onClose={() => setDownloadOpen(false)} />
     </motion.header>
