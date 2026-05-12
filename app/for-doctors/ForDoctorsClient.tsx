@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import FeatureShowcase from "@/components/home/FeatureShowcase";
+import { normaliseHospitalKey } from "@/lib/hospitals";
 
 // Hero slideshow frames. Every town listed here is a real StatDoctor
 // partner location (cross-checked against the PARTNERS list below) so the
@@ -141,10 +142,14 @@ function HeroSlideshow() {
 
 export default function ForDoctorsClient({
   partnerCount,
+  websiteByName,
 }: {
   // Live count of active hospitals — fetched server-side in page.tsx so
   // the headline below matches the homepage hero exactly.
   partnerCount?: number;
+  // Normalised-name → website URL map from the CRM. Any partner card
+  // whose name matches a key renders as a clickable link.
+  websiteByName?: Record<string, string>;
 }) {
   const openDownload = () => {
     if (typeof window !== "undefined") {
@@ -258,7 +263,7 @@ export default function ForDoctorsClient({
         <FeatureShowcase />
       </div>
 
-      <PartnerNetwork partnerCount={partnerCount} />
+      <PartnerNetwork partnerCount={partnerCount} websiteByName={websiteByName} />
 
       <section className="relative bg-white">
         <div className="relative max-w-[1100px] mx-auto px-6 py-12 md:py-14 text-center">
@@ -352,7 +357,13 @@ const PARTNERS: { name: string; state: AusState }[] = [
   { name: "Saint Lukes Medical Centre", state: "VIC" },
 ];
 
-function PartnerNetwork({ partnerCount }: { partnerCount?: number }) {
+function PartnerNetwork({
+  partnerCount,
+  websiteByName,
+}: {
+  partnerCount?: number;
+  websiteByName?: Record<string, string>;
+}) {
   const [filter, setFilter] = useState<AusState | "ALL">("ALL");
   const visible =
     filter === "ALL" ? PARTNERS : PARTNERS.filter((p) => p.state === filter);
@@ -404,24 +415,55 @@ function PartnerNetwork({ partnerCount }: { partnerCount?: number }) {
             className="flex flex-wrap justify-center gap-3 md:gap-4 mb-6"
           >
             <AnimatePresence mode="popLayout">
-              {visible.map((p) => (
-                <motion.div
-                  key={p.name}
-                  layout
-                  initial={{ opacity: 0, scale: 0.95 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.95 }}
-                  transition={{ duration: 0.25, ease: [0.2, 0.8, 0.2, 1] }}
-                  className="basis-[calc(50%-6px)] md:basis-[calc(25%-12px)] rounded-2xl bg-white border border-ink/8 px-4 py-4 flex flex-col items-center justify-center text-center min-h-[78px]"
-                >
-                  <div className="text-[13px] md:text-[14px] text-ink leading-snug">
-                    {p.name}
-                  </div>
-                  <div className="mt-1 text-[10px] tracking-[0.15em] uppercase text-muted">
-                    {p.state}
-                  </div>
-                </motion.div>
-              ))}
+              {visible.map((p) => {
+                const website = websiteByName?.[normaliseHospitalKey(p.name)];
+                // Shared card body — name + state code centred. Hover lift
+                // only fires when the card is actually clickable.
+                const body = (
+                  <>
+                    <div className="text-[13px] md:text-[14px] text-ink leading-snug group-hover:text-ocean transition-colors">
+                      {p.name}
+                    </div>
+                    <div className="mt-1 text-[10px] tracking-[0.15em] uppercase text-muted">
+                      {p.state}
+                    </div>
+                  </>
+                );
+                const baseClasses =
+                  "basis-[calc(50%-6px)] md:basis-[calc(25%-12px)] rounded-2xl bg-white border border-ink/8 px-4 py-4 flex flex-col items-center justify-center text-center min-h-[78px]";
+                const linkClasses =
+                  baseClasses +
+                  " group cursor-pointer hover:border-ocean/40 hover:shadow-[0_10px_30px_-15px_rgba(50,50,255,0.25)] transition-[border-color,box-shadow]";
+
+                return (
+                  <motion.div
+                    key={p.name}
+                    layout
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.95 }}
+                    transition={{ duration: 0.25, ease: [0.2, 0.8, 0.2, 1] }}
+                    className="basis-[calc(50%-6px)] md:basis-[calc(25%-12px)]"
+                  >
+                    {website ? (
+                      <a
+                        href={website}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className={linkClasses + " w-full h-full"}
+                        data-hover
+                        aria-label={`Visit ${p.name} website`}
+                      >
+                        {body}
+                      </a>
+                    ) : (
+                      <div className={baseClasses + " w-full h-full"}>
+                        {body}
+                      </div>
+                    )}
+                  </motion.div>
+                );
+              })}
             </AnimatePresence>
           </motion.div>
 
