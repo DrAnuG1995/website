@@ -17,6 +17,13 @@ type Perk = {
   blurb: string;
   value: string; // the actual member benefit
   accent: "ocean" | "electric" | "leaf";
+  // Outbound URL to the partner's website. Cards are wrapped in an
+  // anchor so doctors can click straight through. Links taken directly
+  // from statdoctor.app/partners — keep these in lock-step.
+  href: string;
+  // Brand logo. Hosted on the Webflow CDN under the partners-site asset
+  // bucket (68dfbc30660b4fef0269fe47) — same images the live site uses.
+  logo: string;
 };
 
 const PERKS: Perk[] = [
@@ -26,6 +33,8 @@ const PERKS: Perk[] = [
     blurb: "All-in-one tax, invoicing, and accounting for sole-trader doctors.",
     value: "First month free + priority onboarding",
     accent: "ocean",
+    href: "https://hnry.com.au/",
+    logo: "https://cdn.prod.website-files.com/68dfbc30660b4fef0269fe47/696f628eb419d93c7b03ea7e_HNRY-img.png",
   },
   {
     brand: "Acceptance Finance",
@@ -33,6 +42,8 @@ const PERKS: Perk[] = [
     blurb: "Mortgage broking and lending built around medical professionals.",
     value: "No-fee broker review for SD members",
     accent: "ocean",
+    href: "https://www.acceptancefinance.com.au/",
+    logo: "https://cdn.prod.website-files.com/68dfbc30660b4fef0269fe47/696f62a5721564e39d24f18f_Acceptance-Finance.png",
   },
   {
     brand: "By Invite Finance",
@@ -40,6 +51,8 @@ const PERKS: Perk[] = [
     blurb: "Bespoke financing tailored for doctors at every career stage.",
     value: "Dedicated SD doctor concierge",
     accent: "ocean",
+    href: "https://byinvitefinance.com.au/",
+    logo: "https://cdn.prod.website-files.com/68dfbc30660b4fef0269fe47/69810cc5f360268b2d220e80_BI_LOGO_.png",
   },
   {
     brand: "CPD Home",
@@ -47,6 +60,8 @@ const PERKS: Perk[] = [
     blurb: "CPD tracking integrated with the College frameworks.",
     value: "Complimentary first-year membership",
     accent: "leaf",
+    href: "https://www.cpdhome.org.au/",
+    logo: "https://cdn.prod.website-files.com/68dfbc30660b4fef0269fe47/696f6471905de39418bb2920_CPD-Home.png",
   },
   {
     brand: "Validex",
@@ -54,6 +69,8 @@ const PERKS: Perk[] = [
     blurb: "Continuous credential verification and AHPRA monitoring.",
     value: "Free credential audit for SD doctors",
     accent: "leaf",
+    href: "https://validex.com.au/medical.html?utm_source=statdoctor&utm_medium=referral&utm_campaign=medical_checks",
+    logo: "https://cdn.prod.website-files.com/68dfbc30660b4fef0269fe47/69b3e148ccb2494596b44ad9_img-26420503-deff-4423-a6d8-94bcee10777c%20(1).png",
   },
   {
     brand: "Milford Specialist Recruitment",
@@ -61,6 +78,8 @@ const PERKS: Perk[] = [
     blurb: "Permanent specialist placements that complement locum work.",
     value: "Priority placement queue for SD members",
     accent: "electric",
+    href: "https://www.milfordspecialistrecruitment.com/",
+    logo: "https://cdn.prod.website-files.com/68dfbc30660b4fef0269fe47/696f63cc4192740a9a92bd6f_Milford-Specialist.png",
   },
 ];
 
@@ -187,12 +206,17 @@ function PerkCard({ perk, delay }: { perk: Perk; delay: number }) {
       : "bg-leaf";
 
   return (
-    <motion.div
+    <motion.a
+      href={perk.href}
+      target="_blank"
+      rel="noopener noreferrer"
+      data-hover
+      aria-label={`Visit ${perk.brand}`}
       initial={{ opacity: 0, y: 30 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-80px" }}
       transition={{ duration: 0.7, delay, ease: [0.2, 0.8, 0.2, 1] }}
-      className="rounded-3xl bg-lavender border border-ocean/10 p-6 md:p-7 flex flex-col"
+      className="group rounded-3xl bg-lavender border border-ocean/10 p-6 md:p-7 flex flex-col hover:border-ocean/30 hover:shadow-[0_20px_50px_-25px_rgba(50,50,255,0.25)] transition-[border-color,box-shadow,transform] hover:-translate-y-0.5"
     >
       <div className="flex items-center gap-2 mb-4">
         <span className={`w-1.5 h-1.5 rounded-full ${dot}`} />
@@ -200,7 +224,23 @@ function PerkCard({ perk, delay }: { perk: Perk; delay: number }) {
           {perk.category}
         </span>
       </div>
-      <h3 className="display text-[22px] md:text-[26px] leading-[1.15] text-ink mb-3">
+
+      {/* Brand logo. White rounded slate so logos with light/transparent
+          backgrounds stay legible on the lavender card. Fixed height so
+          every card's logo block has the same vertical weight regardless
+          of the logo's natural aspect ratio. */}
+      <div className="rounded-2xl bg-white border border-ink/10 px-5 py-5 mb-4 flex items-center justify-center min-h-[96px]">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={perk.logo}
+          alt={`${perk.brand} logo`}
+          loading="lazy"
+          decoding="async"
+          className="max-h-[60px] md:max-h-[64px] w-auto object-contain"
+        />
+      </div>
+
+      <h3 className="display text-[22px] md:text-[26px] leading-[1.15] text-ink mb-3 group-hover:text-ocean transition-colors">
         {perk.brand}
       </h3>
       <p className="text-[13px] md:text-[14px] text-muted leading-relaxed mb-5">
@@ -214,7 +254,17 @@ function PerkCard({ perk, delay }: { perk: Perk; delay: number }) {
           {perk.value}
         </div>
       </div>
-    </motion.div>
+
+      {/* Visit-link affordance — small arrow row at the bottom that
+          telegraphs the whole card is clickable without competing with
+          the perk value. */}
+      <div className="mt-4 inline-flex items-center gap-1.5 text-[11px] tracking-[0.18em] uppercase font-semibold text-muted group-hover:text-ocean transition-colors">
+        Visit
+        <span aria-hidden className="transition-transform group-hover:translate-x-0.5">
+          →
+        </span>
+      </div>
+    </motion.a>
   );
 }
 
