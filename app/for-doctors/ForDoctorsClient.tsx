@@ -52,8 +52,8 @@ const HERO_SLIDES: { src: string; alt: string; town: string; state: string }[] =
   },
   {
     // Bairnsdale — East Gippsland farmland, green rolling country.
-    src: "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=1920&q=75&auto=format&fit=crop",
-    alt: "East Gippsland farmland near Bairnsdale, Victoria",
+    src: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=1920&q=75&auto=format&fit=crop",
+    alt: "Green rolling farmland of East Gippsland near Bairnsdale, Victoria",
     town: "Bairnsdale",
     state: "VIC",
   },
