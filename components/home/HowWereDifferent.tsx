@@ -106,8 +106,8 @@ function FlowRow({
 }) {
   const rowBg =
     rowAccent === "ocean"
-      ? "bg-gradient-to-r from-ocean/[0.06] via-electric/[0.10] to-ocean/[0.06] border-ocean/15"
-      : "bg-bone/40 border-ink/8";
+      ? "bg-gradient-to-r from-ocean/[0.06] via-electric/[0.10] to-ocean/[0.06] border-ocean/20"
+      : "bg-bone/50 border-ink/8";
 
   return (
     <motion.div
@@ -115,7 +115,7 @@ function FlowRow({
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-60px" }}
       transition={{ duration: 0.55, ease: [0.2, 0.8, 0.2, 1] }}
-      className={`relative rounded-3xl border ${rowBg} px-5 md:px-8 py-6 md:py-8`}
+      className={`relative rounded-3xl border ${rowBg} px-4 md:px-8 py-6 md:py-8`}
     >
       <div className="mb-5 md:mb-6 text-center">
         <span
@@ -132,7 +132,7 @@ function FlowRow({
         </span>
       </div>
 
-      <div className="flex flex-col md:flex-row items-center justify-center gap-3 md:gap-0">
+      <div className="flex flex-col md:flex-row items-center justify-center gap-1 md:gap-0">
         {nodes.map((node, i) => (
           <div key={node.name} className="contents">
             <FlowNode node={node} />
@@ -148,21 +148,21 @@ function FlowRow({
 
 function FlowNode({ node }: { node: { name: string; tone: NodeTone; badge?: string } }) {
   const styles: Record<NodeTone, string> = {
-    neutral: "bg-white border-ink/15 text-ink",
-    warn: "bg-white border-stat/30 text-ink",
-    ocean: "bg-white border-ocean/25 text-ink shadow-[0_8px_30px_-12px_rgba(50,50,255,0.4)]",
+    neutral: "bg-white border-ink/12 text-ink",
+    warn: "bg-white border-stat/40 text-ink shadow-[0_6px_24px_-12px_rgba(255,90,54,0.35)]",
+    ocean: "bg-white border-ocean/25 text-ink shadow-[0_6px_24px_-12px_rgba(50,50,255,0.4)]",
   };
 
   return (
-    <div className="relative">
+    <div className="relative shrink-0">
       <div
-        className={`px-5 md:px-7 py-3 md:py-4 rounded-2xl border-2 ${styles[node.tone]} font-semibold text-[14px] md:text-[15px] min-w-[110px] md:min-w-[140px] text-center`}
+        className={`px-5 md:px-6 py-2.5 md:py-3 rounded-full border-2 ${styles[node.tone]} font-semibold text-[14px] md:text-[15px] min-w-[120px] md:min-w-[130px] text-center`}
       >
         {node.name}
       </div>
       {node.badge && (
         <div
-          className={`absolute left-1/2 -translate-x-1/2 -top-3 inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] tracking-[0.18em] uppercase font-bold whitespace-nowrap ${
+          className={`absolute left-1/2 -translate-x-1/2 -top-2.5 inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] tracking-[0.18em] uppercase font-bold whitespace-nowrap ${
             node.tone === "warn"
               ? "bg-stat text-white"
               : "bg-electric text-ink"
@@ -182,39 +182,42 @@ function FlowArrow({
   amount: string;
   tone: FlowTone;
 }) {
-  const lineColor: Record<FlowTone, string> = {
-    neutral: "bg-ink/20",
-    warn: "bg-stat/40",
-    ocean: "bg-ocean/40",
-  };
-  const headColor: Record<FlowTone, string> = {
-    neutral: "border-l-ink/40",
-    warn: "border-l-stat/60",
-    ocean: "border-l-ocean/60",
-  };
-  const labelColor: Record<FlowTone, string> = {
-    neutral: "text-muted",
+  const colorClass: Record<FlowTone, string> = {
+    neutral: "text-ink/45",
     warn: "text-stat",
     ocean: "text-ocean",
   };
+  const labelBg: Record<FlowTone, string> = {
+    neutral: "bg-white border-ink/12",
+    warn: "bg-white border-stat/30",
+    ocean: "bg-white border-ocean/25",
+  };
 
   return (
-    <div className="relative flex flex-col items-center justify-center md:flex-1 px-2 md:px-3 py-2 md:py-0">
+    <div className={`flex flex-col md:flex-row items-center justify-center md:flex-1 gap-1.5 md:gap-2 px-2 md:px-3 py-1 md:py-0 ${colorClass[tone]}`}>
+      {/* Rate label as a pill — reads as the value being passed along, not
+          as floating text disconnected from the line. */}
       <span
-        className={`text-[10px] md:text-[11px] tracking-[0.14em] uppercase font-bold ${labelColor[tone]} mb-1 md:mb-2 whitespace-nowrap`}
+        className={`inline-flex items-center px-2.5 py-0.5 rounded-full border ${labelBg[tone]} text-[10px] md:text-[11px] tracking-[0.14em] uppercase font-bold whitespace-nowrap`}
       >
         {amount}
       </span>
-      <div className="flex items-center w-6 md:w-full">
-        <div className={`hidden md:block flex-1 h-[2px] ${lineColor[tone]}`} />
-        <div
-          className={`md:hidden w-[2px] flex-1 ${lineColor[tone]}`}
-          style={{ minHeight: "20px" }}
-        />
-        <div
-          className={`w-0 h-0 border-y-[6px] border-y-transparent border-l-[8px] ${headColor[tone]} md:rotate-0 rotate-90 md:translate-y-0 translate-y-[-1px]`}
-        />
-      </div>
+      {/* Clean SVG arrow — single icon, rotates 90° on mobile for vertical
+          flow. CSS-border triangles rendered badly when rotated, so this
+          is an explicit path that scales reliably. */}
+      <svg
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        className="w-5 h-5 md:w-7 md:h-7 rotate-90 md:rotate-0 shrink-0"
+        aria-hidden
+      >
+        <line x1="4" y1="12" x2="20" y2="12" />
+        <polyline points="13 5 20 12 13 19" />
+      </svg>
     </div>
   );
 }
