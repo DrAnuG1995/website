@@ -139,7 +139,13 @@ function HeroSlideshow() {
   );
 }
 
-export default function ForDoctorsClient() {
+export default function ForDoctorsClient({
+  partnerCount,
+}: {
+  // Live count of active hospitals — fetched server-side in page.tsx so
+  // the headline below matches the homepage hero exactly.
+  partnerCount?: number;
+}) {
   const openDownload = () => {
     if (typeof window !== "undefined") {
       window.dispatchEvent(new Event("open-download-modal"));
@@ -252,7 +258,7 @@ export default function ForDoctorsClient() {
         <FeatureShowcase />
       </div>
 
-      <PartnerNetwork />
+      <PartnerNetwork partnerCount={partnerCount} />
 
       <section className="relative bg-white">
         <div className="relative max-w-[1100px] mx-auto px-6 py-12 md:py-14 text-center">
@@ -346,7 +352,7 @@ const PARTNERS: { name: string; state: AusState }[] = [
   { name: "Saint Lukes Medical Centre", state: "VIC" },
 ];
 
-function PartnerNetwork() {
+function PartnerNetwork({ partnerCount }: { partnerCount?: number }) {
   const [filter, setFilter] = useState<AusState | "ALL">("ALL");
   const visible =
     filter === "ALL" ? PARTNERS : PARTNERS.filter((p) => p.state === filter);
@@ -368,7 +374,8 @@ function PartnerNetwork() {
               The network
             </div>
             <h2 className="display text-[clamp(24px,3.5vw,40px)] leading-[1.05]">
-              Filling shifts at 60+ partner clinics{" "}
+              Filling shifts at{" "}
+              {partnerCount && partnerCount > 0 ? `${partnerCount} hospitals` : "hospitals"}{" "}
               <span className="italic text-ocean">across Australia</span>.
             </h2>
           </div>
