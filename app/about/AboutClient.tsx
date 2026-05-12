@@ -28,7 +28,7 @@ export default function AboutClient() {
 /* ---------- HERO ---------- */
 function Hero() {
   return (
-    <section className="relative pt-28 md:pt-32 pb-12 md:pb-20 px-6">
+    <section className="relative pt-28 md:pt-32 pb-12 md:pb-20 px-6 overflow-hidden">
       <div
         aria-hidden
         className="pointer-events-none absolute inset-0 opacity-50"
@@ -76,7 +76,7 @@ function Hero() {
           transition={{ duration: 0.9, delay: 0.15, ease: [0.2, 0.8, 0.2, 1] }}
           className="relative"
         >
-          <div className="relative aspect-[5/6] md:aspect-[4/5] md:min-h-[640px] rounded-3xl overflow-hidden bg-lavender border border-ocean/10">
+          <div className="relative aspect-[5/6] md:aspect-[4/5] lg:min-h-[640px] rounded-3xl overflow-hidden bg-lavender border border-ocean/10">
             <Image
               src="/author-anu.png"
               alt="Dr Anu, founder of StatDoctor"
