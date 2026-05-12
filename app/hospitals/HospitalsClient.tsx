@@ -1,5 +1,5 @@
 "use client";
-import { useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { motion, useScroll, useTransform, type MotionValue } from "framer-motion";
 import Counter from "@/components/Counter";
 
@@ -25,6 +25,7 @@ export default function HospitalsClient() {
     <div className="bg-white text-ink">
       <Hero onContact={goContact} />
       <HowItWorks />
+      <HospitalDemoVideo />
       <Comparison />
       <Pricing onContact={goContact} />
       <HospitalFAQ />
@@ -453,6 +454,94 @@ function ProgressDot({
       style={{ opacity, scale }}
       className="w-2 h-2 rounded-full bg-ink"
     />
+  );
+}
+
+/* ---------- HOSPITAL DEMO VIDEO ---------- */
+function HospitalDemoVideo() {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const [muted, setMuted] = useState(true);
+  const [playing, setPlaying] = useState(false);
+
+  useEffect(() => {
+    if (!containerRef.current || !videoRef.current) return;
+    const v = videoRef.current;
+    const io = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((e) => {
+          if (e.isIntersecting && e.intersectionRatio > 0.4) {
+            v.play().then(() => setPlaying(true)).catch(() => {});
+          } else {
+            v.pause();
+            setPlaying(false);
+          }
+        });
+      },
+      { threshold: [0, 0.4, 0.6] },
+    );
+    io.observe(containerRef.current);
+    return () => io.disconnect();
+  }, []);
+
+  return (
+    <section className="relative bg-white pt-10 pb-14 md:pt-16 md:pb-20 px-4 md:px-6">
+      <div className="max-w-[1280px] mx-auto">
+        <motion.div
+          initial={{ opacity: 0, y: 18 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-80px" }}
+          transition={{ duration: 0.7 }}
+          className="text-center mb-8"
+        >
+          <div className="text-[10px] tracking-[0.22em] uppercase text-muted mb-2">
+            See it in action
+          </div>
+          <h2 className="display text-[clamp(24px,3.6vw,44px)] leading-[1.0]">
+            StatHospital, <span className="italic text-ocean">end to end</span>.
+          </h2>
+        </motion.div>
+
+        <div ref={containerRef} className="relative max-w-[900px] mx-auto">
+          <div
+            aria-hidden
+            className="absolute -inset-4 md:-inset-6 rounded-[34px] -z-10"
+            style={{
+              background:
+                "linear-gradient(135deg, rgba(50,50,255,0.35), rgba(205,227,93,0.45))",
+              filter: "blur(28px)",
+              opacity: 0.5,
+            }}
+          />
+          <div className="relative rounded-[24px] md:rounded-[28px] overflow-hidden border-2 border-ocean/40 shadow-[0_40px_120px_-30px_rgba(50,50,255,0.45)] bg-ink">
+            <video
+              ref={videoRef}
+              className="block w-full h-auto"
+              src="/stathospital-video.mp4"
+              poster="/stathospital-video-poster.jpg"
+              muted={muted}
+              loop
+              playsInline
+              preload="metadata"
+            />
+            <button
+              onClick={() => {
+                if (!videoRef.current) return;
+                const next = !muted;
+                videoRef.current.muted = next;
+                setMuted(next);
+                if (!playing) videoRef.current.play().catch(() => {});
+              }}
+              className="absolute bottom-4 right-4 md:bottom-5 md:right-5 px-4 py-2 rounded-full bg-white/90 backdrop-blur-md border border-ink/10 text-xs font-medium text-ink hover:bg-white transition-colors flex items-center gap-2"
+              data-hover
+            >
+              <span className="block w-1.5 h-1.5 rounded-full bg-electric" />
+              {muted ? "Tap for sound" : "Sound on"}
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
   );
 }
 
