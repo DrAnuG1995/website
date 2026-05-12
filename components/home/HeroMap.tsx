@@ -573,12 +573,12 @@ function HeroCTA({ partnerCount, ready }: { partnerCount: number; ready: boolean
         <span className="italic text-ocean">No agency in the middle.</span>
       </h1>
 
-      <div className="mt-4 flex items-center gap-4 text-[10px] tracking-[0.18em] uppercase">
+      <div className="mt-4 flex items-center gap-3 sm:gap-4 text-[10px] tracking-[0.18em] uppercase">
         <Stat to={partnerCount} label="Hospitals" play={ready} />
-        <span className="w-px h-6 bg-ink/15" />
+        <span className="w-px h-6 bg-ink/15 shrink-0" />
         <Stat to={400} suffix="+" label="Doctors" play={ready} />
-        <span className="w-px h-6 bg-ink/15" />
-        <Stat to={500} prefix="$" smallPrefix="Up to" label="More per shift" play={ready} />
+        <span className="w-px h-6 bg-ink/15 shrink-0" />
+        <Stat to={500} prefix="$" smallPrefix="Up to" label="Per shift" play={ready} />
       </div>
 
       <div className="mt-5 flex flex-col sm:flex-row gap-2">
