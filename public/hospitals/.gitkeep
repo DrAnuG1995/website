@@ -1,0 +1,5 @@
+# Per-hospital splash photos for the /hospitals page carousel.
+# Save each file as <hospital-slug>.<jpg|png|webp|avif>.
+# Run `node scripts/list-hospital-photos.mjs` to see the expected
+# filename for every active CRM hospital and which ones are still
+# missing.
