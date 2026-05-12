@@ -12,36 +12,52 @@ export default function ForDoctorsClient() {
 
   return (
     <div className="bg-white text-ink">
-      <section className="relative pt-48 md:pt-60 pb-4 md:pb-6 px-6">
+      {/* Cinematic video hero — full-bleed footage of a doctor moving
+          freely across Australia, with overlay copy and a download CTA.
+          Drop the source files at /doctors-hero.mp4 (h264, ~5MB) and
+          /doctors-hero-poster.jpg for instant first paint. The poster
+          shows immediately while the video buffers. */}
+      <section className="relative w-full h-[100svh] min-h-[560px] max-h-[860px] overflow-hidden bg-ink">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <video
+          className="absolute inset-0 w-full h-full object-cover"
+          src="/doctors-hero.mp4"
+          poster="/doctors-hero-poster.jpg"
+          autoPlay
+          muted
+          loop
+          playsInline
+          preload="auto"
+          aria-hidden
+        />
+        {/* Gradient overlay so the white text reads against any frame.
+            Stronger at the bottom where the copy sits. */}
         <div
           aria-hidden
-          className="pointer-events-none absolute inset-0 opacity-50"
-          style={{
-            background:
-              "radial-gradient(40% 40% at 80% 20%, rgba(50,50,255,0.10), transparent 70%), radial-gradient(40% 40% at 15% 80%, rgba(205,227,93,0.18), transparent 70%)",
-          }}
+          className="absolute inset-0 bg-gradient-to-b from-ink/30 via-ink/20 to-ink/75"
         />
-        <div className="relative max-w-[1100px] mx-auto text-center">
+
+        <div className="relative h-full max-w-[1200px] mx-auto px-6 flex flex-col items-center justify-center text-center">
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 24 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, ease: [0.2, 0.8, 0.2, 1] }}
+            transition={{ duration: 0.9, ease: [0.2, 0.8, 0.2, 1], delay: 0.2 }}
           >
-            <div className="text-[10px] tracking-[0.22em] uppercase text-muted mb-3">
+            <div className="text-[10px] md:text-[11px] tracking-[0.32em] uppercase text-bone/80 mb-5 md:mb-6">
               For doctors
             </div>
-            <h1 className="display text-[clamp(36px,6vw,84px)] leading-[0.98]">
+            <h1 className="display text-white text-[clamp(44px,8vw,112px)] leading-[0.98] tracking-tight mx-auto max-w-[14ch]">
               Locum work,{" "}
-              <span className="italic text-ocean">on your terms</span>.
+              <span className="italic text-electric">on your terms.</span>
             </h1>
-            <p className="mt-5 text-muted max-w-xl mx-auto text-[15px] md:text-base leading-relaxed">
-              Verified by AHPRA. Posted rate visible upfront. Paid in 48 hours.
-              No agency reps, no contracts, no chasing.
+            <p className="mt-6 md:mt-8 mx-auto max-w-[560px] text-bone/85 text-[15px] md:text-[18px] leading-relaxed">
+              Pick the shifts that fit your life. Posted rate visible upfront,
+              paid in 48 hours, no agency in the middle.
             </p>
-            <div className="mt-8 flex flex-col sm:flex-row gap-3 justify-center">
+            <div className="mt-8 md:mt-10 flex flex-col sm:flex-row gap-3 justify-center">
               <button
                 onClick={openDownload}
-                className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-full bg-ocean text-white text-sm font-semibold hover:bg-ink transition-colors"
+                className="inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-full bg-electric text-ink text-sm md:text-base font-semibold hover:bg-white transition-colors"
                 data-hover
               >
                 Download the app
@@ -49,14 +65,30 @@ export default function ForDoctorsClient() {
               </button>
               <a
                 href="#features"
-                className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-full border border-ink/20 text-ink text-sm font-medium hover:bg-bone hover:border-ink transition-colors"
+                className="inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-full border border-bone/40 text-bone text-sm md:text-base font-medium hover:bg-bone/10 hover:border-bone transition-colors"
                 data-hover
               >
-                What's inside the app
+                What&apos;s inside the app
               </a>
             </div>
           </motion.div>
         </div>
+
+        {/* Subtle scroll cue */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 1.2, duration: 0.6 }}
+          className="absolute bottom-4 md:bottom-6 left-1/2 -translate-x-1/2 text-bone/60 text-[10px] tracking-[0.3em] uppercase hidden md:flex items-center gap-2"
+        >
+          Scroll
+          <motion.span
+            className="block w-px h-5 bg-bone/60"
+            animate={{ scaleY: [0.3, 1, 0.3] }}
+            transition={{ duration: 1.6, repeat: Infinity, ease: "easeInOut" }}
+            style={{ transformOrigin: "top" }}
+          />
+        </motion.div>
       </section>
 
       {/* Section break: caption sits horizontally centered, with a vertical
