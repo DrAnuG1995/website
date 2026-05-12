@@ -85,9 +85,16 @@ const HERO_SLIDES: { src: string; alt: string; town: string; state: string }[] =
 ];
 
 const SLIDE_INTERVAL_MS = 5500;
+// Photo crossfade duration — must match the `transition.duration` on the
+// motion.div opacity below. The caption swap lags the photo swap by half
+// this so the caption flips at the visual midpoint of the crossfade,
+// when both old + new photos are equally visible. Without the lag the
+// caption visibly leads the photo by ~700ms.
+const CROSSFADE_MS = 1400;
 
 function HeroSlideshow() {
   const [active, setActive] = useState(0);
+  const [captionIndex, setCaptionIndex] = useState(0);
 
   useEffect(() => {
     const id = window.setInterval(
@@ -97,7 +104,14 @@ function HeroSlideshow() {
     return () => window.clearInterval(id);
   }, []);
 
-  const current = HERO_SLIDES[active];
+  // Slide the caption to the active photo at the crossfade midpoint, so
+  // the label matches whatever photo is dominant on screen.
+  useEffect(() => {
+    const id = window.setTimeout(() => setCaptionIndex(active), CROSSFADE_MS / 2);
+    return () => window.clearTimeout(id);
+  }, [active]);
+
+  const current = HERO_SLIDES[captionIndex];
 
   return (
     <>
@@ -108,7 +122,7 @@ function HeroSlideshow() {
             className="absolute inset-0"
             initial={false}
             animate={{ opacity: i === active ? 1 : 0 }}
-            transition={{ duration: 1.4, ease: "easeInOut" }}
+            transition={{ duration: CROSSFADE_MS / 1000, ease: "easeInOut" }}
           >
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <motion.img
