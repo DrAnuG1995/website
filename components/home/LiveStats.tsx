@@ -30,7 +30,8 @@ export default function LiveStatsStrip({ initial }: { initial: LiveStats }) {
       .on("postgres_changes", { event: "*", schema: "public", table: "shifts" }, refresh)
       .on("postgres_changes", { event: "*", schema: "public", table: "hospitals" }, refresh)
       .subscribe();
-    const interval = window.setInterval(refresh, 15_000);
+    // Poll every 15 minutes — matches the CRM's admin-portal sync cadence.
+    const interval = window.setInterval(refresh, 15 * 60 * 1000);
     // Also refresh when the tab regains focus — covers users who leave the
     // page open for hours.
     const onVisibility = () => {

@@ -114,7 +114,9 @@ export default function LiveShiftFeed({ initialShifts }: { initialShifts: LiveSh
       .channel("live-shift-feed")
       .on("postgres_changes", { event: "*", schema: "public", table: "shifts" }, refetch)
       .subscribe();
-    const interval = window.setInterval(refetch, 5_000);
+    // Poll every 15 minutes — matches the CRM's admin-portal sync cadence,
+    // so the public feed gets fresh data within a tick of the CRM itself.
+    const interval = window.setInterval(refetch, 15 * 60 * 1000);
     const onVisibility = () => {
       if (document.visibilityState === "visible") refetch();
     };
@@ -191,8 +193,11 @@ export default function LiveShiftFeed({ initialShifts }: { initialShifts: LiveSh
             </div>
             <div className="text-[10px] tracking-[0.22em] uppercase text-bone/55 tabular-nums">
               {(() => {
-                const ago = Math.max(0, Math.floor((now - lastRefreshAt) / 1000));
-                return ago < 2 ? "Just updated" : `Updated ${ago}s ago`;
+                const sec = Math.max(0, Math.floor((now - lastRefreshAt) / 1000));
+                if (sec < 5) return "Just updated";
+                if (sec < 60) return `Updated ${sec}s ago`;
+                const min = Math.floor(sec / 60);
+                return `Updated ${min}m ago`;
               })()}
             </div>
           </div>
