@@ -834,6 +834,9 @@ function Pricing({ onContact }: { onContact: () => void }) {
             <div className="text-[10px] tracking-[0.22em] uppercase text-muted mb-3">
               Single hospital
             </div>
+            <div className="text-[11px] md:text-[12px] text-muted mb-1">
+              Starting from
+            </div>
             <div className="display text-[clamp(48px,5vw,64px)] leading-none">
               $10K
               <span className="text-base text-muted ml-1">/year</span>
@@ -868,6 +871,9 @@ function Pricing({ onContact }: { onContact: () => void }) {
           >
             <div className="text-[10px] tracking-[0.22em] uppercase text-bone/60 mb-3">
               Health service · State service
+            </div>
+            <div className="text-[11px] md:text-[12px] text-bone/60 mb-1">
+              Starting from
             </div>
             <div className="display text-[clamp(48px,5vw,64px)] leading-none">
               $50K
@@ -989,7 +995,7 @@ const HOSPITAL_FAQ: { q: string; a: string }[] = [
   },
   {
     q: "What's the platform fee, exactly?",
-    a: "Flat annual pricing. $10K/year for a single hospital — unlimited shifts, unlimited doctors, locum and permanent hiring all included. $50K/year for health services or state services managing up to 10 hospitals through a single admin account. No per-shift fees, no buy-out fees, no per-seat charges.",
+    a: "Flat annual pricing, starting from $10K/year for a single hospital — unlimited shifts, unlimited doctors, locum and permanent hiring all included. Starting from $50K/year for health services or state services managing up to 10 hospitals through a single admin account. No per-shift fees, no buy-out fees, no per-seat charges.",
   },
   {
     q: "Can we set a maximum hourly rate?",
