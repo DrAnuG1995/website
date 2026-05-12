@@ -4,6 +4,7 @@ import Link from "next/link";
 import { motion, useScroll, useTransform, type MotionValue } from "framer-motion";
 import Counter from "@/components/Counter";
 import { PARTNER_LOGOS } from "@/lib/partner-logos";
+import { AGENCY_FEES_SAVED_AUD, VERIFIED_DOCTORS } from "@/lib/marketing-stats";
 
 /* ============================================================
    /hospitals, sales landing page for hospital admins.
@@ -15,12 +16,10 @@ import { PARTNER_LOGOS } from "@/lib/partner-logos";
 
 export default function HospitalsClient({
   partnerCount,
-  activeShifts,
 }: {
-  // Live CRM values fetched server-side in page.tsx. Both default to 0
+  // Live partner count fetched server-side in page.tsx. Defaults to 0
   // when the CRM is unreachable so the page still renders cleanly.
   partnerCount?: number;
-  activeShifts?: number;
 }) {
   const goContact = () => {
     if (typeof window !== "undefined") {
@@ -33,16 +32,13 @@ export default function HospitalsClient({
   };
   return (
     <div className="bg-white text-ink">
-      <Hero
-        onContact={goContact}
-        partnerCount={partnerCount ?? 0}
-        activeShifts={activeShifts ?? 0}
-      />
+      <Hero onContact={goContact} partnerCount={partnerCount ?? 0} />
       <HospitalLogosStrip partnerCount={partnerCount ?? 0} />
       <HowItWorks />
       <HospitalDemoVideo />
       <Comparison />
       <Pricing onContact={goContact} />
+      <PermHireCallout onContact={goContact} />
       <HospitalFAQ />
       <ClosingCTA onContact={goContact} />
     </div>
@@ -53,69 +49,95 @@ export default function HospitalsClient({
 function Hero({
   onContact,
   partnerCount,
-  activeShifts,
 }: {
   onContact: () => void;
   partnerCount: number;
-  activeShifts: number;
 }) {
-  // Two of three stats are now live from the CRM (hospital count + open
-  // shifts right now). The "75% cheaper" claim is a value-prop, not a
-  // count, so it stays static. When the CRM is unreachable both live
-  // values are 0; the Counter just renders 0 — acceptable for a
-  // momentary outage and visually obvious that something's wrong.
+  // Three stats: a verified-doctor count from the shared marketing
+  // constant (kept identical across the public site), a live partner
+  // count straight from the CRM, and the cumulative agency-fees-saved
+  // value-prop counter. The agency-fees number is a curated marketing
+  // claim from lib/marketing-stats.ts — bump it as ops verifies new
+  // thresholds.
   const stats = [
     {
+      to: VERIFIED_DOCTORS,
+      prefix: "",
+      suffix: "+",
+      label: "Verified Australian doctors",
+      live: false,
+    },
+    {
       to: partnerCount > 0 ? partnerCount : 60,
+      prefix: "",
       suffix: partnerCount > 0 ? "" : "+",
       label: "Partner clinics & hospitals",
       live: partnerCount > 0,
     },
     {
-      to: activeShifts > 0 ? activeShifts : 0,
-      suffix: "",
-      label: "Open shifts right now",
-      live: true,
-    },
-    {
-      to: 75,
-      suffix: "%",
-      label: "Cheaper than agency fees",
+      to: AGENCY_FEES_SAVED_AUD,
+      prefix: "$",
+      suffix: "+",
+      label: "Agency fees saved",
       live: false,
     },
   ];
   return (
-    <section className="relative pt-32 md:pt-36 pb-12 md:pb-16 px-6">
+    <section className="relative overflow-hidden text-bone min-h-[640px] md:min-h-[720px] flex items-center pt-32 md:pt-36 pb-12 md:pb-16 px-6">
+      {/* Background photo. Modern clinical / hospital scene — kept
+          deliberately soft (object-cover + overlay gradient) so the
+          stat cards and copy stay the visual anchor. */}
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src="https://images.unsplash.com/photo-1551076805-e1869033e561?w=2400&q=80&auto=format&fit=crop"
+        alt=""
+        aria-hidden
+        className="absolute inset-0 w-full h-full object-cover object-center"
+        loading="eager"
+        fetchPriority="high"
+      />
+      {/* Layered overlay: a strong ink wash for legibility + the same
+          ocean/electric radial accents we use elsewhere so the hero
+          still reads as part of the site's visual language. */}
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-0 opacity-50"
+        className="pointer-events-none absolute inset-0"
         style={{
           background:
-            "radial-gradient(40% 40% at 80% 20%, rgba(50,50,255,0.10), transparent 70%), radial-gradient(40% 40% at 15% 80%, rgba(205,227,93,0.18), transparent 70%)",
+            "linear-gradient(180deg, rgba(26,26,46,0.78), rgba(26,26,46,0.62) 55%, rgba(26,26,46,0.85))",
         }}
       />
-      <div className="relative max-w-[1100px] mx-auto text-center">
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 opacity-60 mix-blend-screen"
+        style={{
+          background:
+            "radial-gradient(40% 40% at 80% 20%, rgba(50,50,255,0.45), transparent 70%), radial-gradient(40% 40% at 15% 80%, rgba(205,227,93,0.25), transparent 70%)",
+        }}
+      />
+
+      <div className="relative max-w-[1100px] mx-auto text-center w-full">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7, ease: [0.2, 0.8, 0.2, 1] }}
         >
-          <div className="text-[10px] tracking-[0.22em] uppercase text-muted mb-3">
+          <div className="text-[10px] tracking-[0.22em] uppercase text-bone/70 mb-3">
             For hospitals
           </div>
-          <h1 className="display text-[clamp(36px,6vw,84px)] leading-[0.98]">
+          <h1 className="display text-white text-[clamp(36px,6vw,84px)] leading-[0.98]">
             Fill shifts faster.{" "}
-            <span className="italic text-ocean">Pay agencies less</span>.
+            <span className="italic text-electric">Pay agencies less</span>.
           </h1>
-          <p className="mt-5 text-muted max-w-xl mx-auto text-[15px] md:text-base leading-relaxed">
-            Post a shift directly to 300+ verified Australian doctors. Review
-            credentials in seconds, confirm in one tap, settle in 48 hours, no
-            recruiter, no markup, no contract.
+          <p className="mt-5 text-bone/80 max-w-xl mx-auto text-[15px] md:text-base leading-relaxed">
+            Post a shift directly to {VERIFIED_DOCTORS}+ verified Australian
+            doctors. Review credentials in seconds, confirm in one tap, settle
+            in 48 hours, no recruiter, no markup, no contract.
           </p>
           <div className="mt-8 flex flex-col sm:flex-row gap-3 justify-center">
             <button
               onClick={onContact}
-              className="inline-flex items-center justify-center gap-2 w-[200px] px-5 py-3 rounded-full bg-ocean text-white text-sm font-semibold hover:bg-ink transition-colors"
+              className="inline-flex items-center justify-center gap-2 w-[210px] px-5 py-3 rounded-full bg-electric text-ink text-sm font-semibold hover:bg-white transition-colors"
               data-hover
             >
               Book a 15-min demo
@@ -123,7 +145,7 @@ function Hero({
             </button>
             <a
               href="#how"
-              className="inline-flex items-center justify-center gap-2 w-[200px] px-5 py-3 rounded-full border border-ink/20 text-ink text-sm font-medium hover:bg-bone hover:border-ink transition-colors"
+              className="inline-flex items-center justify-center gap-2 w-[210px] px-5 py-3 rounded-full border border-bone/40 text-bone text-sm font-medium hover:bg-bone/10 hover:border-bone transition-colors"
               data-hover
             >
               How it works
@@ -140,7 +162,7 @@ function Hero({
           {stats.map((s, i) => (
             <div
               key={s.label}
-              className="relative rounded-3xl bg-lavender border border-ocean/10 px-6 py-7 md:py-8"
+              className="relative rounded-3xl bg-white/8 backdrop-blur-md border border-bone/15 px-6 py-7 md:py-8"
             >
               {s.live && (
                 <span className="absolute top-4 right-4 inline-flex items-center gap-1.5">
@@ -148,15 +170,20 @@ function Hero({
                     <span className="absolute inset-0 rounded-full bg-electric animate-ping opacity-75" />
                     <span className="relative block w-1.5 h-1.5 rounded-full bg-electric" />
                   </span>
-                  <span className="text-[9px] tracking-[0.22em] uppercase font-semibold text-muted">
+                  <span className="text-[9px] tracking-[0.22em] uppercase font-semibold text-bone/70">
                     Live
                   </span>
                 </span>
               )}
-              <div className="display text-[clamp(40px,5vw,64px)] leading-none text-ink tabular-nums">
-                <Counter to={s.to} suffix={s.suffix} duration={1.6 + i * 0.2} />
+              <div className="display text-[clamp(36px,4.6vw,56px)] leading-none text-white tabular-nums">
+                <Counter
+                  to={s.to}
+                  prefix={s.prefix}
+                  suffix={s.suffix}
+                  duration={1.6 + i * 0.2}
+                />
               </div>
-              <div className="mt-3 text-[12px] md:text-[13px] text-muted leading-snug">
+              <div className="mt-3 text-[12px] md:text-[13px] text-bone/75 leading-snug">
                 {s.label}
               </div>
             </div>
@@ -249,7 +276,7 @@ const STEPS: Step[] = [
     n: "01",
     pill: "Post",
     title: "Post a shift in 90 seconds.",
-    body: "Specialty, date, hours, rate, location. Live to 300+ verified doctors.",
+    body: `Specialty, date, hours, rate, location. Live to ${VERIFIED_DOCTORS}+ verified doctors.`,
     src: "/screens/stathospital-post-requirements.png",
     accent: "ocean",
   },
@@ -882,6 +909,65 @@ function Bullet({
   );
 }
 
+/* ---------- PERMANENT-HIRE VALUE PROP ----------
+   Hospitals routinely meet a locum they'd like to hire permanently —
+   on most agencies that triggers a buy-out fee (often 20–25% of first-
+   year salary). StatDoctor doesn't charge anything to convert. This
+   callout makes that visible right after pricing so admins reading
+   the page see it before they reach the FAQ. */
+function PermHireCallout({ onContact }: { onContact: () => void }) {
+  return (
+    <section className="relative bg-white py-10 md:py-14 px-6">
+      <div className="max-w-[1100px] mx-auto">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-80px" }}
+          transition={{ duration: 0.6, ease: [0.2, 0.8, 0.2, 1] }}
+          className="relative overflow-hidden rounded-3xl border border-ocean/15 bg-lavender p-7 md:p-10"
+        >
+          <div
+            aria-hidden
+            className="pointer-events-none absolute inset-y-0 right-0 w-1/2 opacity-40"
+            style={{
+              background:
+                "radial-gradient(50% 60% at 80% 50%, rgba(50,50,255,0.30), transparent 70%)",
+            }}
+          />
+          <div className="relative flex flex-col md:flex-row md:items-center md:justify-between gap-6 md:gap-10">
+            <div className="md:max-w-2xl">
+              <div className="text-[10px] tracking-[0.22em] uppercase text-muted mb-2">
+                No buy-out fees, ever
+              </div>
+              <h3 className="display text-[clamp(22px,3vw,36px)] leading-[1.1] text-ink">
+                Like a locum? Hire them permanently{" "}
+                <span className="italic text-ocean">
+                  at no extra cost
+                </span>
+                .
+              </h3>
+              <p className="mt-3 text-[14px] md:text-[15px] text-ink/70 leading-relaxed max-w-xl">
+                Agencies charge 15–25% of first-year salary to convert a locum
+                to a permanent hire. We charge $0. If a hospital and a doctor
+                want to make it permanent, that&apos;s between you and them —
+                we&apos;re not in the middle.
+              </p>
+            </div>
+            <button
+              onClick={onContact}
+              className="shrink-0 inline-flex items-center justify-center gap-2 px-5 py-3 rounded-full bg-ocean text-white text-sm font-semibold hover:bg-ink transition-colors"
+              data-hover
+            >
+              Talk to us
+              <span aria-hidden>→</span>
+            </button>
+          </div>
+        </motion.div>
+      </div>
+    </section>
+  );
+}
+
 /* ---------- FAQ ---------- */
 const HOSPITAL_FAQ: { q: string; a: string }[] = [
   {
@@ -906,7 +992,7 @@ const HOSPITAL_FAQ: { q: string; a: string }[] = [
   },
   {
     q: "Can we hire one of the doctors permanently?",
-    a: "Yes, no agency placement fees. If a hospital and doctor want to formalise a permanent role, that's between you and them.",
+    a: "Yes, at no extra cost. Most agencies charge 15–25% of first-year salary as a buy-out fee when a locum converts to a permanent hire — we charge $0. If a hospital and doctor want to formalise a permanent role, that's between you and them.",
   },
 ];
 
