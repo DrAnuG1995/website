@@ -238,7 +238,7 @@ const DOCTORS: {
   {
     name: "Dr Layth Samari",
     credential: "MD · ACEM Trainee",
-    img: "https://cdn.prod.website-files.com/688db6d677516719c3925d01/697828648e6bd8e828e91b1c_statdocto_doctors_available-07-03.png",
+    img: "/doctors/dr-layth.png",
     quote:
       "A great initiative to help doctors be in charge of their own work-life balance with the ease of picking up shifts on demand.",
     accent: "ocean",
@@ -268,7 +268,7 @@ const DOCTORS: {
   {
     name: "Dr David Burton",
     credential: "MBChB · FRNZCGP",
-    img: "https://cdn.prod.website-files.com/688db6d677516719c3925d01/69a025c3085be6b4dea58517_Screenshot%202026-02-26%20at%208.51.34%E2%80%AFpm.png",
+    img: "/doctors/dr-david.png",
     quote:
       "StatDoctor is a brilliant solution to the ridiculous financial burden on public hospitals that locum agencies were charging, and the drudgery and admin of locuming. It's better, sleeker, easier to navigate and more invested in making locuming work well for both parties than any locum agency.",
     accent: "ocean",

@@ -24,7 +24,13 @@ export default async function Page() {
       return {
         name: h.name,
         state: deriveAuState(h.formatted_address),
-        photoUrl: pickHospitalPhoto(h.name, town, h.logo_url, photoMap),
+        photoUrl: pickHospitalPhoto(
+          h.name,
+          town,
+          h.formatted_address,
+          h.logo_url,
+          photoMap,
+        ),
         website: h.website,
       };
     })

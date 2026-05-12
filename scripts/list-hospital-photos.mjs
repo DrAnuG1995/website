@@ -96,36 +96,90 @@ for (const r of rows) {
   byCity.get(slug).hospitals.push(r.name);
 }
 
-const sorted = [...byCity.entries()].sort(([a], [b]) => a.localeCompare(b));
-let present = 0;
-let missing = 0;
+// Build the available photo map (slug → filename) so we can run the
+// same multi-strategy match the website uses.
+const availablePhotos = new Map();
+if (existsSync(PHOTO_DIR)) {
+  for (const file of readdirSync(PHOTO_DIR)) {
+    const dot = file.lastIndexOf(".");
+    if (dot < 0) continue;
+    const base = file.slice(0, dot).toLowerCase();
+    const ext = file.slice(dot + 1).toLowerCase();
+    if (ACCEPTED_EXTS.includes(ext) && !availablePhotos.has(base))
+      availablePhotos.set(base, file);
+  }
+}
+const slugsByLength = [...availablePhotos.keys()].sort(
+  (a, b) => b.length - a.length,
+);
+function slugContains(haystack, slug) {
+  if (!slug || !haystack) return false;
+  if (haystack === slug) return true;
+  if (haystack.startsWith(slug + "-")) return true;
+  if (haystack.endsWith("-" + slug)) return true;
+  return haystack.includes("-" + slug + "-");
+}
+function resolvePhoto(name, town, address) {
+  if (town) {
+    const hit = availablePhotos.get(citySlug(town));
+    if (hit) return { slug: citySlug(town), file: hit, strategy: "town" };
+  }
+  const nameSlug = citySlug(name);
+  for (const slug of slugsByLength) {
+    if (slugContains(nameSlug, slug))
+      return { slug, file: availablePhotos.get(slug), strategy: "name" };
+  }
+  if (address) {
+    const addrSlug = citySlug(address);
+    for (const slug of slugsByLength) {
+      if (slugContains(addrSlug, slug))
+        return { slug, file: availablePhotos.get(slug), strategy: "address" };
+    }
+  }
+  return null;
+}
 
-console.log(`\nFound ${rows.length} active hospitals across ${sorted.length} cities.\n`);
+console.log(`\nFound ${rows.length} active hospitals.\n`);
 console.log(`Photos live in: ${PHOTO_DIR.replace(process.cwd(), ".")}`);
 console.log(`Accepted formats: ${ACCEPTED_EXTS.join(", ")}\n`);
-console.log("─".repeat(96));
-console.log("STATUS  CITY SLUG".padEnd(35) + "TOWN".padEnd(25) + "HOSPITALS USING THIS PHOTO");
-console.log("─".repeat(96));
+console.log("─".repeat(110));
+console.log(
+  "RESULT  PHOTO".padEnd(28) +
+    "VIA".padEnd(10) +
+    "HOSPITAL".padEnd(50) +
+    "ADDRESS",
+);
+console.log("─".repeat(110));
 
-for (const [slug, { town, hospitals }] of sorted) {
-  const file = findPhotoFile(slug);
-  const status = file ? "  ✓  " : "  ✗  ";
-  const filename = file || `${slug}.jpg`;
-  if (file) present++;
-  else missing++;
-  const firstLine = `${status}   ${filename.padEnd(29)}${town.padEnd(25)}${hospitals[0]}`;
-  console.log(firstLine);
-  for (const h of hospitals.slice(1)) {
-    console.log(`${" ".repeat(8)}${" ".repeat(29)}${" ".repeat(25)}${h}`);
+let matched = 0;
+let unmatched = 0;
+const unmatchedRows = [];
+
+for (const r of rows.sort((a, b) => a.name.localeCompare(b.name))) {
+  const town = deriveAuTown(r.formatted_address);
+  const hit = resolvePhoto(r.name, town, r.formatted_address);
+  if (hit) {
+    matched++;
+    const photo = hit.file;
+    console.log(
+      `  ✓     ${photo.padEnd(22)}${hit.strategy.padEnd(10)}${r.name.padEnd(50)}${(r.formatted_address || "").slice(0, 40)}`,
+    );
+  } else {
+    unmatched++;
+    unmatchedRows.push(r);
+    console.log(
+      `  ✗     ${"(no match)".padEnd(22)}${"".padEnd(10)}${r.name.padEnd(50)}${(r.formatted_address || "").slice(0, 40)}`,
+    );
   }
 }
 
-console.log("─".repeat(96));
-console.log(`\n${present} cities covered · ${missing} cities missing photos · ${sorted.length} total\n`);
+console.log("─".repeat(110));
+console.log(
+  `\n${matched} hospitals matched to a photo · ${unmatched} unmatched · ${rows.length} total\n`,
+);
 
-if (missing > 0) {
-  console.log(`To add a city photo, save as:`);
-  console.log(`  public/hospitals/<city-slug>.<jpg|png|webp|avif>`);
-  console.log(`Filename is case-insensitive but please stick to lowercase for`);
-  console.log(`Linux/Vercel compatibility.\n`);
+if (unmatchedRows.length > 0) {
+  console.log("To cover an unmatched hospital, add a city photo whose slug appears");
+  console.log("either as a token in the hospital name or in its address. Example:");
+  console.log("  public/hospitals/rockhampton.jpg  → covers Mater Private Rockhampton\n");
 }

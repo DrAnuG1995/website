@@ -52,27 +52,66 @@ export function loadHospitalPhotoMap(): Map<string, string> {
   return map;
 }
 
-// Resolve the best splash image for a hospital. Order of preference:
-//   1. /public/hospitals/<town-slug>.<ext> — city photo for the suburb
-//      we derived from the formatted_address (most hospitals in the same
-//      city share this).
-//   2. /public/hospitals/<hospital-name-slug>.<ext> — fall back to a
-//      photo named after the hospital itself, in case ops curates a
-//      specific shot for one hospital.
-//   3. logo_url from the CRM (synced from admin portal hospitalImage).
-//   4. null — caller decides on a placeholder.
+// Resolve the best splash image for a hospital. Strategy:
+//   1. exact match: town slug from formatted_address → photo file
+//   2. substring match: scan the hospital name for any photo's city
+//      slug (e.g. "Mater Private Hospital - Brisbane" matches
+//      brisbane.jpg). Critical because most CRM addresses don't follow
+//      the "Town STATE postcode" pattern cleanly, so address-derived
+//      town fails for the majority of rows.
+//   3. substring match: same scan against formatted_address
+//   4. logo_url from the CRM
+//   5. null (caller renders a placeholder)
+//
+// Substring matches walk the photo map in longest-slug-first order so
+// "hervey-bay" wins over "bay" if both exist.
 export function pickHospitalPhoto(
   name: string,
   town: string | null,
+  address: string | null,
   logoUrl: string | null,
   photoMap: Map<string, string>,
 ): string | null {
+  // 1. Exact town slug match
   if (town) {
     const townHit = photoMap.get(citySlug(town));
     if (townHit) return townHit;
   }
-  const nameHit = photoMap.get(citySlug(name));
-  if (nameHit) return nameHit;
+
+  // Build a longest-first list of photo slugs so substring search picks
+  // the most specific match.
+  const slugsByLength = [...photoMap.keys()].sort(
+    (a, b) => b.length - a.length,
+  );
+
+  // 2. Substring match against the hospital name (slug-form)
+  const nameSlug = citySlug(name);
+  for (const slug of slugsByLength) {
+    if (slugContains(nameSlug, slug)) return photoMap.get(slug)!;
+  }
+
+  // 3. Substring match against the full address (slug-form)
+  if (address) {
+    const addrSlug = citySlug(address);
+    for (const slug of slugsByLength) {
+      if (slugContains(addrSlug, slug)) return photoMap.get(slug)!;
+    }
+  }
+
+  // 4. CRM logo
   if (logoUrl) return logoUrl;
   return null;
+}
+
+// Whether `slug` appears as a hyphen-bounded token sequence inside
+// `haystack`. Prevents "tom-price" from matching "tom-pricewich" or
+// "atom-price" — both haystack and slug are already in citySlug form
+// (lowercase, hyphenated, no other punctuation), so we just need to
+// check the boundaries.
+function slugContains(haystack: string, slug: string): boolean {
+  if (!slug || !haystack) return false;
+  if (haystack === slug) return true;
+  if (haystack.startsWith(slug + "-")) return true;
+  if (haystack.endsWith("-" + slug)) return true;
+  return haystack.includes("-" + slug + "-");
 }
