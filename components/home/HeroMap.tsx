@@ -14,18 +14,20 @@ const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL ?? "";
 const SUPABASE_ANON_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? "";
 
 const AU_CENTER = { lat: -28, lng: 134.5 };
-// Bounds are intentionally generous in every direction so the user can pan
-// freely (vertically AND horizontally) at any zoom without the elastic
-// restriction snapping the camera back. Tighter bounds locked the camera in
-// place at MIN_ZOOM on mobile.
+// Bounds form a snug box around Australia + a small Pacific/PNG buffer
+// so the user can't pan into Asia or the Pacific Ocean. Kept loose enough
+// that the elastic restriction (strictBounds: false) never traps the
+// camera at MIN_ZOOM on mobile — it just nudges them back when they try
+// to drag past. If you tighten further, also bump MIN_ZOOM or the
+// viewport will fail to render the bounds at the lowest zoom level.
 const AU_BOUNDS = {
-  north: 30,
-  south: -70,
-  west: 50,
-  east: 220,
+  north: -5, // just above Cape York / PNG
+  south: -48, // just below Tasmania
+  west: 108, // just west of WA coast
+  east: 160, // east enough to include NZ approach
 };
 const OVERVIEW_ZOOM = 4.2;
-const MIN_ZOOM = 3;
+const MIN_ZOOM = 4;
 const MAX_ZOOM = 18;
 
 const DEFAULT_HOSPITAL_ZOOM = 16;
