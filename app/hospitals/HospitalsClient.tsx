@@ -3,18 +3,10 @@ import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { motion, useScroll, useTransform, type MotionValue } from "framer-motion";
 import Counter from "@/components/Counter";
-import type { AusState } from "@/lib/hospitals";
+import CitySlideshow from "@/components/CitySlideshow";
+import { HERO_CITY_SLIDES } from "@/lib/hero-slides";
+import { PARTNER_LOGOS } from "@/lib/partner-logos";
 import { AGENCY_FEES_SAVED_AUD, VERIFIED_DOCTORS } from "@/lib/marketing-stats";
-
-// CRM-derived hospital card for the area carousel. Photo URL resolved
-// server-side in page.tsx (public/hospitals/<slug>.jpg → logo_url →
-// null). When null the carousel renders a soft swatch instead.
-export type HospitalCard = {
-  name: string;
-  state: AusState | null;
-  photoUrl: string | null;
-  website: string | null;
-};
 
 /* ============================================================
    /hospitals, sales landing page for hospital admins.
@@ -26,14 +18,10 @@ export type HospitalCard = {
 
 export default function HospitalsClient({
   partnerCount,
-  hospitalCards,
 }: {
   // Live partner count fetched server-side in page.tsx. Defaults to 0
   // when the CRM is unreachable so the page still renders cleanly.
   partnerCount?: number;
-  // Full list of active hospitals with their resolved splash photo
-  // URL. Used by the HospitalAreaCarousel below the hero.
-  hospitalCards?: HospitalCard[];
 }) {
   const goContact = () => {
     if (typeof window !== "undefined") {
@@ -47,7 +35,7 @@ export default function HospitalsClient({
   return (
     <div className="bg-white text-ink">
       <Hero onContact={goContact} partnerCount={partnerCount ?? 0} />
-      <HospitalAreaCarousel cards={hospitalCards ?? []} />
+      <HospitalLogosStrip partnerCount={partnerCount ?? 0} />
       <HowItWorks />
       <HospitalDemoVideo />
       <Comparison />
@@ -98,18 +86,12 @@ function Hero({
   ];
   return (
     <section className="relative overflow-hidden text-bone min-h-[640px] md:min-h-[720px] flex items-center pt-32 md:pt-36 pb-12 md:pb-16 px-6">
-      {/* Background photo. Modern clinical / hospital scene — kept
-          deliberately soft (object-cover + overlay gradient) so the
-          stat cards and copy stay the visual anchor. */}
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
-        src="https://images.unsplash.com/photo-1551076805-e1869033e561?w=2400&q=80&auto=format&fit=crop"
-        alt=""
-        aria-hidden
-        className="absolute inset-0 w-full h-full object-cover object-center"
-        loading="eager"
-        fetchPriority="high"
-      />
+      {/* Ken Burns–style city slideshow as the hero background, same
+          component + same source list /for-doctors uses so the two
+          pages stay in lock-step. Drop a new photo into
+          public/hospitals/<city>.jpg and append it to HERO_CITY_SLIDES
+          to add a slide. */}
+      <CitySlideshow slides={HERO_CITY_SLIDES} />
       {/* Layered overlay: a strong ink wash for legibility + the same
           ocean/electric radial accents we use elsewhere so the hero
           still reads as part of the site's visual language. */}
@@ -208,20 +190,16 @@ function Hero({
   );
 }
 
-/* ---------- HOSPITAL AREA CAROUSEL ----------
-   Auto-scrolling marquee of every active hospital. Each card shows the
-   per-hospital splash photo from public/hospitals/<slug>.<ext> (resolved
-   server-side in page.tsx) with the hospital name + state overlaid.
-   Pauses on hover, doubles the source list for a seamless -50% loop. */
-function HospitalAreaCarousel({ cards }: { cards: HospitalCard[] }) {
-  // Need at least one card to render anything; otherwise the marquee
-  // would either error or display nothing. Bail early.
-  if (cards.length === 0) return null;
-
-  // Double the list so the keyframe -50% wrap lands on an identical
-  // copy of the first card — no visible seam.
-  const doubled = [...cards, ...cards];
-
+/* ---------- HOSPITAL LOGOS STRIP ----------
+   Same partner-logos marquee the homepage uses (PARTNER_LOGOS from
+   lib/partner-logos.ts). One source list keeps the homepage and
+   /hospitals page in lock-step — add a logo there and both update.
+   Live partner count from the CRM appears in the eyebrow under the
+   headline. */
+function HospitalLogosStrip({ partnerCount }: { partnerCount: number }) {
+  // Doubled so the -50% keyframe wraps onto an identical copy of the
+  // first slot — no visible seam at the loop point.
+  const doubled = [...PARTNER_LOGOS, ...PARTNER_LOGOS];
   return (
     <section className="py-12 md:py-14 bg-white">
       <div className="max-w-[1280px] mx-auto px-6 mb-8 md:mb-10">
@@ -247,7 +225,9 @@ function HospitalAreaCarousel({ cards }: { cards: HospitalCard[] }) {
             className="group inline-flex items-center gap-2 text-[10px] tracking-[0.22em] uppercase text-muted hover:text-ocean transition-colors"
             data-hover
           >
-            {cards.length} partners · growing weekly
+            {partnerCount > 0
+              ? `${partnerCount} hospitals · growing weekly`
+              : "Growing weekly"}
             <span
               aria-hidden
               className="inline-block transition-transform group-hover:translate-x-0.5"
@@ -259,71 +239,24 @@ function HospitalAreaCarousel({ cards }: { cards: HospitalCard[] }) {
       </div>
 
       <div className="marquee-mask">
-        <div className="flex w-max items-stretch gap-4 md:gap-5 animate-marquee-slow hover:[animation-play-state:paused]">
-          {doubled.map((card, i) => (
-            <HospitalAreaCard key={`${card.name}-${i}`} card={card} />
+        <div className="flex w-max items-center animate-marquee-slow hover:[animation-play-state:paused]">
+          {doubled.map((logo, i) => (
+            <div
+              key={i}
+              className="shrink-0 w-[150px] md:w-[170px] flex items-center justify-center"
+            >
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={logo.src}
+                alt=""
+                style={{ height: `${logo.h ?? 51}px` }}
+                className="w-auto max-w-[120px] md:max-w-[140px] opacity-60 hover:opacity-100 transition-opacity duration-500 grayscale hover:grayscale-0"
+              />
+            </div>
           ))}
         </div>
       </div>
     </section>
-  );
-}
-
-function HospitalAreaCard({ card }: { card: HospitalCard }) {
-  const body = (
-    <div className="relative w-[240px] md:w-[280px] aspect-[4/3] rounded-2xl overflow-hidden bg-lavender border border-ink/8 shadow-[0_10px_30px_-15px_rgba(26,26,46,0.2)] group transition-transform hover:-translate-y-0.5">
-      {card.photoUrl ? (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img
-          src={card.photoUrl}
-          alt={card.name}
-          loading="lazy"
-          decoding="async"
-          className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-        />
-      ) : (
-        // Placeholder for hospitals without a stored splash photo yet —
-        // soft ocean/electric wash, name still readable below.
-        <div
-          aria-hidden
-          className="absolute inset-0"
-          style={{
-            background:
-              "linear-gradient(135deg, rgba(50,50,255,0.18), rgba(205,227,93,0.22))",
-          }}
-        />
-      )}
-      {/* Bottom-of-card gradient so the white name text always reads. */}
-      <div
-        aria-hidden
-        className="absolute inset-x-0 bottom-0 h-2/3 bg-gradient-to-t from-ink/85 via-ink/40 to-transparent"
-      />
-      <div className="absolute left-4 right-4 bottom-3.5 text-left">
-        <div className="text-white text-[13px] md:text-[14px] font-semibold leading-snug drop-shadow-[0_1px_3px_rgba(0,0,0,0.4)]">
-          {card.name}
-        </div>
-        {card.state && (
-          <div className="mt-0.5 text-[9px] tracking-[0.22em] uppercase text-bone/85 font-semibold">
-            {card.state}
-          </div>
-        )}
-      </div>
-    </div>
-  );
-
-  return card.website ? (
-    <a
-      href={card.website}
-      target="_blank"
-      rel="noopener noreferrer"
-      className="shrink-0"
-      data-hover
-      aria-label={`Visit ${card.name} website`}
-    >
-      {body}
-    </a>
-  ) : (
-    <div className="shrink-0">{body}</div>
   );
 }
 

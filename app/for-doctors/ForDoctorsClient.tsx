@@ -1,7 +1,10 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
+// useState/motion/AnimatePresence are used by PartnerNetwork below.
 import FeatureShowcase from "@/components/home/FeatureShowcase";
+import CitySlideshow from "@/components/CitySlideshow";
+import { HERO_CITY_SLIDES } from "@/lib/hero-slides";
 import type { AusState } from "@/lib/hospitals";
 
 // CRM-derived shape passed from the server component. State is
@@ -13,113 +16,6 @@ export type LivePartner = {
   website: string | null;
   logoUrl: string | null;
 };
-
-// Hero slideshow frames. Every town listed here is a real StatDoctor
-// partner location. Photos live in public/hospitals/ — same folder
-// the /hospitals page carousel reads from, so one image update covers
-// both pages. Filenames are <city-slug>.jpg (lowercase, hyphenated).
-// To add a slide, drop public/hospitals/<city>.jpg and append a frame
-// here. State labels are best-effort and shown as a small uppercase
-// pill in the corner caption.
-const HERO_SLIDES: { src: string; alt: string; town: string; state: string }[] = [
-  { src: "/hospitals/bendigo.jpg",     alt: "Bendigo, Victoria",                            town: "Bendigo",     state: "VIC" },
-  { src: "/hospitals/brisbane.jpg",    alt: "Brisbane river city, Queensland",              town: "Brisbane",    state: "QLD" },
-  { src: "/hospitals/bundaberg.jpg",   alt: "Bundaberg, Queensland",                        town: "Bundaberg",   state: "QLD" },
-  { src: "/hospitals/cairns.jpg",      alt: "Tropical Far North Queensland coast, Cairns",  town: "Cairns",      state: "QLD" },
-  { src: "/hospitals/esperance.jpg",   alt: "White sand and turquoise water at Esperance",  town: "Esperance",   state: "WA"  },
-  { src: "/hospitals/gold-coast.jpg",  alt: "Gold Coast skyline and beaches, Queensland",   town: "Gold Coast",  state: "QLD" },
-  { src: "/hospitals/hervey-bay.jpg",  alt: "Calm Fraser Coast waters near Hervey Bay",     town: "Hervey Bay",  state: "QLD" },
-  { src: "/hospitals/hobart.jpg",      alt: "Mountains above Hobart, Tasmania",             town: "Hobart",      state: "TAS" },
-  { src: "/hospitals/kalgoorlie.jpg",  alt: "Red-earth outback of the WA Goldfields",       town: "Kalgoorlie",  state: "WA"  },
-  { src: "/hospitals/mackay.jpg",      alt: "Tropical North Queensland coastline at Mackay",town: "Mackay",      state: "QLD" },
-  { src: "/hospitals/melbourne.jpg",   alt: "Melbourne cityscape, Victoria",                town: "Melbourne",   state: "VIC" },
-  { src: "/hospitals/noosa.jpg",       alt: "Noosa Heads surf beach, Sunshine Coast",       town: "Noosa",       state: "QLD" },
-  { src: "/hospitals/parabudoo.jpg",   alt: "Pilbara landscape near Paraburdoo",            town: "Paraburdoo",  state: "WA"  },
-  { src: "/hospitals/perth.jpg",       alt: "Perth, Western Australia",                     town: "Perth",       state: "WA"  },
-  { src: "/hospitals/sydney.jpg",      alt: "Sydney harbour, New South Wales",              town: "Sydney",      state: "NSW" },
-  { src: "/hospitals/tom-price.jpg",   alt: "Red-dirt road through the Pilbara",            town: "Tom Price",   state: "WA"  },
-  { src: "/hospitals/townsville.jpg",  alt: "Townsville, North Queensland coast",           town: "Townsville",  state: "QLD" },
-];
-
-const SLIDE_INTERVAL_MS = 5500;
-// Photo crossfade duration — must match the `transition.duration` on the
-// motion.div opacity below. The caption swap lags the photo swap by half
-// this so the caption flips at the visual midpoint of the crossfade,
-// when both old + new photos are equally visible. Without the lag the
-// caption visibly leads the photo by ~700ms.
-const CROSSFADE_MS = 1400;
-
-function HeroSlideshow() {
-  const [active, setActive] = useState(0);
-  const [captionIndex, setCaptionIndex] = useState(0);
-
-  useEffect(() => {
-    const id = window.setInterval(
-      () => setActive((a) => (a + 1) % HERO_SLIDES.length),
-      SLIDE_INTERVAL_MS,
-    );
-    return () => window.clearInterval(id);
-  }, []);
-
-  // Slide the caption to the active photo at the crossfade midpoint, so
-  // the label matches whatever photo is dominant on screen.
-  useEffect(() => {
-    const id = window.setTimeout(() => setCaptionIndex(active), CROSSFADE_MS / 2);
-    return () => window.clearTimeout(id);
-  }, [active]);
-
-  const current = HERO_SLIDES[captionIndex];
-
-  return (
-    <>
-      <div className="absolute inset-0 overflow-hidden bg-ink">
-        {HERO_SLIDES.map((s, i) => (
-          <motion.div
-            key={i}
-            className="absolute inset-0"
-            initial={false}
-            animate={{ opacity: i === active ? 1 : 0 }}
-            transition={{ duration: CROSSFADE_MS / 1000, ease: "easeInOut" }}
-          >
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <motion.img
-              src={s.src}
-              alt={s.alt}
-              // First slide loads eagerly so the hero paints fast; the rest
-              // lazy-load as they cycle in.
-              loading={i === 0 ? "eager" : "lazy"}
-              fetchPriority={i === 0 ? "high" : "auto"}
-              className="w-full h-full object-cover"
-              initial={{ scale: 1.08 }}
-              animate={{ scale: i === active ? 1.2 : 1.08 }}
-              transition={{ duration: SLIDE_INTERVAL_MS / 1000, ease: "linear" }}
-            />
-          </motion.div>
-        ))}
-      </div>
-
-      {/* Region caption — crossfades with each slide. Sits in the bottom-
-          right corner. */}
-      <div className="absolute bottom-5 right-5 md:bottom-7 md:right-7 z-20 pointer-events-none">
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={`${current.town}-${current.state}`}
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -8 }}
-            transition={{ duration: 0.5, ease: [0.2, 0.8, 0.2, 1] }}
-            className="inline-flex items-center gap-2 px-3.5 py-2 rounded-full bg-ink/60 backdrop-blur-md border border-bone/15"
-          >
-            <span className="w-1.5 h-1.5 rounded-full bg-electric" />
-            <span className="text-[10px] md:text-[11px] tracking-[0.22em] uppercase font-semibold text-white whitespace-nowrap">
-              {current.town} · {current.state}
-            </span>
-          </motion.div>
-        </AnimatePresence>
-      </div>
-    </>
-  );
-}
 
 export default function ForDoctorsClient({
   partnerCount,
@@ -140,12 +36,11 @@ export default function ForDoctorsClient({
 
   return (
     <div className="bg-white text-ink">
-      {/* Cinematic hero — Ken Burns–style slideshow of Australia +
-          medical scenes. Acts as a "video" hero without needing an actual
-          mp4 file. To swap to a real video later, replace HeroSlideshow
-          with a <video src="/doctors-hero.mp4" ... /> element. */}
+      {/* Cinematic hero — Ken Burns–style slideshow of city photos
+          shared with /hospitals (lib/hero-slides.ts). To swap to a real
+          video later, replace CitySlideshow with a <video ... /> element. */}
       <section className="relative w-full h-[100svh] min-h-[560px] max-h-[860px] overflow-hidden bg-ink">
-        <HeroSlideshow />
+        <CitySlideshow slides={HERO_CITY_SLIDES} />
         {/* Gradient overlay so the white text reads against any frame.
             Stronger at the bottom where the copy sits. */}
         <div
