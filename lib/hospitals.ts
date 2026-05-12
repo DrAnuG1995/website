@@ -278,24 +278,30 @@ export async function fetchLiveShifts(limit = 5): Promise<LiveShift[]> {
     const weekAhead = new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000);
     const weekAheadStr = weekAhead.toISOString().slice(0, 10);
 
-    const baseFilters = supabase
-      .from("shifts")
-      .select(
-        "id, hospital_name, hospital_location, specialty, skill_level, rate_per_hour, created_at, shift_date",
-      )
-      .eq("status", "Active")
-      .not("hospital_name", "is", null)
-      .not("hospital_name", "ilike", "%trial%")
-      .not("hospital_name", "ilike", "%test%")
-      .not("hospital_name", "ilike", "%statdoctor%");
+    // Build a fresh query for each call. The Supabase query builder is
+    // mutable, so reusing one between the upcoming and recent fetches would
+    // leak filters from one into the other (e.g. the recent fetch would
+    // inherit the shift_date BETWEEN today AND +7d filter, hiding every
+    // shift posted for a date more than a week out).
+    const buildBase = () =>
+      supabase
+        .from("shifts")
+        .select(
+          "id, hospital_name, hospital_location, specialty, skill_level, rate_per_hour, created_at, shift_date",
+        )
+        .eq("status", "Active")
+        .not("hospital_name", "is", null)
+        .not("hospital_name", "ilike", "%trial%")
+        .not("hospital_name", "ilike", "%test%")
+        .not("hospital_name", "ilike", "%statdoctor%");
 
     const [upcomingRes, recentRes, hospitalsRes] = await Promise.all([
-      baseFilters
+      buildBase()
         .gte("shift_date", todayStr)
         .lte("shift_date", weekAheadStr)
         .order("shift_date", { ascending: true })
         .limit(500),
-      baseFilters
+      buildBase()
         .order("created_at", { ascending: false })
         .limit(500),
       supabase
