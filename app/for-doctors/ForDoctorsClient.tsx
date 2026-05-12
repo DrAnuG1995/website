@@ -65,12 +65,11 @@ const HERO_SLIDES: { src: string; alt: string; town: string; state: string }[] =
     state: "QLD",
   },
   {
-    // Bendigo — historic central-Victorian gold-rush town and the wide
-    // dry-grass country around it.
-    src: "https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=1920&q=75&auto=format&fit=crop",
-    alt: "Central Victorian countryside near Bendigo",
-    town: "Bendigo",
-    state: "VIC",
+    // Esperance — south-coast WA, white-sand beaches and turquoise water.
+    src: "https://images.unsplash.com/photo-1551244072-5d12893278ab?w=1920&q=75&auto=format&fit=crop",
+    alt: "White-sand beach and turquoise water near Esperance, WA",
+    town: "Esperance",
+    state: "WA",
   },
 ];
 
