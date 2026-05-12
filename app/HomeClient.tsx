@@ -3,9 +3,12 @@ import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import HeroMap from "@/components/home/HeroMap";
+import LiveStatsStrip from "@/components/home/LiveStats";
 import AppShowcase from "@/components/home/AppShowcase";
-import AgencyCompare from "@/components/home/AgencyCompare";
+import NotAnAgency from "@/components/home/NotAnAgency";
+import HowWereDifferent from "@/components/home/HowWereDifferent";
 import LiveShiftFeed from "@/components/home/LiveShiftFeed";
+import type { LiveShift, LiveStats, MapHospital } from "@/lib/hospitals";
 
 /* =========================================================
    HOMEPAGE, doctor-download funnel
@@ -13,15 +16,28 @@ import LiveShiftFeed from "@/components/home/LiveShiftFeed";
    05 Doctor voices · 06 FAQ · 07 Final CTA
    ========================================================= */
 
-export default function HomeClient() {
+export default function HomeClient({
+  hospitals,
+  shiftCounts,
+  liveShifts,
+  liveStats,
+}: {
+  hospitals: MapHospital[];
+  shiftCounts: Record<string, number>;
+  liveShifts: LiveShift[];
+  liveStats: LiveStats;
+}) {
+  const partnerCount = hospitals.length;
   return (
     <div className="bg-white text-ink">
-      <HeroMap />
-      <LogosStrip />
+      <HeroMap hospitals={hospitals} shiftCounts={shiftCounts} />
+      <LiveStatsStrip initial={liveStats} />
+      <LogosStrip partnerCount={partnerCount} />
       <FounderVideo />
       <AppShowcase />
-      <AgencyCompare />
-      <LiveShiftFeed />
+      <NotAnAgency />
+      <HowWereDifferent />
+      <LiveShiftFeed initialShifts={liveShifts} />
       <DoctorVoicesPinned />
       <FAQGrid />
       <FinalCTA />
@@ -56,7 +72,7 @@ const LOGOS: Logo[] = [
   { src: "https://cdn.prod.website-files.com/688db6d677516719c3925d01/69a79f6b8e767399e5f8ad70_4.png", h: 56 },
 ];
 
-function LogosStrip() {
+function LogosStrip({ partnerCount }: { partnerCount: number }) {
   // Single row, doubled for a seamless -50% loop. Each logo sits inside a
   // fixed-width slot so visible spacing reads identical regardless of the
   // logo's natural width.
@@ -69,11 +85,11 @@ function LogosStrip() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-80px" }}
           transition={{ duration: 0.6 }}
-          className="flex items-end justify-between flex-wrap gap-4"
+          className="flex flex-col items-center text-center gap-4"
         >
           <div>
             <div className="text-[10px] tracking-[0.22em] uppercase text-muted mb-2">The network</div>
-            <h2 className="display text-[clamp(24px,3.2vw,40px)] leading-[1.05] max-w-2xl">
+            <h2 className="display text-[clamp(24px,3.2vw,40px)] leading-[1.05] max-w-2xl mx-auto">
               Trusted by hospitals from <span className="italic text-ocean">Cairns to Hobart</span>.
             </h2>
           </div>
@@ -82,7 +98,7 @@ function LogosStrip() {
             className="group inline-flex items-center gap-2 text-[10px] tracking-[0.22em] uppercase text-muted hover:text-ocean transition-colors"
             data-hover
           >
-            60+ partners · growing weekly
+            {partnerCount > 0 ? `${partnerCount} hospitals · growing weekly` : "Growing weekly"}
             <span
               aria-hidden
               className="inline-block transition-transform group-hover:translate-x-0.5"
@@ -355,7 +371,7 @@ function DoctorVoicesPinned() {
             Doctors using StatDoctor
           </div>
           <h2 className="display text-[clamp(28px,4.5vw,56px)] leading-[1.0] max-w-3xl mx-auto">
-            Verified by AHPRA. <span className="italic text-ocean">Earning more.</span> Calling fewer agencies.
+            <span className="italic text-ocean">Earning more.</span> Calling fewer agencies.
           </h2>
         </motion.div>
       </div>
@@ -622,7 +638,7 @@ function FinalCTA() {
           <span className="italic text-ocean">Two taps to apply.</span>
         </h2>
         <p className="mt-4 text-muted max-w-xl mx-auto text-[14px] md:text-[15px] leading-relaxed">
-          Verified by AHPRA. Posted rate visible upfront. Paid in 48 hours.
+          Posted rate visible upfront. Paid in 48 hours.
         </p>
 
         <div className="mt-7 grid grid-cols-1 sm:grid-cols-2 gap-3 max-w-[440px] mx-auto">
