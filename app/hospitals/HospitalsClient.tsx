@@ -621,7 +621,7 @@ function Pricing({ onContact }: { onContact: () => void }) {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-80px" }}
             transition={{ duration: 0.7, delay: 0.15, ease: [0.2, 0.8, 0.2, 1] }}
-            className="relative rounded-3xl bg-ink text-bone p-7 md:p-8 flex flex-col"
+            className="relative rounded-3xl bg-ink text-bone border border-bone/10 p-7 md:p-8 flex flex-col"
           >
             <div className="text-[10px] tracking-[0.22em] uppercase text-bone/60 mb-3">
               Network · Health districts
