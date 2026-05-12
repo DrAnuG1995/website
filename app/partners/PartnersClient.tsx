@@ -275,7 +275,7 @@ function ClosingCTA() {
       <div className="relative max-w-[1100px] mx-auto px-6 py-14 md:py-16 text-center">
         <h2 className="display text-[clamp(28px,4.5vw,56px)] leading-[1.0] max-w-3xl mx-auto">
           Want your brand in front of Australia&apos;s{" "}
-          <span className="italic text-ocean">locum doctors</span>?
+          <span className="italic text-ocean">doctors</span>?
         </h2>
         <p className="mt-4 text-muted max-w-xl mx-auto text-[14px] md:text-[15px] leading-relaxed">
           We partner with brands that genuinely make a working doctor&apos;s
