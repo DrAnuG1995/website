@@ -15,68 +15,55 @@ export type LivePartner = {
 };
 
 // Hero slideshow frames. Every town listed here is a real StatDoctor
-// partner location (cross-checked against the PARTNERS list below) so the
-// caption that fades in at the corner of the hero matches a place we
-// actually fill shifts in. Photos: Unsplash CDN (CC0 / commercial-OK).
-// Each photo was picked to read as the region it labels — coastal QLD
-// for Hervey Bay/Noosa/Mackay, Pilbara red earth for Tom Price, etc.
-// Swap any photo by editing the `src` — keep the
-// `?w=1920&q=75&auto=format&fit=crop` suffix so the CDN returns an
-// optimised landscape JPG.
+// partner location. Photos live in public/for-doctors/ — swap any of
+// them by dropping a new image at the same filename. Filenames follow
+// <town>-<state>.jpg. Keep them ~1920px wide, JPG, under ~600KB for
+// fast LCP on the hero.
 const HERO_SLIDES: { src: string; alt: string; town: string; state: string }[] = [
   {
-    // Pilbara red-dirt road — the look of the iron-ore country Tom Price
-    // sits in.
-    src: "https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?w=1920&q=75&auto=format&fit=crop",
+    src: "/for-doctors/tom-price-wa.jpg",
     alt: "Red-dirt road through the Pilbara, Western Australia",
     town: "Tom Price",
     state: "WA",
   },
   {
-    // Hervey Bay — Fraser Coast / whale-watching town.
-    src: "https://images.unsplash.com/photo-1605651531144-51381895e23d?w=1920&q=75&auto=format&fit=crop",
+    src: "/for-doctors/hervey-bay-qld.jpg",
     alt: "Calm Fraser Coast waters near Hervey Bay, Queensland",
     town: "Hervey Bay",
     state: "QLD",
   },
   {
-    // Noosa Heads — iconic Sunshine Coast surf headland.
-    src: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1920&q=75&auto=format&fit=crop",
+    src: "/for-doctors/noosa-qld.jpg",
     alt: "Noosa Heads surf beach and headland, Sunshine Coast",
     town: "Noosa",
     state: "QLD",
   },
   {
-    // Hobart — Mount Wellington / kunanyi looming over the harbour city.
-    src: "https://images.unsplash.com/photo-1494522855154-9297ac14b55f?w=1920&q=75&auto=format&fit=crop",
+    src: "/for-doctors/hobart-tas.jpg",
     alt: "Mountains above Hobart, Tasmania",
     town: "Hobart",
     state: "TAS",
   },
   {
-    // Kalgoorlie — Goldfields outback, red earth and big sky.
-    src: "https://images.unsplash.com/photo-1517457373958-b7bdd4587205?w=1920&q=75&auto=format&fit=crop",
+    src: "/for-doctors/kalgoorlie-wa.jpg",
     alt: "Red-earth outback of the WA Goldfields near Kalgoorlie",
     town: "Kalgoorlie",
     state: "WA",
   },
   {
-    // Bairnsdale — East Gippsland farmland, green rolling country.
-    src: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=1920&q=75&auto=format&fit=crop",
+    src: "/for-doctors/bairnsdale-vic.jpg",
     alt: "Green rolling farmland of East Gippsland near Bairnsdale, Victoria",
     town: "Bairnsdale",
     state: "VIC",
   },
   {
-    // Mackay — tropical North Queensland sugarcane coast.
-    src: "https://images.unsplash.com/photo-1559494007-9f5847c49d94?w=1920&q=75&auto=format&fit=crop",
+    src: "/for-doctors/mackay-qld.jpg",
     alt: "Tropical North Queensland coastline near Mackay",
     town: "Mackay",
     state: "QLD",
   },
   {
-    // Esperance — south-coast WA, white-sand beaches and turquoise water.
-    src: "https://images.unsplash.com/photo-1551244072-5d12893278ab?w=1920&q=75&auto=format&fit=crop",
+    src: "/for-doctors/esperance-wa.jpg",
     alt: "White-sand beach and turquoise water near Esperance, WA",
     town: "Esperance",
     state: "WA",
