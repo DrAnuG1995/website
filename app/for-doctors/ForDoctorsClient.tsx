@@ -3,60 +3,74 @@ import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import FeatureShowcase from "@/components/home/FeatureShowcase";
 
-// Hero slideshow frames. Each frame is tagged with the regional partner
-// town it represents — the caption fades in at the corner of the hero so
-// visitors see the spread of places StatDoctor partners with as the
-// photos cycle. Photos: Unsplash CDN (CC0 / commercial-OK). Swap any photo
-// by editing the `src` — keep the `?w=1920&q=75&auto=format&fit=crop`
-// suffix so the CDN returns an optimised landscape JPG.
+// Hero slideshow frames. Every town listed here is a real StatDoctor
+// partner location (cross-checked against the PARTNERS list below) so the
+// caption that fades in at the corner of the hero matches a place we
+// actually fill shifts in. Photos: Unsplash CDN (CC0 / commercial-OK).
+// Each photo was picked to read as the region it labels — coastal QLD
+// for Hervey Bay/Noosa/Mackay, Pilbara red earth for Tom Price, etc.
+// Swap any photo by editing the `src` — keep the
+// `?w=1920&q=75&auto=format&fit=crop` suffix so the CDN returns an
+// optimised landscape JPG.
 const HERO_SLIDES: { src: string; alt: string; town: string; state: string }[] = [
   {
-    src: "https://images.unsplash.com/photo-1523482580672-f109ba8cb9be?w=1920&q=75&auto=format&fit=crop",
-    alt: "Uluru at sunset",
-    town: "Uluru",
-    state: "NT",
-  },
-  {
+    // Pilbara red-dirt road — the look of the iron-ore country Tom Price
+    // sits in.
     src: "https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?w=1920&q=75&auto=format&fit=crop",
-    alt: "Red-dirt road through the Pilbara",
+    alt: "Red-dirt road through the Pilbara, Western Australia",
     town: "Tom Price",
     state: "WA",
   },
   {
+    // Hervey Bay — Fraser Coast / whale-watching town, aerial of the
+    // turquoise coastline.
     src: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1920&q=75&auto=format&fit=crop",
-    alt: "Aerial of a coastal town",
+    alt: "Aerial of the turquoise Fraser Coast near Hervey Bay",
     town: "Hervey Bay",
     state: "QLD",
   },
   {
+    // Noosa Heads — iconic Sunshine Coast surf headland.
+    src: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1920&q=75&auto=format&fit=crop",
+    alt: "Noosa Heads surf beach and headland, Sunshine Coast",
+    town: "Noosa",
+    state: "QLD",
+  },
+  {
+    // Hobart — Mount Wellington / kunanyi looming over the harbour city.
     src: "https://images.unsplash.com/photo-1494522855154-9297ac14b55f?w=1920&q=75&auto=format&fit=crop",
-    alt: "Mountain landscape, Tasmania",
+    alt: "Mountains above Hobart, Tasmania",
     town: "Hobart",
     state: "TAS",
   },
   {
-    src: "https://images.unsplash.com/photo-1551244072-5d12893278ab?w=1920&q=75&auto=format&fit=crop",
-    alt: "Sandstone cliffs and turquoise water",
-    town: "Esperance",
-    state: "WA",
-  },
-  {
+    // Kalgoorlie — Goldfields outback, red earth and big sky.
     src: "https://images.unsplash.com/photo-1473893604213-3df9c15611c0?w=1920&q=75&auto=format&fit=crop",
-    alt: "Aerial of vast Australian landscape",
+    alt: "Goldfields outback near Kalgoorlie, Western Australia",
     town: "Kalgoorlie",
     state: "WA",
   },
   {
+    // Bairnsdale — East Gippsland farmland, green rolling country.
     src: "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=1920&q=75&auto=format&fit=crop",
-    alt: "Regional Victorian countryside",
+    alt: "East Gippsland farmland near Bairnsdale, Victoria",
     town: "Bairnsdale",
     state: "VIC",
   },
   {
-    src: "https://images.unsplash.com/photo-1538108149393-fbbd81895907?w=1920&q=75&auto=format&fit=crop",
-    alt: "Outback emergency centre",
-    town: "Mater Mackay",
+    // Mackay — tropical North Queensland sugarcane coast.
+    src: "https://images.unsplash.com/photo-1559494007-9f5847c49d94?w=1920&q=75&auto=format&fit=crop",
+    alt: "Tropical North Queensland coastline near Mackay",
+    town: "Mackay",
     state: "QLD",
+  },
+  {
+    // Bendigo — historic central-Victorian gold-rush town and the wide
+    // dry-grass country around it.
+    src: "https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=1920&q=75&auto=format&fit=crop",
+    alt: "Central Victorian countryside near Bendigo",
+    town: "Bendigo",
+    state: "VIC",
   },
 ];
 
