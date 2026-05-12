@@ -384,16 +384,17 @@ function PartnerNetwork({
             <AnimatePresence mode="popLayout">
               {visible.map((p) => {
                 // Every card is clickable. If the CRM has a stored
-                // website use it directly (top-of-feel-good path); when
-                // it doesn't, fall back to a Google "I'm Feeling Lucky"
-                // search for the hospital name so the link still lands
-                // the doctor on the real site instead of being dead.
-                // Ops should still backfill website URLs in the admin
-                // portal — once they do, the card upgrades to the
-                // direct link on the next page load.
+                // website use it directly. Otherwise fall back to
+                // DuckDuckGo's "!ducky" bang, which redirects straight
+                // to the top search result with no interstitial — much
+                // smoother than Google's "I'm Feeling Lucky", which
+                // now always shows a redirect notice. Ops should still
+                // backfill website URLs in the admin portal — once
+                // filled in, the card silently upgrades to the direct
+                // link on the next page load.
                 const href =
                   p.website ||
-                  `https://www.google.com/search?btnI=1&q=${encodeURIComponent(
+                  `https://duckduckgo.com/?q=%21ducky+${encodeURIComponent(
                     `${p.name} ${p.state ?? "Australia"}`,
                   )}`;
                 const body = (
