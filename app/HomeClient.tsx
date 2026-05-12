@@ -376,23 +376,52 @@ function DoctorVoicesPinned() {
         </motion.div>
       </div>
 
-      {/* Desktop: three auto-scrolling columns with fade masks.
-          Mobile: a single flat list — the marquee + fixed-height container
-          clipped most of the cards on narrow screens. */}
-      <div className="relative max-w-[1280px] mx-auto md:h-[600px] md:overflow-hidden">
-        {/* fade masks (desktop only) */}
+      {/* Mobile: horizontal swipe carousel — one card visible at a time
+          with a peek of the next, snap-scrolling. */}
+      <div className="md:hidden relative max-w-[1280px] mx-auto">
+        <div
+          className="flex gap-4 overflow-x-auto snap-x snap-mandatory pb-4 -mx-6 px-6 scrollbar-hide"
+          style={{ scrollbarWidth: "none" }}
+        >
+          {DOCTORS.map((d, i) => (
+            <div
+              key={i}
+              className="snap-center shrink-0 w-[85%] first:ml-0"
+            >
+              <TestimonialCard d={d} />
+            </div>
+          ))}
+        </div>
+        <div className="mt-3 flex items-center justify-center gap-2 text-[10px] tracking-[0.2em] uppercase text-muted">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+            <polyline points="15 18 9 12 15 6" />
+          </svg>
+          <span>Swipe</span>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+            <polyline points="9 18 15 12 9 6" />
+          </svg>
+        </div>
+        <style jsx>{`
+          .scrollbar-hide::-webkit-scrollbar {
+            display: none;
+          }
+        `}</style>
+      </div>
+
+      {/* Desktop: three auto-scrolling columns with fade masks. */}
+      <div className="hidden md:block relative max-w-[1280px] mx-auto h-[600px] overflow-hidden">
         <div
           aria-hidden
-          className="hidden md:block absolute inset-x-0 top-0 h-24 z-10 pointer-events-none"
+          className="absolute inset-x-0 top-0 h-24 z-10 pointer-events-none"
           style={{ background: "linear-gradient(to bottom, white, transparent)" }}
         />
         <div
           aria-hidden
-          className="hidden md:block absolute inset-x-0 bottom-0 h-24 z-10 pointer-events-none"
+          className="absolute inset-x-0 bottom-0 h-24 z-10 pointer-events-none"
           style={{ background: "linear-gradient(to top, white, transparent)" }}
         />
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-5 md:gap-6 md:h-full">
+        <div className="grid grid-cols-3 gap-6 h-full">
           {cols.map((col, ci) => (
             <TestimonialColumn
               key={ci}
@@ -419,37 +448,24 @@ function TestimonialColumn({
   duration: number;
   paused?: boolean;
 }) {
-  // Duplicate cards so the desktop marquee loop is seamless. The duplicates
-  // are hidden on mobile because the mobile layout shows the cards as a
-  // flat scrollable list rather than an auto-scrolling column.
+  // Duplicate cards so the marquee loop is seamless. Desktop-only — mobile
+  // uses the swipe carousel above.
   const doubled = [...cards, ...cards];
   return (
-    <div className="relative md:h-full md:overflow-hidden">
+    <div className="relative h-full overflow-hidden">
       <div
-        className={`flex flex-col gap-5 md:gap-6 md:hover:[animation-play-state:paused] ${
-          direction === "up" ? "md-marquee-up" : "md-marquee-down"
-        }`}
+        className="flex flex-col gap-6 hover:[animation-play-state:paused]"
         style={{
-          ["--marquee-duration" as never]: `${duration}s`,
+          animation: `${direction === "up" ? "scrollColUp" : "scrollColDown"} ${duration}s linear infinite`,
           animationPlayState: paused ? "paused" : "running",
         }}
       >
         {doubled.map((d, i) => (
-          <div key={i} className={i >= cards.length ? "hidden md:block" : ""}>
-            <TestimonialCard d={d} />
-          </div>
+          <TestimonialCard key={i} d={d} />
         ))}
       </div>
 
       <style jsx>{`
-        @media (min-width: 768px) {
-          .md-marquee-up {
-            animation: scrollColUp var(--marquee-duration, 42s) linear infinite;
-          }
-          .md-marquee-down {
-            animation: scrollColDown var(--marquee-duration, 42s) linear infinite;
-          }
-        }
         @keyframes scrollColUp {
           from { transform: translateY(0); }
           to   { transform: translateY(-50%); }
