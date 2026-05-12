@@ -207,7 +207,7 @@ export default function ForDoctorsClient({
             </div>
             <h1 className="display text-white text-[clamp(44px,8vw,112px)] leading-[0.98] tracking-tight mx-auto max-w-[14ch]">
               Locum work,{" "}
-              <span className="italic text-electric">on your terms.</span>
+              <span className="italic text-ocean">on your terms.</span>
             </h1>
             <p className="mt-6 md:mt-8 mx-auto max-w-[560px] text-bone/85 text-[15px] md:text-[18px] leading-relaxed">
               Pick the shifts that fit your life. Posted rate visible upfront,
@@ -383,9 +383,19 @@ function PartnerNetwork({
           >
             <AnimatePresence mode="popLayout">
               {visible.map((p) => {
-                const website = p.website;
-                // Shared card body — name + state code centred. Hover lift
-                // only fires when the card is actually clickable.
+                // Every card is clickable. If the CRM has a stored
+                // website use it directly (top-of-feel-good path); when
+                // it doesn't, fall back to a Google "I'm Feeling Lucky"
+                // search for the hospital name so the link still lands
+                // the doctor on the real site instead of being dead.
+                // Ops should still backfill website URLs in the admin
+                // portal — once they do, the card upgrades to the
+                // direct link on the next page load.
+                const href =
+                  p.website ||
+                  `https://www.google.com/search?btnI=1&q=${encodeURIComponent(
+                    `${p.name} ${p.state ?? "Australia"}`,
+                  )}`;
                 const body = (
                   <>
                     <div className="text-[13px] md:text-[14px] text-ink leading-snug group-hover:text-ocean transition-colors">
@@ -398,11 +408,8 @@ function PartnerNetwork({
                     )}
                   </>
                 );
-                const baseClasses =
-                  "basis-[calc(50%-6px)] md:basis-[calc(25%-12px)] rounded-2xl bg-white border border-ink/8 px-4 py-4 flex flex-col items-center justify-center text-center min-h-[78px]";
                 const linkClasses =
-                  baseClasses +
-                  " group cursor-pointer hover:border-ocean/40 hover:shadow-[0_10px_30px_-15px_rgba(50,50,255,0.25)] transition-[border-color,box-shadow]";
+                  "group cursor-pointer w-full h-full rounded-2xl bg-white border border-ink/8 px-4 py-4 flex flex-col items-center justify-center text-center min-h-[78px] hover:border-ocean/40 hover:shadow-[0_10px_30px_-15px_rgba(50,50,255,0.25)] transition-[border-color,box-shadow]";
 
                 return (
                   <motion.div
@@ -414,22 +421,16 @@ function PartnerNetwork({
                     transition={{ duration: 0.25, ease: [0.2, 0.8, 0.2, 1] }}
                     className="basis-[calc(50%-6px)] md:basis-[calc(25%-12px)]"
                   >
-                    {website ? (
-                      <a
-                        href={website}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className={linkClasses + " w-full h-full"}
-                        data-hover
-                        aria-label={`Visit ${p.name} website`}
-                      >
-                        {body}
-                      </a>
-                    ) : (
-                      <div className={baseClasses + " w-full h-full"}>
-                        {body}
-                      </div>
-                    )}
+                    <a
+                      href={href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className={linkClasses}
+                      data-hover
+                      aria-label={`Visit ${p.name} website`}
+                    >
+                      {body}
+                    </a>
                   </motion.div>
                 );
               })}
