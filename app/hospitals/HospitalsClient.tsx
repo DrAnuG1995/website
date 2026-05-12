@@ -360,8 +360,11 @@ function HowItWorks() {
             padding for the fixed navbar) instead of vertically centring
             it. items-center inside a 100vh sticky region pushed the
             560px card down by ~170px on tall screens, which read as a
-            big empty band between the header and the first card. */}
-        <div className="sticky top-0 h-screen flex items-start pt-24 overflow-hidden px-4 md:px-6">
+            big empty band between the header and the first card.
+            Height is sized to the card + nav clearance (not h-screen)
+            so there's no empty bottom band when the sticky releases
+            into the next section. */}
+        <div className="sticky top-0 h-[660px] md:h-[680px] flex items-start pt-24 overflow-hidden px-4 md:px-6">
           <div className="relative w-full max-w-[1100px] mx-auto h-[520px] md:h-[560px]">
             {STEPS.map((step, i) => (
               <StackedCard
@@ -639,7 +642,7 @@ function HospitalDemoVideo() {
   }, []);
 
   return (
-    <section className="relative bg-white pt-10 pb-14 md:pt-16 md:pb-20 px-4 md:px-6">
+    <section className="relative bg-white pt-6 pb-14 md:pt-10 md:pb-20 px-4 md:px-6">
       <div className="max-w-[1280px] mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 18 }}
