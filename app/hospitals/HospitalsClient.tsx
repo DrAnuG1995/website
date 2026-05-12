@@ -812,8 +812,8 @@ function Pricing({ onContact }: { onContact: () => void }) {
             Pricing
           </div>
           <h2 className="display text-[clamp(28px,4.5vw,56px)] leading-[1.0]">
-            One simple price.{" "}
-            <span className="italic text-ocean">Per accepted shift</span>.
+            Flat annual pricing.{" "}
+            <span className="italic text-ocean">No per-shift fees</span>.
           </h2>
         </motion.div>
 
@@ -826,28 +826,29 @@ function Pricing({ onContact }: { onContact: () => void }) {
             className="relative rounded-3xl bg-lavender border border-ocean/10 p-7 md:p-8 flex flex-col"
           >
             <div className="text-[10px] tracking-[0.22em] uppercase text-muted mb-3">
-              Pay-as-you-go
+              Single hospital
             </div>
             <div className="display text-[clamp(48px,5vw,64px)] leading-none">
-              $99
-              <span className="text-base text-muted ml-1">/shift</span>
+              $10K
+              <span className="text-base text-muted ml-1">/year</span>
             </div>
             <p className="mt-3 text-[13px] md:text-[14px] text-muted leading-relaxed">
-              Charged only when a doctor accepts a posted shift. No accept, no
-              fee. No subscription, no minimums.
+              Unlimited access for one hospital. Locum shifts, permanent
+              hiring, and locum-to-permanent conversion — all included, no
+              per-shift fees, no buy-out fees.
             </p>
             <ul className="mt-5 space-y-2.5 text-[13px] md:text-[14px] text-ink/85 flex-1">
-              <Bullet>Unlimited postings</Bullet>
+              <Bullet>Unlimited doctors & shifts</Bullet>
+              <Bullet>Permanent hiring included</Bullet>
+              <Bullet>Locum-to-permanent at $0 extra</Bullet>
               <Bullet>Verified, AHPRA-checked doctors</Bullet>
-              <Bullet>Auto credential refresh</Bullet>
-              <Bullet>Email + in-app notifications</Bullet>
             </ul>
             <button
               onClick={onContact}
               className="mt-6 inline-flex items-center justify-center gap-2 w-full px-5 py-3 rounded-full bg-ocean text-white text-sm font-semibold hover:bg-ink transition-colors"
               data-hover
             >
-              Start posting
+              Get started
               <span aria-hidden>→</span>
             </button>
           </motion.div>
@@ -860,19 +861,22 @@ function Pricing({ onContact }: { onContact: () => void }) {
             className="relative rounded-3xl bg-ink text-bone border border-bone/10 p-7 md:p-8 flex flex-col"
           >
             <div className="text-[10px] tracking-[0.22em] uppercase text-bone/60 mb-3">
-              Network · Health districts
+              Health service · State service
             </div>
             <div className="display text-[clamp(48px,5vw,64px)] leading-none">
-              Custom
+              $50K
+              <span className="text-base text-bone/60 ml-1">/year</span>
             </div>
             <p className="mt-3 text-[13px] md:text-[14px] text-bone/70 leading-relaxed">
-              One flat annual fee. Unlimited posting, unlimited doctors,
-              every site and admin in your network on the same plan.
+              Manage up to 10 hospitals through a single admin account.
+              Everything in the single-hospital plan, applied across your
+              entire network.
             </p>
             <ul className="mt-5 space-y-2.5 text-[13px] md:text-[14px] text-bone/85 flex-1">
-              <Bullet dark>Unlimited doctors</Bullet>
-              <Bullet dark>Unlimited shifts</Bullet>
-              <Bullet dark>Multi-site, multi-admin</Bullet>
+              <Bullet dark>Up to 10 hospitals</Bullet>
+              <Bullet dark>One admin account, all sites</Bullet>
+              <Bullet dark>Unlimited doctors & shifts</Bullet>
+              <Bullet dark>Locum-to-permanent at $0 extra</Bullet>
             </ul>
             <button
               onClick={onContact}
@@ -979,7 +983,7 @@ const HOSPITAL_FAQ: { q: string; a: string }[] = [
   },
   {
     q: "What's the platform fee, exactly?",
-    a: "$99 per accepted shift on pay-as-you-go. Volume pricing for districts and large networks, talk to us. No fees on unfilled posts, no subscription, no per-seat charges.",
+    a: "Flat annual pricing. $10K/year for a single hospital — unlimited shifts, unlimited doctors, locum and permanent hiring all included. $50K/year for health services or state services managing up to 10 hospitals through a single admin account. No per-shift fees, no buy-out fees, no per-seat charges.",
   },
   {
     q: "Can we set a maximum hourly rate?",
