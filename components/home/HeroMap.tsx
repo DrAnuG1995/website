@@ -18,16 +18,26 @@ const AU_CENTER = { lat: -28, lng: 134.5 };
 // so the user can't pan into Asia or the Pacific Ocean. Kept loose enough
 // that the elastic restriction (strictBounds: false) never traps the
 // camera at MIN_ZOOM on mobile — it just nudges them back when they try
-// to drag past. If you tighten further, also bump MIN_ZOOM or the
-// viewport will fail to render the bounds at the lowest zoom level.
+// to drag past.
 const AU_BOUNDS = {
   north: -5, // just above Cape York / PNG
   south: -48, // just below Tasmania
   west: 108, // just west of WA coast
   east: 160, // east enough to include NZ approach
 };
-const OVERVIEW_ZOOM = 4.2;
-const MIN_ZOOM = 4;
+// Mobile viewports can't fit all of Australia at zoom 4 (the continent
+// spans ~46° of longitude, a phone shows ~22° at that zoom level), so
+// pick the initial + minimum zoom based on viewport width. Desktop gets
+// the tighter framing; mobile zooms out a step so the whole country is
+// visible without panning. Computed once at init — we don't react to
+// resize, since rotating a phone mid-session is rare and the bounds
+// already keep the user inside Australia anyway.
+function pickZoomDefaults(): { overview: number; min: number } {
+  if (typeof window !== "undefined" && window.innerWidth < 768) {
+    return { overview: 3.4, min: 3 };
+  }
+  return { overview: 4.2, min: 4 };
+}
 const MAX_ZOOM = 18;
 
 const DEFAULT_HOSPITAL_ZOOM = 16;
@@ -162,18 +172,29 @@ export default function HeroMap({
     }
   };
 
+  // Resolve responsive zoom once. Kept on a ref so handlers below (which
+  // close over render-time scope) read the same values that were used to
+  // initialise the map.
+  const zoomDefaultsRef = useRef<{ overview: number; min: number }>({
+    overview: 4.2,
+    min: 4,
+  });
+
   const goOverview = () => {
     clearIdleTimer();
     if (!mapRef.current) return;
     activeIdRef.current = null;
     setActiveId(null);
     mapRef.current.panTo(AU_CENTER);
-    mapRef.current.setZoom(OVERVIEW_ZOOM);
+    mapRef.current.setZoom(zoomDefaultsRef.current.overview);
   };
 
   // Init map (once)
   useEffect(() => {
     if (!mapContainer.current || mapRef.current || !KEY) return;
+    zoomDefaultsRef.current = pickZoomDefaults();
+    const OVERVIEW_ZOOM = zoomDefaultsRef.current.overview;
+    const MIN_ZOOM = zoomDefaultsRef.current.min;
 
     setOptions({
       key: KEY,
