@@ -319,7 +319,7 @@ export default function HeroMap() {
                 <span className="italic text-ocean">No agency in the middle.</span>
               </h1>
 
-              <div className="mt-4 flex items-center gap-4 text-[10px] tracking-[0.18em] uppercase">
+              <div className="mt-4 flex items-center gap-2.5 sm:gap-4 text-[10px] tracking-[0.18em] uppercase">
                 <Stat to={60} label="Hospitals" play={introDone} />
                 <span className="w-px h-6 bg-ink/15" />
                 <Stat to={400} suffix="+" label="Doctors" play={introDone} />
@@ -436,7 +436,7 @@ function Stat({
 }) {
   return (
     <div>
-      <div className="display text-xl md:text-2xl normal-case tracking-tight leading-none inline-flex items-baseline gap-1 whitespace-nowrap">
+      <div className="display text-lg sm:text-xl md:text-2xl normal-case tracking-tight leading-none inline-flex items-baseline gap-1 whitespace-nowrap">
         {smallPrefix && (
           <span className="text-ink mr-1">
             {smallPrefix}

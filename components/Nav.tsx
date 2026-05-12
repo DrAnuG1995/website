@@ -52,7 +52,7 @@ export default function Nav() {
           />
         </Link>
 
-        <div className="flex items-center gap-3 md:gap-4 justify-self-center text-xs md:text-sm font-semibold">
+        <div className="flex items-center gap-2.5 sm:gap-3 md:gap-4 justify-self-center text-[11px] sm:text-xs md:text-sm font-semibold">
           <Link
             href="/for-doctors"
             className={`transition-colors text-ink hover:text-ink/70 ${
@@ -89,17 +89,18 @@ export default function Nav() {
             href="https://hospital.statdoctor.app/#/login"
             target="_blank"
             rel="noopener noreferrer"
-            className="px-3 md:px-4 py-2 text-xs md:text-sm font-medium text-ink hover:text-ink/70 transition-colors"
+            className="hidden sm:inline-flex px-3 md:px-4 py-2 text-xs md:text-sm font-medium text-ink hover:text-ink/70 transition-colors"
             data-hover
           >
             Log in
           </a>
           <button
             onClick={() => setDownloadOpen(true)}
-            className="px-4 md:px-5 py-2 md:py-2.5 rounded-full bg-ocean text-white text-xs md:text-sm font-semibold hover:bg-ink transition-colors"
+            className="px-3 sm:px-4 md:px-5 py-2 md:py-2.5 rounded-full bg-ocean text-white text-[11px] sm:text-xs md:text-sm font-semibold hover:bg-ink transition-colors whitespace-nowrap"
             data-hover
           >
-            Download App
+            <span className="sm:hidden">Download</span>
+            <span className="hidden sm:inline">Download App</span>
           </button>
         </div>
       </motion.div>
