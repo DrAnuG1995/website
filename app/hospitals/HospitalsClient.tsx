@@ -132,7 +132,7 @@ function Hero({
           <p className="mt-5 text-bone/80 max-w-xl mx-auto text-[15px] md:text-base leading-relaxed">
             Post a shift directly to {VERIFIED_DOCTORS}+ verified Australian
             doctors. Review credentials in seconds, confirm in one tap, settle
-            in 48 hours, no recruiter, no markup, no contract.
+            in 48 hours, no recruiter, no markup.
           </p>
           <div className="mt-8 flex flex-col sm:flex-row gap-3 justify-center">
             <button
@@ -698,7 +698,6 @@ const COMPARE: { dim: string; agency: string; sd: string }[] = [
   { dim: "Agency fee", agency: "15–25%", sd: "0%" },
   { dim: "Time to fill", agency: "2–10 days", sd: "2–48 hours" },
   { dim: "Credential check", agency: "Manual, ongoing", sd: "Continuous & automated" },
-  { dim: "Lock-in contract", agency: "12+ months", sd: "None" },
   { dim: "Doctor quality control", agency: "Agency-mediated", sd: "Direct ratings & reviews" },
   { dim: "Payment", agency: "Via agency", sd: "Direct, 48 hours" },
 ];
@@ -971,8 +970,8 @@ function PermHireCallout({ onContact }: { onContact: () => void }) {
 /* ---------- FAQ ---------- */
 const HOSPITAL_FAQ: { q: string; a: string }[] = [
   {
-    q: "Is there a contract or onboarding fee?",
-    a: "No contract. No onboarding fee. You can post your first shift within 30 minutes of creating an account.",
+    q: "Is there an onboarding fee?",
+    a: "No. You can post your first shift within 30 minutes of creating an account.",
   },
   {
     q: "How are doctors verified?",

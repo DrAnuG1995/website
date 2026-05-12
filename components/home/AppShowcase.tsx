@@ -111,7 +111,7 @@ export default function AppShowcase() {
             <span className="italic text-ocean">in 24 hours</span>.
           </h2>
           <p className="mt-4 text-muted max-w-xl mx-auto text-[14px] md:text-[15px] leading-relaxed">
-            Four steps, no recruiter calls, no contracts.
+            Four steps, no recruiter calls.
           </p>
         </motion.div>
 

@@ -7,7 +7,6 @@ const ROWS: Row[] = [
   { dim: "Rate visibility", agency: "After phone tag", sd: "Posted upfront" },
   { dim: "Time to confirm", agency: "2 to 10 days", sd: "Usually under an hour" },
   { dim: "Commission on your earnings", agency: "15 to 25%", sd: "0%" },
-  { dim: "Contracts and lock-ins", agency: "12 months+", sd: "None" },
 ];
 
 export default function AgencyCompare() {
