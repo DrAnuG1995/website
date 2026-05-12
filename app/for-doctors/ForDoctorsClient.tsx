@@ -327,6 +327,7 @@ const PARTNERS: { name: string; state: AusState }[] = [
   { name: "Noosa Private Hospital", state: "QLD" },
   { name: "Friendly Society Private Bundaberg", state: "QLD" },
   // WA
+  { name: "Esperance Health", state: "WA" },
   { name: "Hollywood Private Hospital", state: "WA" },
   { name: "Kalgoorlie Hospital", state: "WA" },
   { name: "Kutjungka Regional Clinic", state: "WA" },
