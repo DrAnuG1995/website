@@ -28,8 +28,19 @@ export default function Footer() {
             <div className="text-[10px] tracking-[0.22em] uppercase text-bone/50 mb-4">
               Built by doctors, for doctors
             </div>
-            <h2 className="display text-[clamp(40px,7.5vw,120px)] leading-[0.92] tracking-tight">
-              StatDoctor.
+            <h2 className="-mx-1">
+              <span className="sr-only">StatDoctor</span>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="/statdoctor-logo.png"
+                alt="StatDoctor"
+                className="h-12 sm:h-16 md:h-24 lg:h-28 w-auto"
+                style={{
+                  // Logo asset is dark navy/blue on light backgrounds — flip
+                  // to pure white so it reads on the dark footer bg.
+                  filter: "brightness(0) invert(1)",
+                }}
+              />
             </h2>
             <p className="mt-5 max-w-md text-sm text-bone/70 leading-relaxed">
               Australia&apos;s first locum doctor marketplace. No agencies, no hidden fees, zero commission, ever.
