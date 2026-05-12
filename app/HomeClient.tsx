@@ -9,6 +9,7 @@ import NotAnAgency from "@/components/home/NotAnAgency";
 import HowWereDifferent from "@/components/home/HowWereDifferent";
 import LiveShiftFeed from "@/components/home/LiveShiftFeed";
 import type { LiveShift, LiveStats, MapHospital } from "@/lib/hospitals";
+import { PARTNER_LOGOS } from "@/lib/partner-logos";
 
 /* =========================================================
    HOMEPAGE, doctor-download funnel
@@ -48,35 +49,11 @@ export default function HomeClient({
 /* ============================================================
    02, LOGOS STRIP
    ============================================================ */
-// Per-logo height (desktop px) tuned to normalise *visual area* across the
-// strip. Source files have inconsistent transparent padding and aspect
-// ratios — wide wordmarks at the same height look enormous next to square
-// icons, and padded PNG icons look tiny. Heights computed off
-// h = sqrt(targetArea / aspect) with target area ≈ 51² = 2601, then nudged
-// up for known-padded icons.
-type Logo = { src: string; h?: number };
-const LOGOS: Logo[] = [
-  // _1.png at index 0 was a dead CDN reference (HTTP 403) — it rendered as
-  // an empty slot, which read as a giant gap between Portland and PEHA at
-  // the marquee wrap. Removed.
-  { src: "https://cdn.prod.website-files.com/688db6d677516719c3925d01/69a79f6b34e627a6c618835f_16.png", h: 60 },
-  { src: "https://cdn.prod.website-files.com/688db6d677516719c3925d01/6891b90e4261c120b064cabc_Group%201799.svg", h: 40 },
-  { src: "https://cdn.prod.website-files.com/688db6d677516719c3925d01/6891b2ca97d3296f92eecdb3_Group%201797.svg", h: 37 },
-  { src: "https://cdn.prod.website-files.com/688db6d677516719c3925d01/6891b9bdc8ce83d0d774d6a0_Group%201795.svg", h: 54 },
-  { src: "https://cdn.prod.website-files.com/688db6d677516719c3925d01/6989187d91bc7a590978853b_Hospital%20Logos%20(100%20x%20100%20px).png", h: 60 },
-  { src: "https://cdn.prod.website-files.com/688db6d677516719c3925d01/69891c60a412a0902b515580_3.png", h: 56 },
-  { src: "https://cdn.prod.website-files.com/688db6d677516719c3925d01/69891c6022354c21182e964e_5.png", h: 56 },
-  { src: "https://cdn.prod.website-files.com/688db6d677516719c3925d01/697c24083cb29d7af761cd8f_brhs.png", h: 36 },
-  { src: "https://cdn.prod.website-files.com/688db6d677516719c3925d01/697c31849389b03bf00674df_Myfast%20medical%20Logo.png", h: 52 },
-  { src: "https://cdn.prod.website-files.com/688db6d677516719c3925d01/69a79f6bd66a38e7ecd9a248_17.png", h: 56 },
-  { src: "https://cdn.prod.website-files.com/688db6d677516719c3925d01/69a79f6b8e767399e5f8ad70_4.png", h: 56 },
-];
-
 function LogosStrip({ partnerCount }: { partnerCount: number }) {
   // Single row, doubled for a seamless -50% loop. Each logo sits inside a
   // fixed-width slot so visible spacing reads identical regardless of the
   // logo's natural width.
-  const doubled = [...LOGOS, ...LOGOS];
+  const doubled = [...PARTNER_LOGOS, ...PARTNER_LOGOS];
   return (
     <section className="py-12 md:py-14 bg-white">
       <div className="max-w-[1280px] mx-auto px-6 mb-10">

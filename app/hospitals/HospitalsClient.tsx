@@ -1,7 +1,9 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
+import Link from "next/link";
 import { motion, useScroll, useTransform, type MotionValue } from "framer-motion";
 import Counter from "@/components/Counter";
+import { PARTNER_LOGOS } from "@/lib/partner-logos";
 
 /* ============================================================
    /hospitals, sales landing page for hospital admins.
@@ -11,7 +13,15 @@ import Counter from "@/components/Counter";
    live in /public/screens/stathospital-*.
    ============================================================ */
 
-export default function HospitalsClient() {
+export default function HospitalsClient({
+  partnerCount,
+  activeShifts,
+}: {
+  // Live CRM values fetched server-side in page.tsx. Both default to 0
+  // when the CRM is unreachable so the page still renders cleanly.
+  partnerCount?: number;
+  activeShifts?: number;
+}) {
   const goContact = () => {
     if (typeof window !== "undefined") {
       window.open(
@@ -23,7 +33,12 @@ export default function HospitalsClient() {
   };
   return (
     <div className="bg-white text-ink">
-      <Hero onContact={goContact} />
+      <Hero
+        onContact={goContact}
+        partnerCount={partnerCount ?? 0}
+        activeShifts={activeShifts ?? 0}
+      />
+      <HospitalLogosStrip partnerCount={partnerCount ?? 0} />
       <HowItWorks />
       <HospitalDemoVideo />
       <Comparison />
@@ -35,11 +50,39 @@ export default function HospitalsClient() {
 }
 
 /* ---------- HERO ---------- */
-function Hero({ onContact }: { onContact: () => void }) {
+function Hero({
+  onContact,
+  partnerCount,
+  activeShifts,
+}: {
+  onContact: () => void;
+  partnerCount: number;
+  activeShifts: number;
+}) {
+  // Two of three stats are now live from the CRM (hospital count + open
+  // shifts right now). The "75% cheaper" claim is a value-prop, not a
+  // count, so it stays static. When the CRM is unreachable both live
+  // values are 0; the Counter just renders 0 — acceptable for a
+  // momentary outage and visually obvious that something's wrong.
   const stats = [
-    { to: 60, suffix: "+", label: "Partner clinics & hospitals" },
-    { to: 300, suffix: "+", label: "Verified Australian doctors" },
-    { to: 75, suffix: "%", label: "Cheaper than agency fees" },
+    {
+      to: partnerCount > 0 ? partnerCount : 60,
+      suffix: partnerCount > 0 ? "" : "+",
+      label: "Partner clinics & hospitals",
+      live: partnerCount > 0,
+    },
+    {
+      to: activeShifts > 0 ? activeShifts : 0,
+      suffix: "",
+      label: "Open shifts right now",
+      live: true,
+    },
+    {
+      to: 75,
+      suffix: "%",
+      label: "Cheaper than agency fees",
+      live: false,
+    },
   ];
   return (
     <section className="relative pt-32 md:pt-36 pb-12 md:pb-16 px-6">
@@ -97,8 +140,19 @@ function Hero({ onContact }: { onContact: () => void }) {
           {stats.map((s, i) => (
             <div
               key={s.label}
-              className="rounded-3xl bg-lavender border border-ocean/10 px-6 py-7 md:py-8"
+              className="relative rounded-3xl bg-lavender border border-ocean/10 px-6 py-7 md:py-8"
             >
+              {s.live && (
+                <span className="absolute top-4 right-4 inline-flex items-center gap-1.5">
+                  <span className="relative w-1.5 h-1.5">
+                    <span className="absolute inset-0 rounded-full bg-electric animate-ping opacity-75" />
+                    <span className="relative block w-1.5 h-1.5 rounded-full bg-electric" />
+                  </span>
+                  <span className="text-[9px] tracking-[0.22em] uppercase font-semibold text-muted">
+                    Live
+                  </span>
+                </span>
+              )}
               <div className="display text-[clamp(40px,5vw,64px)] leading-none text-ink tabular-nums">
                 <Counter to={s.to} suffix={s.suffix} duration={1.6 + i * 0.2} />
               </div>
@@ -108,6 +162,73 @@ function Hero({ onContact }: { onContact: () => void }) {
             </div>
           ))}
         </motion.div>
+      </div>
+    </section>
+  );
+}
+
+/* ---------- HOSPITAL LOGOS STRIP ----------
+   Social proof sitting between the hero stats and the How-it-works
+   stack. Mirrors the homepage marquee (same source list via
+   lib/partner-logos.ts) so both pages stay in lock-step. Live partner
+   count from the CRM appears in the eyebrow under the headline. */
+function HospitalLogosStrip({ partnerCount }: { partnerCount: number }) {
+  const doubled = [...PARTNER_LOGOS, ...PARTNER_LOGOS];
+  return (
+    <section className="py-12 md:py-14 bg-white">
+      <div className="max-w-[1280px] mx-auto px-6 mb-8 md:mb-10">
+        <motion.div
+          initial={{ opacity: 0, y: 18 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-80px" }}
+          transition={{ duration: 0.6 }}
+          className="flex flex-col items-center text-center gap-3 md:gap-4"
+        >
+          <div>
+            <div className="text-[10px] tracking-[0.22em] uppercase text-muted mb-2">
+              In good company
+            </div>
+            <h2 className="display text-[clamp(22px,3vw,38px)] leading-[1.05] max-w-2xl mx-auto">
+              Hospitals from{" "}
+              <span className="italic text-ocean">Cairns to Hobart</span>{" "}
+              fill shifts here.
+            </h2>
+          </div>
+          <Link
+            href="/partners"
+            className="group inline-flex items-center gap-2 text-[10px] tracking-[0.22em] uppercase text-muted hover:text-ocean transition-colors"
+            data-hover
+          >
+            {partnerCount > 0
+              ? `${partnerCount} partners · growing weekly`
+              : "Growing weekly"}
+            <span
+              aria-hidden
+              className="inline-block transition-transform group-hover:translate-x-0.5"
+            >
+              →
+            </span>
+          </Link>
+        </motion.div>
+      </div>
+
+      <div className="marquee-mask">
+        <div className="flex w-max items-center animate-marquee-slow hover:[animation-play-state:paused]">
+          {doubled.map((logo, i) => (
+            <div
+              key={i}
+              className="shrink-0 w-[150px] md:w-[170px] flex items-center justify-center"
+            >
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={logo.src}
+                alt=""
+                style={{ height: `${logo.h ?? 51}px` }}
+                className="w-auto max-w-[120px] md:max-w-[140px] opacity-60 hover:opacity-100 transition-opacity duration-500 grayscale hover:grayscale-0"
+              />
+            </div>
+          ))}
+        </div>
       </div>
     </section>
   );
