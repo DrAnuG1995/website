@@ -376,21 +376,23 @@ function DoctorVoicesPinned() {
         </motion.div>
       </div>
 
-      {/* Three scrolling columns, 1 up, 2 down, 3 up */}
-      <div className="relative max-w-[1280px] mx-auto h-[520px] md:h-[600px] overflow-hidden">
-        {/* fade masks */}
+      {/* Desktop: three auto-scrolling columns with fade masks.
+          Mobile: a single flat list — the marquee + fixed-height container
+          clipped most of the cards on narrow screens. */}
+      <div className="relative max-w-[1280px] mx-auto md:h-[600px] md:overflow-hidden">
+        {/* fade masks (desktop only) */}
         <div
           aria-hidden
-          className="absolute inset-x-0 top-0 h-24 z-10 pointer-events-none"
+          className="hidden md:block absolute inset-x-0 top-0 h-24 z-10 pointer-events-none"
           style={{ background: "linear-gradient(to bottom, white, transparent)" }}
         />
         <div
           aria-hidden
-          className="absolute inset-x-0 bottom-0 h-24 z-10 pointer-events-none"
+          className="hidden md:block absolute inset-x-0 bottom-0 h-24 z-10 pointer-events-none"
           style={{ background: "linear-gradient(to top, white, transparent)" }}
         />
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-5 md:gap-6 h-full">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-5 md:gap-6 md:h-full">
           {cols.map((col, ci) => (
             <TestimonialColumn
               key={ci}
@@ -417,23 +419,37 @@ function TestimonialColumn({
   duration: number;
   paused?: boolean;
 }) {
-  // Duplicate cards so the loop is seamless
+  // Duplicate cards so the desktop marquee loop is seamless. The duplicates
+  // are hidden on mobile because the mobile layout shows the cards as a
+  // flat scrollable list rather than an auto-scrolling column.
   const doubled = [...cards, ...cards];
   return (
-    <div className="relative h-full overflow-hidden">
+    <div className="relative md:h-full md:overflow-hidden">
       <div
-        className="flex flex-col gap-5 md:gap-6 hover:[animation-play-state:paused]"
+        className={`flex flex-col gap-5 md:gap-6 md:hover:[animation-play-state:paused] ${
+          direction === "up" ? "md-marquee-up" : "md-marquee-down"
+        }`}
         style={{
-          animation: `${direction === "up" ? "scrollColUp" : "scrollColDown"} ${duration}s linear infinite`,
+          ["--marquee-duration" as never]: `${duration}s`,
           animationPlayState: paused ? "paused" : "running",
         }}
       >
         {doubled.map((d, i) => (
-          <TestimonialCard key={i} d={d} />
+          <div key={i} className={i >= cards.length ? "hidden md:block" : ""}>
+            <TestimonialCard d={d} />
+          </div>
         ))}
       </div>
 
       <style jsx>{`
+        @media (min-width: 768px) {
+          .md-marquee-up {
+            animation: scrollColUp var(--marquee-duration, 42s) linear infinite;
+          }
+          .md-marquee-down {
+            animation: scrollColDown var(--marquee-duration, 42s) linear infinite;
+          }
+        }
         @keyframes scrollColUp {
           from { transform: translateY(0); }
           to   { transform: translateY(-50%); }
