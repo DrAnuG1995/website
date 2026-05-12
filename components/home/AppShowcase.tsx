@@ -167,7 +167,11 @@ function StepCard({
         style={{ background: ACCENT_GLOW[step.accent] }}
       />
 
-      <div className="relative p-6 md:p-7 pb-4">
+      {/* `flex-1` lets the text section absorb any extra height the parent
+          grid stretches to so the phone wrapper below always starts at the
+          same offset from the bottom — keeping the 4 phones bottom-aligned
+          regardless of how each card's body text wraps. */}
+      <div className="relative p-6 md:p-7 pb-4 flex-1">
         <div className="flex items-center justify-between mb-5">
           <div
             className={`display text-[28px] md:text-[32px] leading-none ${ACCENT_NUM[step.accent]}`}
@@ -184,8 +188,10 @@ function StepCard({
         </p>
       </div>
 
-      {/* phone preview, fixed 3:4-ish window, phone scaled to fit cleanly */}
-      <div className="relative mt-4 mx-6 md:mx-7 mb-0 h-[280px] md:h-[300px]">
+      {/* phone preview — container is sized to the phone's actual height
+          (width 160-170px × 19/9 aspect ≈ 338-359px) so the phone never
+          overflows upward into the body text above. */}
+      <div className="relative mt-4 mx-6 md:mx-7 mb-0 h-[350px] md:h-[370px] shrink-0">
         <PhonePreview
           step={step}
           index={index}
@@ -219,7 +225,7 @@ function PhonePreview({
               <img
                 src={step.screen}
                 alt={step.title}
-                className="w-full h-auto object-cover object-top"
+                className="absolute inset-0 w-full h-full object-cover object-top"
               />
             </div>
           </div>
@@ -287,7 +293,7 @@ function SecondaryPop({
           Posted rate
         </div>
         <div className="display text-[15px] leading-none mt-0.5">
-          $145<span className="opacity-60 text-[10px]">/hr</span>
+          $250<span className="opacity-60 text-[10px]">/hr</span>
         </div>
       </motion.div>
     );

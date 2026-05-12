@@ -1,32 +1,32 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { createClient } from "@supabase/supabase-js";
+import { fetchLiveShifts, type LiveShift } from "@/lib/hospitals";
 
+const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL ?? "";
+const SUPABASE_ANON_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? "";
+
+type Accent = "ocean" | "electric" | "leaf" | "stat";
 type Shift = {
   hospital: string;
   state: string;
   role: string;
   rate: string;
-  accent: "ocean" | "electric" | "leaf" | "stat";
+  accent: Accent;
 };
 
-// Pool drawn from the real partner-hospital database (components/home/hospitals.ts).
-// Each entry references a hospital that's already on the live map, so the
-// "live feed" actually corresponds to the network we list elsewhere.
-const SHIFT_POOL: Shift[] = [
-  { hospital: "Bendigo Health", state: "VIC", role: "ED Registrar", rate: "$165/hr", accent: "ocean" },
-  { hospital: "Knox Private Hospital ED", state: "VIC", role: "ED HMO", rate: "$140/hr", accent: "leaf" },
-  { hospital: "Mater Private Brisbane", state: "QLD", role: "Anaesthetics", rate: "$210/hr", accent: "electric" },
-  { hospital: "Hobart Private Hospital", state: "TAS", role: "ED Registrar", rate: "$175/hr", accent: "stat" },
-  { hospital: "Tom Price Hospital", state: "WA", role: "Rural GP", rate: "$280/hr", accent: "stat" },
-  { hospital: "Hollywood Private Hospital", state: "WA", role: "Surgery Reg", rate: "$220/hr", accent: "ocean" },
-  { hospital: "Bundaberg Hospital", state: "QLD", role: "ED HMO", rate: "$155/hr", accent: "leaf" },
-  { hospital: "CBD Doctors Melbourne", state: "VIC", role: "GP Locum", rate: "$160/hr", accent: "electric" },
-  { hospital: "Mater Private Townsville", state: "QLD", role: "ED Registrar", rate: "$185/hr", accent: "ocean" },
-  { hospital: "Yarrawonga Health", state: "VIC", role: "GP Locum", rate: "$170/hr", accent: "leaf" },
-  { hospital: "HEAL Urgent Care Newcastle", state: "NSW", role: "Urgent Care", rate: "$180/hr", accent: "stat" },
-  { hospital: "Kalgoorlie Hospital", state: "WA", role: "Rural GP", rate: "$240/hr", accent: "electric" },
-];
+const ACCENT_CYCLE: Accent[] = ["ocean", "leaf", "electric", "stat", "ocean"];
+
+function shiftFromLive(ls: LiveShift, index: number): Shift {
+  return {
+    hospital: ls.hospital,
+    state: ls.state,
+    role: ls.role,
+    rate: ls.rate,
+    accent: ACCENT_CYCLE[index % ACCENT_CYCLE.length],
+  };
+}
 
 const ACCENT_DOT: Record<Shift["accent"], string> = {
   ocean: "bg-ocean",
@@ -42,42 +42,89 @@ const ACCENT_TAG: Record<Shift["accent"], string> = {
   stat: "bg-stat/12 text-stat",
 };
 
-type FeedItem = Shift & { id: number; postedAt: number };
+type FeedItem = Shift & {
+  id: string;
+  postedAt: number;
+  startsAt: string | null;
+  variant: "upcoming" | "recent";
+  logoUrl: string | null;
+};
 
 const VISIBLE = 5;
-// Hospitals don't post shifts every few seconds, they post every few hours.
-// New entry every hour. Seeded entries span the last ~14 hours so the times
-// read like a realistic "today's posts" feed at first glance.
-const POST_INTERVAL_MS = 60 * 60 * 1000;
 
-const SEED_AGE_MIN = [12, 65, 150, 320, 700]; // minutes ago, top → bottom
+function toFeedItems(shifts: LiveShift[]): FeedItem[] {
+  return shifts.slice(0, VISIBLE).map((s, i) => ({
+    ...shiftFromLive(s, i),
+    id: s.id,
+    postedAt: new Date(s.postedAt).getTime(),
+    startsAt: s.startsAt,
+    variant: s.variant,
+    logoUrl: s.logoUrl,
+  }));
+}
 
-export default function LiveShiftFeed() {
-  const [items, setItems] = useState<FeedItem[]>(() => {
-    const now = Date.now();
-    return SHIFT_POOL.slice(0, VISIBLE).map((s, i) => ({
-      ...s,
-      id: i,
-      postedAt: now - SEED_AGE_MIN[i] * 60_000,
-    }));
-  });
+// Display string for the right-side timestamp column. Upcoming shifts show
+// "Today" / "Tomorrow" / weekday + date; recent posts show the existing
+// time-ago formatting.
+function displayWhen(item: FeedItem, now: number): string {
+  if (item.variant === "upcoming" && item.startsAt) {
+    const start = new Date(item.startsAt + "T00:00:00");
+    const today = new Date(); today.setHours(0, 0, 0, 0);
+    const days = Math.round((start.getTime() - today.getTime()) / 86_400_000);
+    if (days <= 0) return "Today";
+    if (days === 1) return "Tomorrow";
+    if (days <= 6) return start.toLocaleDateString(undefined, { weekday: "short" });
+    return start.toLocaleDateString(undefined, { month: "short", day: "numeric" });
+  }
+  return timeAgo(item.postedAt, now);
+}
+
+export default function LiveShiftFeed({ initialShifts }: { initialShifts: LiveShift[] }) {
+  const [items, setItems] = useState<FeedItem[]>(() => toFeedItems(initialShifts));
   const [now, setNow] = useState(() => Date.now());
-  const idRef = useRef(VISIBLE);
+  const [lastRefreshAt, setLastRefreshAt] = useState(() => Date.now());
+  // Cumulative count of shifts the user has seen since landing, including
+  // any new ones pushed via realtime — drives the "X shifts since you
+  // arrived" counter.
+  const arrivedCountRef = useRef(items.length);
 
-  // Push a new shift every interval, cycle through pool, then random.
+  // Live update path: Supabase realtime push (instant when the publication
+  // is enabled) + 5-second polling fallback + tab-visibility refresh. Each
+  // successful refetch stamps `lastRefreshAt` so the header can show an
+  // "Updated Xs ago" ticker that proves the feed is alive.
   useEffect(() => {
-    const interval = setInterval(() => {
+    if (!SUPABASE_URL || !SUPABASE_ANON_KEY) return;
+    const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    const refetch = async () => {
+      const picked = await fetchLiveShifts(VISIBLE);
+      const fresh = toFeedItems(picked);
+      // Count any IDs that weren't previously visible — those are "new"
+      // posts since the user arrived.
       setItems((prev) => {
-        const next: FeedItem = {
-          ...SHIFT_POOL[idRef.current % SHIFT_POOL.length],
-          id: idRef.current,
-          postedAt: Date.now(),
-        };
-        idRef.current += 1;
-        return [next, ...prev].slice(0, VISIBLE);
+        const known = new Set(prev.map((p) => p.id));
+        const added = fresh.filter((f) => !known.has(f.id)).length;
+        arrivedCountRef.current += added;
+        return fresh;
       });
-    }, POST_INTERVAL_MS);
-    return () => clearInterval(interval);
+      setLastRefreshAt(Date.now());
+    };
+
+    const channel = supabase
+      .channel("live-shift-feed")
+      .on("postgres_changes", { event: "*", schema: "public", table: "shifts" }, refetch)
+      .subscribe();
+    const interval = window.setInterval(refetch, 5_000);
+    const onVisibility = () => {
+      if (document.visibilityState === "visible") refetch();
+    };
+    document.addEventListener("visibilitychange", onVisibility);
+
+    return () => {
+      supabase.removeChannel(channel);
+      window.clearInterval(interval);
+      document.removeEventListener("visibilitychange", onVisibility);
+    };
   }, []);
 
   // Tick clock every second so timestamps stay fresh.
@@ -85,6 +132,12 @@ export default function LiveShiftFeed() {
     const tick = setInterval(() => setNow(Date.now()), 1000);
     return () => clearInterval(tick);
   }, []);
+
+  if (items.length === 0) {
+    // Hide the section entirely when there are no live shifts — better than
+    // showing an empty feed widget on the marketing page.
+    return null;
+  }
 
   return (
     <section className="relative bg-white py-20 md:py-24 px-6 overflow-hidden">
@@ -136,8 +189,11 @@ export default function LiveShiftFeed() {
                 Live · shifts feed
               </span>
             </div>
-            <div className="text-[10px] tracking-[0.22em] uppercase text-bone/55">
-              Auto-updating
+            <div className="text-[10px] tracking-[0.22em] uppercase text-bone/55 tabular-nums">
+              {(() => {
+                const ago = Math.max(0, Math.floor((now - lastRefreshAt) / 1000));
+                return ago < 2 ? "Just updated" : `Updated ${ago}s ago`;
+              })()}
             </div>
           </div>
 
@@ -157,13 +213,29 @@ export default function LiveShiftFeed() {
                       opacity: { duration: 0.45, ease: [0.2, 0.8, 0.2, 1] },
                       y: { duration: 0.55, ease: [0.2, 0.8, 0.2, 1] },
                     }}
-                    className="px-5 md:px-6 py-4 flex items-center gap-4 bg-lavender min-h-[76px]"
+                    className="px-5 md:px-6 py-4 flex items-center gap-3 md:gap-4 bg-lavender min-h-[76px]"
                   >
-                    {/* Hospital initials avatar */}
+                    {/* Hospital logo (falls back to initials if no logo) */}
                     <div
-                      className={`relative shrink-0 w-10 h-10 rounded-full grid place-items-center text-[12px] font-semibold ${ACCENT_TAG[item.accent]}`}
+                      className={`relative shrink-0 w-10 h-10 rounded-full overflow-hidden grid place-items-center text-[12px] font-semibold ring-1 ring-ink/10 ${item.logoUrl ? "bg-white" : ACCENT_TAG[item.accent]}`}
                     >
-                      {initials(item.hospital)}
+                      {item.logoUrl ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img
+                          src={item.logoUrl}
+                          alt=""
+                          className="w-full h-full object-cover"
+                          loading="lazy"
+                          referrerPolicy="no-referrer"
+                          onError={(e) => {
+                            // If the logo fails to load, hide the img so the
+                            // accent-coloured initials fall through underneath.
+                            (e.target as HTMLImageElement).style.display = "none";
+                          }}
+                        />
+                      ) : (
+                        initials(item.hospital)
+                      )}
                       {i === 0 && (
                         <span className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-stat ring-2 ring-lavender" />
                       )}
@@ -171,11 +243,13 @@ export default function LiveShiftFeed() {
 
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center gap-2 mb-1">
-                        <div className="text-[14px] font-semibold text-ink truncate">
+                        <div className="text-[14px] font-semibold text-ink truncate flex-1 min-w-0">
                           {item.hospital}
                         </div>
-                        <span className="text-[10px] text-muted shrink-0">
-                          · {item.state}
+                        {/* Fixed-width state column so VIC/QLD/NSW etc. all
+                            line up at the same column across every row. */}
+                        <span className="text-[10px] text-muted shrink-0 w-10 text-right tracking-[0.1em] uppercase font-semibold">
+                          {item.state || "—"}
                         </span>
                       </div>
                       <div className="flex items-center gap-2 text-[12px]">
@@ -184,22 +258,31 @@ export default function LiveShiftFeed() {
                         >
                           {item.role}
                         </span>
-                        <span className="text-muted">·</span>
-                        <span className="display text-[14px] text-ink leading-none">
-                          {item.rate}
-                        </span>
                       </div>
                     </div>
 
-                    <div className="text-right shrink-0 flex flex-col items-end gap-1">
-                      {i === 0 ? (
+                    {/* Dedicated rate column so $250/hr, $200/hr etc. all line up
+                        regardless of how long the role pill above is. */}
+                    <div className="shrink-0 text-right min-w-[68px] md:min-w-[78px]">
+                      <span className="display text-[15px] md:text-[16px] text-ink leading-none tabular-nums">
+                        {item.rate}
+                      </span>
+                    </div>
+
+                    <div className="text-right shrink-0 flex flex-col items-end gap-1 min-w-[100px] md:min-w-[120px]">
+                      {item.variant === "upcoming" ? (
+                        <span className="inline-flex items-center gap-1.5 px-2 py-1 rounded-full bg-ocean/10 text-ocean text-[9px] tracking-[0.18em] uppercase font-bold">
+                          <span className="w-1.5 h-1.5 rounded-full bg-ocean" />
+                          Starts {displayWhen(item, now)}
+                        </span>
+                      ) : i === 0 ? (
                         <span className="inline-flex items-center gap-1.5 px-2 py-1 rounded-full bg-electric text-ink text-[9px] tracking-[0.18em] uppercase font-bold">
                           <span className={`w-1.5 h-1.5 rounded-full ${ACCENT_DOT[item.accent]}`} />
                           Just posted
                         </span>
                       ) : (
                         <span className="text-[10px] text-muted tracking-[0.12em] uppercase">
-                          {timeAgo(item.postedAt, now)}
+                          {displayWhen(item, now)}
                         </span>
                       )}
                     </div>
@@ -210,7 +293,7 @@ export default function LiveShiftFeed() {
 
             {/* Footer counter */}
             <div className="px-5 md:px-6 py-3 border-t border-ink/8 flex items-center justify-between text-[10px] tracking-[0.22em] uppercase text-muted bg-white/60">
-              <span>{idRef.current} shifts since you arrived</span>
+              <span>{arrivedCountRef.current} shifts since you arrived</span>
               <button
                 onClick={() => {
                   if (typeof window !== "undefined") {
