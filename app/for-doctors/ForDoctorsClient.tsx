@@ -1,7 +1,79 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import FeatureShowcase from "@/components/home/FeatureShowcase";
+
+// Hero slideshow frames. Public Unsplash CDN URLs (CC0 / commercial-OK).
+// Swap any photo by editing the `src` — keep the `?w=1920&q=75&auto=format&fit=crop`
+// suffix so the CDN returns an optimised landscape JPG.
+const HERO_SLIDES: { src: string; alt: string }[] = [
+  {
+    src: "https://images.unsplash.com/photo-1523482580672-f109ba8cb9be?w=1920&q=75&auto=format&fit=crop",
+    alt: "Uluru at sunset, Northern Territory",
+  },
+  {
+    src: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1920&q=75&auto=format&fit=crop",
+    alt: "Aerial view of an Australian beach",
+  },
+  {
+    src: "https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?w=1920&q=75&auto=format&fit=crop",
+    alt: "Open road through the outback",
+  },
+  {
+    src: "https://images.unsplash.com/photo-1506973035872-a4ec16b8e8d9?w=1920&q=75&auto=format&fit=crop",
+    alt: "Sydney Opera House and harbour",
+  },
+  {
+    src: "https://images.unsplash.com/photo-1538108149393-fbbd81895907?w=1920&q=75&auto=format&fit=crop",
+    alt: "Doctor walking through a hospital corridor",
+  },
+  {
+    src: "https://images.unsplash.com/photo-1473893604213-3df9c15611c0?w=1920&q=75&auto=format&fit=crop",
+    alt: "Aerial of Australian mountain landscape",
+  },
+];
+
+const SLIDE_INTERVAL_MS = 5500;
+
+function HeroSlideshow() {
+  const [active, setActive] = useState(0);
+
+  useEffect(() => {
+    const id = window.setInterval(
+      () => setActive((a) => (a + 1) % HERO_SLIDES.length),
+      SLIDE_INTERVAL_MS,
+    );
+    return () => window.clearInterval(id);
+  }, []);
+
+  return (
+    <div className="absolute inset-0 overflow-hidden bg-ink">
+      {HERO_SLIDES.map((s, i) => (
+        <motion.div
+          key={i}
+          className="absolute inset-0"
+          initial={false}
+          animate={{ opacity: i === active ? 1 : 0 }}
+          transition={{ duration: 1.4, ease: "easeInOut" }}
+        >
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <motion.img
+            src={s.src}
+            alt={s.alt}
+            // First slide loads eagerly so the hero paints fast; the rest
+            // lazy-load as they cycle in.
+            loading={i === 0 ? "eager" : "lazy"}
+            fetchPriority={i === 0 ? "high" : "auto"}
+            className="w-full h-full object-cover"
+            initial={{ scale: 1.08 }}
+            animate={{ scale: i === active ? 1.2 : 1.08 }}
+            transition={{ duration: SLIDE_INTERVAL_MS / 1000, ease: "linear" }}
+          />
+        </motion.div>
+      ))}
+    </div>
+  );
+}
 
 export default function ForDoctorsClient() {
   const openDownload = () => {
@@ -12,29 +84,17 @@ export default function ForDoctorsClient() {
 
   return (
     <div className="bg-white text-ink">
-      {/* Cinematic video hero — full-bleed footage of a doctor moving
-          freely across Australia, with overlay copy and a download CTA.
-          Drop the source files at /doctors-hero.mp4 (h264, ~5MB) and
-          /doctors-hero-poster.jpg for instant first paint. The poster
-          shows immediately while the video buffers. */}
+      {/* Cinematic hero — Ken Burns–style slideshow of Australia +
+          medical scenes. Acts as a "video" hero without needing an actual
+          mp4 file. To swap to a real video later, replace HeroSlideshow
+          with a <video src="/doctors-hero.mp4" ... /> element. */}
       <section className="relative w-full h-[100svh] min-h-[560px] max-h-[860px] overflow-hidden bg-ink">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <video
-          className="absolute inset-0 w-full h-full object-cover"
-          src="/doctors-hero.mp4"
-          poster="/doctors-hero-poster.jpg"
-          autoPlay
-          muted
-          loop
-          playsInline
-          preload="auto"
-          aria-hidden
-        />
+        <HeroSlideshow />
         {/* Gradient overlay so the white text reads against any frame.
             Stronger at the bottom where the copy sits. */}
         <div
           aria-hidden
-          className="absolute inset-0 bg-gradient-to-b from-ink/30 via-ink/20 to-ink/75"
+          className="absolute inset-0 bg-gradient-to-b from-ink/45 via-ink/30 to-ink/80"
         />
 
         <div className="relative h-full max-w-[1200px] mx-auto px-6 flex flex-col items-center justify-center text-center">
