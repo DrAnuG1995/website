@@ -18,56 +18,27 @@ export type LivePartner = {
 // partner location. Photos live in public/hospitals/ — same folder
 // the /hospitals page carousel reads from, so one image update covers
 // both pages. Filenames are <city-slug>.jpg (lowercase, hyphenated).
-// To swap a slide, replace the file at public/hospitals/<city>.jpg.
+// To add a slide, drop public/hospitals/<city>.jpg and append a frame
+// here. State labels are best-effort and shown as a small uppercase
+// pill in the corner caption.
 const HERO_SLIDES: { src: string; alt: string; town: string; state: string }[] = [
-  {
-    src: "/hospitals/tom-price.jpg",
-    alt: "Red-dirt road through the Pilbara, Western Australia",
-    town: "Tom Price",
-    state: "WA",
-  },
-  {
-    src: "/hospitals/hervey-bay.jpg",
-    alt: "Calm Fraser Coast waters near Hervey Bay, Queensland",
-    town: "Hervey Bay",
-    state: "QLD",
-  },
-  {
-    src: "/hospitals/noosa.jpg",
-    alt: "Noosa Heads surf beach and headland, Sunshine Coast",
-    town: "Noosa",
-    state: "QLD",
-  },
-  {
-    src: "/hospitals/hobart.jpg",
-    alt: "Mountains above Hobart, Tasmania",
-    town: "Hobart",
-    state: "TAS",
-  },
-  {
-    src: "/hospitals/kalgoorlie.jpg",
-    alt: "Red-earth outback of the WA Goldfields near Kalgoorlie",
-    town: "Kalgoorlie",
-    state: "WA",
-  },
-  {
-    src: "/hospitals/bairnsdale.jpg",
-    alt: "Green rolling farmland of East Gippsland near Bairnsdale, Victoria",
-    town: "Bairnsdale",
-    state: "VIC",
-  },
-  {
-    src: "/hospitals/mackay.jpg",
-    alt: "Tropical North Queensland coastline near Mackay",
-    town: "Mackay",
-    state: "QLD",
-  },
-  {
-    src: "/hospitals/esperance.jpg",
-    alt: "White-sand beach and turquoise water near Esperance, WA",
-    town: "Esperance",
-    state: "WA",
-  },
+  { src: "/hospitals/bendigo.jpg",     alt: "Bendigo, Victoria",                            town: "Bendigo",     state: "VIC" },
+  { src: "/hospitals/brisbane.jpg",    alt: "Brisbane river city, Queensland",              town: "Brisbane",    state: "QLD" },
+  { src: "/hospitals/bundaberg.jpg",   alt: "Bundaberg, Queensland",                        town: "Bundaberg",   state: "QLD" },
+  { src: "/hospitals/cairns.jpg",      alt: "Tropical Far North Queensland coast, Cairns",  town: "Cairns",      state: "QLD" },
+  { src: "/hospitals/esperance.jpg",   alt: "White sand and turquoise water at Esperance",  town: "Esperance",   state: "WA"  },
+  { src: "/hospitals/gold-coast.jpg",  alt: "Gold Coast skyline and beaches, Queensland",   town: "Gold Coast",  state: "QLD" },
+  { src: "/hospitals/hervey-bay.jpg",  alt: "Calm Fraser Coast waters near Hervey Bay",     town: "Hervey Bay",  state: "QLD" },
+  { src: "/hospitals/hobart.jpg",      alt: "Mountains above Hobart, Tasmania",             town: "Hobart",      state: "TAS" },
+  { src: "/hospitals/kalgoorlie.jpg",  alt: "Red-earth outback of the WA Goldfields",       town: "Kalgoorlie",  state: "WA"  },
+  { src: "/hospitals/mackay.jpg",      alt: "Tropical North Queensland coastline at Mackay",town: "Mackay",      state: "QLD" },
+  { src: "/hospitals/melbourne.jpg",   alt: "Melbourne cityscape, Victoria",                town: "Melbourne",   state: "VIC" },
+  { src: "/hospitals/noosa.jpg",       alt: "Noosa Heads surf beach, Sunshine Coast",       town: "Noosa",       state: "QLD" },
+  { src: "/hospitals/parabudoo.jpg",   alt: "Pilbara landscape near Paraburdoo",            town: "Paraburdoo",  state: "WA"  },
+  { src: "/hospitals/perth.jpg",       alt: "Perth, Western Australia",                     town: "Perth",       state: "WA"  },
+  { src: "/hospitals/sydney.jpg",      alt: "Sydney harbour, New South Wales",              town: "Sydney",      state: "NSW" },
+  { src: "/hospitals/tom-price.jpg",   alt: "Red-dirt road through the Pilbara",            town: "Tom Price",   state: "WA"  },
+  { src: "/hospitals/townsville.jpg",  alt: "Townsville, North Queensland coast",           town: "Townsville",  state: "QLD" },
 ];
 
 const SLIDE_INTERVAL_MS = 5500;
