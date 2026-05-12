@@ -33,10 +33,9 @@ const HERO_SLIDES: { src: string; alt: string; town: string; state: string }[] =
     state: "WA",
   },
   {
-    // Hervey Bay — Fraser Coast / whale-watching town, aerial of the
-    // turquoise coastline.
-    src: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1920&q=75&auto=format&fit=crop",
-    alt: "Aerial of the turquoise Fraser Coast near Hervey Bay",
+    // Hervey Bay — Fraser Coast / whale-watching town.
+    src: "https://images.unsplash.com/photo-1605651531144-51381895e23d?w=1920&q=75&auto=format&fit=crop",
+    alt: "Calm Fraser Coast waters near Hervey Bay, Queensland",
     town: "Hervey Bay",
     state: "QLD",
   },
