@@ -3,33 +3,60 @@ import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import FeatureShowcase from "@/components/home/FeatureShowcase";
 
-// Hero slideshow frames. Public Unsplash CDN URLs (CC0 / commercial-OK).
-// Swap any photo by editing the `src` — keep the `?w=1920&q=75&auto=format&fit=crop`
+// Hero slideshow frames. Each frame is tagged with the regional partner
+// town it represents — the caption fades in at the corner of the hero so
+// visitors see the spread of places StatDoctor partners with as the
+// photos cycle. Photos: Unsplash CDN (CC0 / commercial-OK). Swap any photo
+// by editing the `src` — keep the `?w=1920&q=75&auto=format&fit=crop`
 // suffix so the CDN returns an optimised landscape JPG.
-const HERO_SLIDES: { src: string; alt: string }[] = [
+const HERO_SLIDES: { src: string; alt: string; town: string; state: string }[] = [
   {
     src: "https://images.unsplash.com/photo-1523482580672-f109ba8cb9be?w=1920&q=75&auto=format&fit=crop",
-    alt: "Uluru at sunset, Northern Territory",
-  },
-  {
-    src: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1920&q=75&auto=format&fit=crop",
-    alt: "Aerial view of an Australian beach",
+    alt: "Uluru at sunset",
+    town: "Uluru",
+    state: "NT",
   },
   {
     src: "https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?w=1920&q=75&auto=format&fit=crop",
-    alt: "Open road through the outback",
+    alt: "Red-dirt road through the Pilbara",
+    town: "Tom Price",
+    state: "WA",
   },
   {
-    src: "https://images.unsplash.com/photo-1506973035872-a4ec16b8e8d9?w=1920&q=75&auto=format&fit=crop",
-    alt: "Sydney Opera House and harbour",
+    src: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1920&q=75&auto=format&fit=crop",
+    alt: "Aerial of a coastal town",
+    town: "Hervey Bay",
+    state: "QLD",
   },
   {
-    src: "https://images.unsplash.com/photo-1538108149393-fbbd81895907?w=1920&q=75&auto=format&fit=crop",
-    alt: "Doctor walking through a hospital corridor",
+    src: "https://images.unsplash.com/photo-1494522855154-9297ac14b55f?w=1920&q=75&auto=format&fit=crop",
+    alt: "Mountain landscape, Tasmania",
+    town: "Hobart",
+    state: "TAS",
+  },
+  {
+    src: "https://images.unsplash.com/photo-1551244072-5d12893278ab?w=1920&q=75&auto=format&fit=crop",
+    alt: "Sandstone cliffs and turquoise water",
+    town: "Esperance",
+    state: "WA",
   },
   {
     src: "https://images.unsplash.com/photo-1473893604213-3df9c15611c0?w=1920&q=75&auto=format&fit=crop",
-    alt: "Aerial of Australian mountain landscape",
+    alt: "Aerial of vast Australian landscape",
+    town: "Kalgoorlie",
+    state: "WA",
+  },
+  {
+    src: "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=1920&q=75&auto=format&fit=crop",
+    alt: "Regional Victorian countryside",
+    town: "Bairnsdale",
+    state: "VIC",
+  },
+  {
+    src: "https://images.unsplash.com/photo-1538108149393-fbbd81895907?w=1920&q=75&auto=format&fit=crop",
+    alt: "Outback emergency centre",
+    town: "Mater Mackay",
+    state: "QLD",
   },
 ];
 
@@ -46,32 +73,56 @@ function HeroSlideshow() {
     return () => window.clearInterval(id);
   }, []);
 
+  const current = HERO_SLIDES[active];
+
   return (
-    <div className="absolute inset-0 overflow-hidden bg-ink">
-      {HERO_SLIDES.map((s, i) => (
-        <motion.div
-          key={i}
-          className="absolute inset-0"
-          initial={false}
-          animate={{ opacity: i === active ? 1 : 0 }}
-          transition={{ duration: 1.4, ease: "easeInOut" }}
-        >
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <motion.img
-            src={s.src}
-            alt={s.alt}
-            // First slide loads eagerly so the hero paints fast; the rest
-            // lazy-load as they cycle in.
-            loading={i === 0 ? "eager" : "lazy"}
-            fetchPriority={i === 0 ? "high" : "auto"}
-            className="w-full h-full object-cover"
-            initial={{ scale: 1.08 }}
-            animate={{ scale: i === active ? 1.2 : 1.08 }}
-            transition={{ duration: SLIDE_INTERVAL_MS / 1000, ease: "linear" }}
-          />
-        </motion.div>
-      ))}
-    </div>
+    <>
+      <div className="absolute inset-0 overflow-hidden bg-ink">
+        {HERO_SLIDES.map((s, i) => (
+          <motion.div
+            key={i}
+            className="absolute inset-0"
+            initial={false}
+            animate={{ opacity: i === active ? 1 : 0 }}
+            transition={{ duration: 1.4, ease: "easeInOut" }}
+          >
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <motion.img
+              src={s.src}
+              alt={s.alt}
+              // First slide loads eagerly so the hero paints fast; the rest
+              // lazy-load as they cycle in.
+              loading={i === 0 ? "eager" : "lazy"}
+              fetchPriority={i === 0 ? "high" : "auto"}
+              className="w-full h-full object-cover"
+              initial={{ scale: 1.08 }}
+              animate={{ scale: i === active ? 1.2 : 1.08 }}
+              transition={{ duration: SLIDE_INTERVAL_MS / 1000, ease: "linear" }}
+            />
+          </motion.div>
+        ))}
+      </div>
+
+      {/* Region caption — crossfades with each slide. Sits in the bottom-
+          right corner. */}
+      <div className="absolute bottom-5 right-5 md:bottom-7 md:right-7 z-20 pointer-events-none">
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={`${current.town}-${current.state}`}
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -8 }}
+            transition={{ duration: 0.5, ease: [0.2, 0.8, 0.2, 1] }}
+            className="inline-flex items-center gap-2 px-3.5 py-2 rounded-full bg-ink/60 backdrop-blur-md border border-bone/15"
+          >
+            <span className="w-1.5 h-1.5 rounded-full bg-electric" />
+            <span className="text-[10px] md:text-[11px] tracking-[0.22em] uppercase font-semibold text-white whitespace-nowrap">
+              {current.town} · {current.state}
+            </span>
+          </motion.div>
+        </AnimatePresence>
+      </div>
+    </>
   );
 }
 
