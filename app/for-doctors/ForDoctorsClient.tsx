@@ -15,55 +15,55 @@ export type LivePartner = {
 };
 
 // Hero slideshow frames. Every town listed here is a real StatDoctor
-// partner location. Photos live in public/for-doctors/ — swap any of
-// them by dropping a new image at the same filename. Filenames follow
-// <town>-<state>.jpg. Keep them ~1920px wide, JPG, under ~600KB for
-// fast LCP on the hero.
+// partner location. Photos live in public/hospitals/ — same folder
+// the /hospitals page carousel reads from, so one image update covers
+// both pages. Filenames are <city-slug>.jpg (lowercase, hyphenated).
+// To swap a slide, replace the file at public/hospitals/<city>.jpg.
 const HERO_SLIDES: { src: string; alt: string; town: string; state: string }[] = [
   {
-    src: "/for-doctors/tom-price-wa.jpg",
+    src: "/hospitals/tom-price.jpg",
     alt: "Red-dirt road through the Pilbara, Western Australia",
     town: "Tom Price",
     state: "WA",
   },
   {
-    src: "/for-doctors/hervey-bay-qld.jpg",
+    src: "/hospitals/hervey-bay.jpg",
     alt: "Calm Fraser Coast waters near Hervey Bay, Queensland",
     town: "Hervey Bay",
     state: "QLD",
   },
   {
-    src: "/for-doctors/noosa-qld.jpg",
+    src: "/hospitals/noosa.jpg",
     alt: "Noosa Heads surf beach and headland, Sunshine Coast",
     town: "Noosa",
     state: "QLD",
   },
   {
-    src: "/for-doctors/hobart-tas.jpg",
+    src: "/hospitals/hobart.jpg",
     alt: "Mountains above Hobart, Tasmania",
     town: "Hobart",
     state: "TAS",
   },
   {
-    src: "/for-doctors/kalgoorlie-wa.jpg",
+    src: "/hospitals/kalgoorlie.jpg",
     alt: "Red-earth outback of the WA Goldfields near Kalgoorlie",
     town: "Kalgoorlie",
     state: "WA",
   },
   {
-    src: "/for-doctors/bairnsdale-vic.jpg",
+    src: "/hospitals/bairnsdale.jpg",
     alt: "Green rolling farmland of East Gippsland near Bairnsdale, Victoria",
     town: "Bairnsdale",
     state: "VIC",
   },
   {
-    src: "/for-doctors/mackay-qld.jpg",
+    src: "/hospitals/mackay.jpg",
     alt: "Tropical North Queensland coastline near Mackay",
     town: "Mackay",
     state: "QLD",
   },
   {
-    src: "/for-doctors/esperance-wa.jpg",
+    src: "/hospitals/esperance.jpg",
     alt: "White-sand beach and turquoise water near Esperance, WA",
     town: "Esperance",
     state: "WA",

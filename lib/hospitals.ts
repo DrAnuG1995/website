@@ -133,6 +133,21 @@ export function deriveAuState(address: string | null | undefined): AusState | nu
   return null;
 }
 
+// Pull the suburb/town out of a Google formatted_address. Google's strings
+// reliably end the locality segment with "<TOWN> <STATE> <POSTCODE>", e.g.
+// "5 Bryden St, Mackay QLD 4740, Australia" → "Mackay". Returns null when
+// the address doesn't match that pattern so callers can fall back.
+export function deriveAuTown(address: string | null | undefined): string | null {
+  if (!address) return null;
+  // Split on commas, search each segment for the locality marker.
+  const segments = address.split(",").map((s) => s.trim());
+  for (const seg of segments) {
+    const m = seg.match(/^(.+?)\s+(?:VIC|NSW|QLD|WA|SA|TAS|ACT|NT)\s+\d{4}\s*$/);
+    if (m) return m[1].trim();
+  }
+  return null;
+}
+
 export type LiveStats = {
   activeShifts: number;
   confirmedShifts: number;
