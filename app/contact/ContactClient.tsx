@@ -103,9 +103,9 @@ function ContactInfo() {
           Office
         </div>
         <div className="text-[14px] leading-relaxed text-ink">
-          Level 2, Collins St
+          2/1 Louise St
           <br />
-          Melbourne VIC 3000
+          Underwood QLD 4119
           <br />
           Australia
         </div>
