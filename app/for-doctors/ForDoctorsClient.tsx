@@ -4,11 +4,12 @@ import { AnimatePresence, motion } from "framer-motion";
 import FeatureShowcase from "@/components/home/FeatureShowcase";
 import type { AusState } from "@/lib/hospitals";
 
-// CRM-derived shape passed from the server component. State has been
-// resolved from formatted_address before reaching the client.
+// CRM-derived shape passed from the server component. State is
+// best-effort — null if formatted_address didn't yield one, which just
+// means the card shows under "All states" but not a specific filter.
 export type LivePartner = {
   name: string;
-  state: AusState;
+  state: AusState | null;
   website: string | null;
   logoUrl: string | null;
 };
@@ -376,9 +377,11 @@ function PartnerNetwork({
                     <div className="text-[13px] md:text-[14px] text-ink leading-snug group-hover:text-ocean transition-colors">
                       {p.name}
                     </div>
-                    <div className="mt-1 text-[10px] tracking-[0.15em] uppercase text-muted">
-                      {p.state}
-                    </div>
+                    {p.state && (
+                      <div className="mt-1 text-[10px] tracking-[0.15em] uppercase text-muted">
+                        {p.state}
+                      </div>
+                    )}
                   </>
                 );
                 const baseClasses =

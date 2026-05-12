@@ -32,9 +32,22 @@ export async function fetchActiveHospitals(): Promise<MapHospital[]> {
       .not("name", "ilike", "%test%")
       .not("name", "ilike", "%statdoctor%");
 
-    // Graceful fallback for the brief window where migration 010 (website
-    // column) hasn't been applied yet — retry without the website column so
-    // the rest of the map still renders.
+    // Graceful fallbacks for migration drift — if either the website or
+    // formatted_address column hasn't been applied yet, retry without
+    // the offending column so the rest of the page still renders.
+    if (error && /column .*formatted_address/i.test(error.message)) {
+      const retry = await supabase
+        .from("hospitals")
+        .select("id, name, type, latitude, longitude, logo_url, website")
+        .eq("status", "active")
+        .not("latitude", "is", null)
+        .not("longitude", "is", null)
+        .not("name", "ilike", "%trial%")
+        .not("name", "ilike", "%test%")
+        .not("name", "ilike", "%statdoctor%");
+      data = retry.data?.map((h) => ({ ...h, formatted_address: null })) ?? null;
+      error = retry.error;
+    }
     if (error && /column .*website/i.test(error.message)) {
       const retry = await supabase
         .from("hospitals")
@@ -91,14 +104,32 @@ export type AusState = "VIC" | "NSW" | "QLD" | "WA" | "SA" | "TAS" | "ACT" | "NT
 
 const STATE_CODES: AusState[] = ["VIC", "NSW", "QLD", "WA", "SA", "TAS", "ACT", "NT"];
 
-// Google's formatted_address strings for AU hospitals reliably contain the
-// state code right before the postcode — e.g. "10 Smith St, Hervey Bay QLD
-// 4655, Australia". Scan for the first standalone state code we find.
-// Returns null when nothing matches so callers can fall back gracefully.
+// Try hard to pull an AU state code out of any address string we have.
+// Google's formatted_address normally reads "… Hervey Bay QLD 4655,
+// Australia" (abbrev), but ops sometimes paste full state names, and a
+// few legacy rows store "Suburb, State" with no postcode. Scan for the
+// abbrev first, then a long-form name, and return null only if nothing
+// matches so the caller can still show the hospital under "All states".
+const LONG_NAME_TO_CODE: Array<[RegExp, AusState]> = [
+  [/\bvictoria\b/i, "VIC"],
+  [/\bnew south wales\b/i, "NSW"],
+  [/\bqueensland\b/i, "QLD"],
+  [/\bwestern australia\b/i, "WA"],
+  [/\bsouth australia\b/i, "SA"],
+  [/\btasmania\b/i, "TAS"],
+  [/\baustralian capital territory\b/i, "ACT"],
+  [/\bnorthern territory\b/i, "NT"],
+];
+
 export function deriveAuState(address: string | null | undefined): AusState | null {
   if (!address) return null;
-  const m = address.match(/\b(VIC|NSW|QLD|WA|SA|TAS|ACT|NT)\b/);
-  if (m && (STATE_CODES as string[]).includes(m[1])) return m[1] as AusState;
+  const abbrev = address.match(/\b(VIC|NSW|QLD|WA|SA|TAS|ACT|NT)\b/);
+  if (abbrev && (STATE_CODES as string[]).includes(abbrev[1])) {
+    return abbrev[1] as AusState;
+  }
+  for (const [re, code] of LONG_NAME_TO_CODE) {
+    if (re.test(address)) return code;
+  }
   return null;
 }
 

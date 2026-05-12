@@ -16,22 +16,18 @@ export const revalidate = 0;
 export default async function Page() {
   const hospitals = await fetchActiveHospitals();
 
-  // Project each CRM row into the shape the network grid needs. We drop
-  // any hospital whose state we can't derive from formatted_address — it
-  // would land under "Unknown" in the filter UI, which looks broken.
-  // Sort alphabetically inside each state so the grid is stable.
+  // Project every CRM row into the grid. State is best-effort — derived
+  // from formatted_address when present, otherwise null. Hospitals
+  // without a derivable state still appear under "All states", they
+  // just don't get bucketed under a specific state filter. Sort
+  // alphabetically so the grid is stable.
   const partners: LivePartner[] = hospitals
-    .map((h) => {
-      const state = deriveAuState(h.formatted_address);
-      if (!state) return null;
-      return {
-        name: h.name,
-        state,
-        website: h.website,
-        logoUrl: h.logo_url,
-      };
-    })
-    .filter((p): p is LivePartner => p !== null)
+    .map((h) => ({
+      name: h.name,
+      state: deriveAuState(h.formatted_address),
+      website: h.website,
+      logoUrl: h.logo_url,
+    }))
     .sort((a, b) => a.name.localeCompare(b.name));
 
   return (
