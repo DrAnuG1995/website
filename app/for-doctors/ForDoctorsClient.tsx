@@ -2,7 +2,16 @@
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import FeatureShowcase from "@/components/home/FeatureShowcase";
-import { normaliseHospitalKey } from "@/lib/hospitals";
+import type { AusState } from "@/lib/hospitals";
+
+// CRM-derived shape passed from the server component. State has been
+// resolved from formatted_address before reaching the client.
+export type LivePartner = {
+  name: string;
+  state: AusState;
+  website: string | null;
+  logoUrl: string | null;
+};
 
 // Hero slideshow frames. Every town listed here is a real StatDoctor
 // partner location (cross-checked against the PARTNERS list below) so the
@@ -142,14 +151,14 @@ function HeroSlideshow() {
 
 export default function ForDoctorsClient({
   partnerCount,
-  websiteByName,
+  partners,
 }: {
   // Live count of active hospitals — fetched server-side in page.tsx so
   // the headline below matches the homepage hero exactly.
   partnerCount?: number;
-  // Normalised-name → website URL map from the CRM. Any partner card
-  // whose name matches a key renders as a clickable link.
-  websiteByName?: Record<string, string>;
+  // Full partner list straight from the CRM — name, state, website,
+  // logo. The grid below renders one card per entry.
+  partners?: LivePartner[];
 }) {
   const openDownload = () => {
     if (typeof window !== "undefined") {
@@ -263,7 +272,7 @@ export default function ForDoctorsClient({
         <FeatureShowcase />
       </div>
 
-      <PartnerNetwork partnerCount={partnerCount} websiteByName={websiteByName} />
+      <PartnerNetwork partnerCount={partnerCount} partners={partners ?? []} />
 
       <section className="relative bg-white">
         <div className="relative max-w-[1100px] mx-auto px-6 py-12 md:py-14 text-center">
@@ -289,8 +298,6 @@ export default function ForDoctorsClient({
   );
 }
 
-type AusState = "VIC" | "NSW" | "QLD" | "WA" | "SA" | "TAS" | "ACT" | "NT";
-
 const STATES: { code: AusState; label: string }[] = [
   { code: "VIC", label: "Victoria" },
   { code: "NSW", label: "New South Wales" },
@@ -302,73 +309,18 @@ const STATES: { code: AusState; label: string }[] = [
   { code: "NT", label: "Northern Territory" },
 ];
 
-const PARTNERS: { name: string; state: AusState }[] = [
-  // VIC
-  { name: "Alexandra District Health", state: "VIC" },
-  { name: "Bairnsdale Regional Health Service", state: "VIC" },
-  { name: "Bendigo & District Aboriginal Co-operative", state: "VIC" },
-  { name: "Bendigo Health", state: "VIC" },
-  { name: "Border Urgent Care Centre", state: "VIC" },
-  { name: "CBD Doctors Melbourne", state: "VIC" },
-  { name: "Colac Area Health", state: "VIC" },
-  { name: "Echuca Regional Health", state: "VIC" },
-  { name: "Knox Private Hospital ED", state: "VIC" },
-  { name: "Merri-bek Family Doctors", state: "VIC" },
-  { name: "Portland District Health", state: "VIC" },
-  { name: "Swan Hill District Health", state: "VIC" },
-  { name: "Yarrawonga Health", state: "VIC" },
-  // NSW
-  { name: "HEAL Urgent Care Newcastle", state: "NSW" },
-  { name: "Woodburn Health GP Clinic", state: "NSW" },
-  { name: "Central West Medical Centre", state: "NSW" },
-  // QLD
-  { name: "Biggenden Multipurpose Health Centre", state: "QLD" },
-  { name: "Bundaberg Hospital", state: "QLD" },
-  { name: "Childers Hospital", state: "QLD" },
-  { name: "Eidsvold Multipurpose Health Service", state: "QLD" },
-  { name: "Gayndah Hospital", state: "QLD" },
-  { name: "Gin Gin Hospital", state: "QLD" },
-  { name: "Hervey Bay Hospital", state: "QLD" },
-  { name: "Maryborough Hospital", state: "QLD" },
-  { name: "Mater Private Brisbane", state: "QLD" },
-  { name: "Mater Private Mackay", state: "QLD" },
-  { name: "Mater Private Rockhampton", state: "QLD" },
-  { name: "Mater Private Townsville", state: "QLD" },
-  { name: "Monto Hospital", state: "QLD" },
-  { name: "Noosa Private Hospital", state: "QLD" },
-  { name: "Friendly Society Private Bundaberg", state: "QLD" },
-  // WA
-  { name: "Esperance Health", state: "WA" },
-  { name: "Hollywood Private Hospital", state: "WA" },
-  { name: "Kalgoorlie Hospital", state: "WA" },
-  { name: "Kutjungka Regional Clinic", state: "WA" },
-  { name: "Paraburdoo Medical Centre", state: "WA" },
-  { name: "Tom Price Hospital", state: "WA" },
-  // TAS
-  { name: "Hobart Private Hospital", state: "TAS" },
-  // ACT
-  { name: "Fisher Family Practice", state: "ACT" },
-  { name: "Holder Family Practice", state: "ACT" },
-  { name: "Kingston Plaza Medical Centre", state: "ACT" },
-  // Uncertain state — best-guess pending confirmation
-  { name: "GN Medical Centre", state: "NSW" },
-  { name: "Mercy Family Doctors", state: "VIC" },
-  { name: "MyFast Medical", state: "VIC" },
-  { name: "Saint Lukes Medical Centre", state: "VIC" },
-];
-
 function PartnerNetwork({
   partnerCount,
-  websiteByName,
+  partners,
 }: {
   partnerCount?: number;
-  websiteByName?: Record<string, string>;
+  partners: LivePartner[];
 }) {
   const [filter, setFilter] = useState<AusState | "ALL">("ALL");
   const visible =
-    filter === "ALL" ? PARTNERS : PARTNERS.filter((p) => p.state === filter);
+    filter === "ALL" ? partners : partners.filter((p) => p.state === filter);
   const countFor = (code: AusState) =>
-    PARTNERS.filter((p) => p.state === code).length;
+    partners.filter((p) => p.state === code).length;
 
   return (
     <section className="relative bg-white py-12 md:py-14 px-6">
@@ -416,7 +368,7 @@ function PartnerNetwork({
           >
             <AnimatePresence mode="popLayout">
               {visible.map((p) => {
-                const website = websiteByName?.[normaliseHospitalKey(p.name)];
+                const website = p.website;
                 // Shared card body — name + state code centred. Hover lift
                 // only fires when the card is actually clickable.
                 const body = (

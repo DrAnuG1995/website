@@ -8,6 +8,7 @@ export type MapHospital = {
   longitude: number;
   logo_url: string | null;
   website: string | null;
+  formatted_address: string | null;
 };
 
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL ?? "";
@@ -23,7 +24,7 @@ export async function fetchActiveHospitals(): Promise<MapHospital[]> {
     const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
     let { data, error } = await supabase
       .from("hospitals")
-      .select("id, name, type, latitude, longitude, logo_url, website")
+      .select("id, name, type, latitude, longitude, logo_url, website, formatted_address")
       .eq("status", "active")
       .not("latitude", "is", null)
       .not("longitude", "is", null)
@@ -44,7 +45,7 @@ export async function fetchActiveHospitals(): Promise<MapHospital[]> {
         .not("name", "ilike", "%trial%")
         .not("name", "ilike", "%test%")
         .not("name", "ilike", "%statdoctor%");
-      data = retry.data?.map((h) => ({ ...h, website: null })) ?? null;
+      data = retry.data?.map((h) => ({ ...h, website: null, formatted_address: null })) ?? null;
       error = retry.error;
     }
 
@@ -84,6 +85,21 @@ export async function fetchActiveShiftCounts(): Promise<Record<string, number>> 
 
 export function normaliseHospitalKey(name: string): string {
   return name.toLowerCase().trim().replace(/\s+/g, " ");
+}
+
+export type AusState = "VIC" | "NSW" | "QLD" | "WA" | "SA" | "TAS" | "ACT" | "NT";
+
+const STATE_CODES: AusState[] = ["VIC", "NSW", "QLD", "WA", "SA", "TAS", "ACT", "NT"];
+
+// Google's formatted_address strings for AU hospitals reliably contain the
+// state code right before the postcode — e.g. "10 Smith St, Hervey Bay QLD
+// 4655, Australia". Scan for the first standalone state code we find.
+// Returns null when nothing matches so callers can fall back gracefully.
+export function deriveAuState(address: string | null | undefined): AusState | null {
+  if (!address) return null;
+  const m = address.match(/\b(VIC|NSW|QLD|WA|SA|TAS|ACT|NT)\b/);
+  if (m && (STATE_CODES as string[]).includes(m[1])) return m[1] as AusState;
+  return null;
 }
 
 export type LiveStats = {

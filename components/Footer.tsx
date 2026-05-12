@@ -1,5 +1,6 @@
 "use client";
 import Link from "next/link";
+import Image from "next/image";
 import { motion } from "framer-motion";
 
 export default function Footer() {
@@ -30,14 +31,23 @@ export default function Footer() {
             </div>
             <h2 className="-mx-1">
               <span className="sr-only">StatDoctor</span>
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
+              {/* Source PNG is 392×116. Capping the rendered height at
+                  ~64px means even on 2× retina (≈128px tall) we stay
+                  within source resolution, so the wordmark renders
+                  crisp instead of upscaled. Next/Image serves an
+                  optimised variant at the exact size needed. The PNG
+                  is dark-blue on transparent — invert it to white so
+                  it reads on the dark footer background. */}
+              <Image
                 src="/statdoctor-logo.png"
                 alt="StatDoctor"
-                className="h-12 sm:h-16 md:h-24 lg:h-28 w-auto"
+                width={392}
+                height={116}
+                priority={false}
+                quality={100}
+                sizes="(max-width: 640px) 160px, 220px"
+                className="h-12 sm:h-14 md:h-16 w-auto"
                 style={{
-                  // Logo asset is dark navy/blue on light backgrounds — flip
-                  // to pure white so it reads on the dark footer bg.
                   filter: "brightness(0) invert(1)",
                 }}
               />
