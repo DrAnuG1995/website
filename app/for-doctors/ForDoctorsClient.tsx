@@ -45,8 +45,8 @@ const HERO_SLIDES: { src: string; alt: string; town: string; state: string }[] =
   },
   {
     // Kalgoorlie — Goldfields outback, red earth and big sky.
-    src: "https://images.unsplash.com/photo-1473893604213-3df9c15611c0?w=1920&q=75&auto=format&fit=crop",
-    alt: "Goldfields outback near Kalgoorlie, Western Australia",
+    src: "https://images.unsplash.com/photo-1517457373958-b7bdd4587205?w=1920&q=75&auto=format&fit=crop",
+    alt: "Red-earth outback of the WA Goldfields near Kalgoorlie",
     town: "Kalgoorlie",
     state: "WA",
   },
