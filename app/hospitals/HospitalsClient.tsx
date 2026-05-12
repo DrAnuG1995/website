@@ -78,7 +78,7 @@ function Hero({
       to: AGENCY_FEES_SAVED_AUD,
       prefix: "$",
       suffix: "+",
-      label: "Agency fees saved",
+      label: "Saved in recruitment fees",
       live: false,
     },
   ];
