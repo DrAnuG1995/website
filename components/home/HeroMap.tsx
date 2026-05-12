@@ -223,7 +223,9 @@ export default function HeroMap({
         scrollwheel: false,
         gestureHandling: "greedy",
         clickableIcons: false,
-        backgroundColor: "#f5f0e8",
+        // Matches the `bone` palette token (tailwind.config.ts) so the
+        // map tiles fade into the page bg seamlessly while loading.
+        backgroundColor: "#F5F1E8",
         mapTypeId: "roadmap",
         // DEMO_MAP_ID is a free Google-provided Map ID that enables vector
         // rendering and AdvancedMarkerElement. Swap with a custom Map ID

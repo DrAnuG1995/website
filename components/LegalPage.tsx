@@ -47,6 +47,10 @@ export default function LegalPage({
         <article className="max-w-3xl mx-auto legal-prose">{children}</article>
       </motion.section>
 
+      {/* Scoped prose styles. Hex values mirror palette tokens in
+          tailwind.config.ts — #1a1a2e = ink, #3232ff = ocean — so if you
+          change the brand colours, update both places. Fonts mirror the
+          `body` + `.display` rules in globals.css for the same reason. */}
       <style jsx global>{`
         .legal-prose p {
           font-family: "Inter", system-ui, sans-serif;

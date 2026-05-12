@@ -296,8 +296,7 @@ export default function PostDetail({
                 href={url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="callout-header-band-link"
-                style={{ color: "#ffffff" }}
+                className="callout-header-band-link text-white"
               >
                 Read case study →
               </a>
