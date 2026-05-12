@@ -376,36 +376,25 @@ function DoctorVoicesPinned() {
         </motion.div>
       </div>
 
-      {/* Mobile: horizontal swipe carousel — one card visible at a time
-          with a peek of the next, snap-scrolling. */}
-      <div className="md:hidden relative max-w-[1280px] mx-auto">
+      {/* Mobile: single vertical-rolling column — auto-scrolls every
+          testimonial through the viewport showing ~1-2 cards at a time. */}
+      <div className="md:hidden relative max-w-[1280px] mx-auto h-[440px] overflow-hidden">
         <div
-          className="flex gap-4 overflow-x-auto snap-x snap-mandatory pb-4 -mx-6 px-6 scrollbar-hide"
-          style={{ scrollbarWidth: "none" }}
-        >
-          {DOCTORS.map((d, i) => (
-            <div
-              key={i}
-              className="snap-center shrink-0 w-[85%] first:ml-0"
-            >
-              <TestimonialCard d={d} />
-            </div>
-          ))}
-        </div>
-        <div className="mt-3 flex items-center justify-center gap-2 text-[10px] tracking-[0.2em] uppercase text-muted">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-            <polyline points="15 18 9 12 15 6" />
-          </svg>
-          <span>Swipe</span>
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-            <polyline points="9 18 15 12 9 6" />
-          </svg>
-        </div>
-        <style jsx>{`
-          .scrollbar-hide::-webkit-scrollbar {
-            display: none;
-          }
-        `}</style>
+          aria-hidden
+          className="absolute inset-x-0 top-0 h-16 z-10 pointer-events-none"
+          style={{ background: "linear-gradient(to bottom, white, transparent)" }}
+        />
+        <div
+          aria-hidden
+          className="absolute inset-x-0 bottom-0 h-16 z-10 pointer-events-none"
+          style={{ background: "linear-gradient(to top, white, transparent)" }}
+        />
+        <TestimonialColumn
+          cards={DOCTORS}
+          direction="up"
+          duration={48}
+          paused={!inView}
+        />
       </div>
 
       {/* Desktop: three auto-scrolling columns with fade masks. */}
