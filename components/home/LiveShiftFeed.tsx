@@ -36,10 +36,10 @@ const ACCENT_DOT: Record<Shift["accent"], string> = {
 };
 
 const ACCENT_TAG: Record<Shift["accent"], string> = {
-  ocean: "bg-ocean/10 text-ocean",
+  ocean: "bg-ocean/18 text-ocean",
   electric: "bg-electric/30 text-ink",
-  leaf: "bg-leaf/12 text-leaf",
-  stat: "bg-stat/12 text-stat",
+  leaf: "bg-leaf/20 text-leaf",
+  stat: "bg-stat/18 text-stat",
 };
 
 type FeedItem = Shift & {
@@ -178,7 +178,7 @@ export default function LiveShiftFeed({ initialShifts }: { initialShifts: LiveSh
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-80px" }}
           transition={{ duration: 0.8, ease: [0.2, 0.8, 0.2, 1] }}
-          className="relative max-w-[560px] mx-auto"
+          className="relative max-w-[760px] mx-auto"
         >
           {/* Live header bar */}
           <div className="rounded-t-3xl bg-ink text-white px-5 md:px-6 py-4 flex items-center justify-between">

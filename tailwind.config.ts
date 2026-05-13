@@ -28,7 +28,7 @@ const config: Config = {
         stat: "#FF5A36",
       },
       fontFamily: {
-        display: ['"Cormorant Garamond"', '"Instrument Serif"', "Georgia", "serif"],
+        display: ['"Cormorant Garamond"', "Georgia", "serif"],
         sans: ['"Inter"', "system-ui", "sans-serif"],
         mono: ["ui-monospace", "SFMono-Regular", "Menlo", "monospace"],
       },

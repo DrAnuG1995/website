@@ -194,7 +194,7 @@ function FounderVideo() {
                 setMuted(next);
                 if (!playing) videoRef.current.play().catch(() => {});
               }}
-              className="absolute bottom-4 right-4 md:bottom-5 md:right-5 px-4 py-2 rounded-full bg-white/90 backdrop-blur-md border border-ink/10 text-xs font-medium text-ink hover:bg-white transition-colors flex items-center gap-2"
+              className="absolute bottom-4 right-4 md:bottom-5 md:right-5 px-3.5 py-2 rounded-full bg-white/90 backdrop-blur-md border border-ink/10 text-[12px] font-medium text-ink hover:bg-white transition-colors inline-flex items-center gap-2"
               data-hover
             >
               <span className="block w-1.5 h-1.5 rounded-full bg-electric" />
@@ -206,7 +206,7 @@ function FounderVideo() {
               href="https://www.linkedin.com/in/dr-anu-g-%F0%9F%A9%BA-3b330a248/"
               target="_blank"
               rel="noopener noreferrer"
-              className="absolute bottom-4 left-4 md:bottom-5 md:left-5 px-3 py-1.5 rounded-full bg-white/90 backdrop-blur-md border border-ink/10 text-[11px] font-medium hover:bg-white hover:text-ocean transition-colors"
+              className="absolute bottom-4 left-4 md:bottom-5 md:left-5 px-3.5 py-2 rounded-full bg-white/90 backdrop-blur-md border border-ink/10 text-[12px] font-medium hover:bg-white hover:text-ocean transition-colors inline-flex items-center"
               data-hover
             >
               Dr Anu, CEO &amp; Founder StatDoctor

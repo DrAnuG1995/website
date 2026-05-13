@@ -150,14 +150,27 @@ function Hero({
         </motion.div>
 
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.2 }}
+          initial="hidden"
+          animate="visible"
+          variants={{
+            hidden: {},
+            visible: {
+              transition: { staggerChildren: 0.18, delayChildren: 0.45 },
+            },
+          }}
           className="mt-12 md:mt-16 grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6"
         >
           {stats.map((s, i) => (
-            <div
+            <motion.div
               key={s.label}
+              variants={{
+                hidden: { opacity: 0, y: 24 },
+                visible: {
+                  opacity: 1,
+                  y: 0,
+                  transition: { duration: 1.1, ease: [0.2, 0.8, 0.2, 1] },
+                },
+              }}
               className="relative rounded-3xl bg-white/8 backdrop-blur-md border border-bone/15 px-6 py-7 md:py-8"
             >
               {s.live && (
@@ -182,7 +195,7 @@ function Hero({
               <div className="mt-3 text-[12px] md:text-[13px] text-bone/75 leading-snug">
                 {s.label}
               </div>
-            </div>
+            </motion.div>
           ))}
         </motion.div>
       </div>
@@ -201,33 +214,23 @@ function HospitalLogosStrip({ partnerCount }: { partnerCount: number }) {
   // first slot — no visible seam at the loop point.
   const doubled = [...PARTNER_LOGOS, ...PARTNER_LOGOS];
   return (
-    <section className="py-12 md:py-14 bg-white">
-      <div className="max-w-[1280px] mx-auto px-6 mb-8 md:mb-10">
+    <section className="py-10 md:py-12 bg-white">
+      <div className="max-w-[1280px] mx-auto px-6 mb-6 md:mb-8">
         <motion.div
           initial={{ opacity: 0, y: 18 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-80px" }}
           transition={{ duration: 0.6 }}
-          className="flex flex-col items-center text-center gap-3 md:gap-4"
+          className="flex items-center justify-center"
         >
-          <div>
-            <div className="text-[10px] tracking-[0.22em] uppercase text-muted mb-2">
-              The network
-            </div>
-            <h2 className="display text-[clamp(24px,3.6vw,44px)] leading-[1.05] max-w-2xl mx-auto">
-              Hospitals from{" "}
-              <span className="italic text-ocean">Cairns to Hobart</span>{" "}
-              fill shifts here.
-            </h2>
-          </div>
           <Link
             href="/partners"
             className="group inline-flex items-center gap-2 text-[10px] tracking-[0.22em] uppercase text-muted hover:text-ocean transition-colors"
             data-hover
           >
             {partnerCount > 0
-              ? `${partnerCount} hospitals · growing weekly`
-              : "Growing weekly"}
+              ? `Trusted by ${partnerCount} hospitals · growing weekly`
+              : "Trusted by hospitals across Australia"}
             <span
               aria-hidden
               className="inline-block transition-transform group-hover:translate-x-0.5"
@@ -584,7 +587,7 @@ function ProgressDots({
   total: number;
 }) {
   return (
-    <div className="absolute -bottom-4 left-1/2 -translate-x-1/2 z-50 flex items-center gap-2 px-3 py-2 rounded-full bg-white border border-ink/10 shadow-[0_15px_30px_-10px_rgba(26,26,46,0.2)]">
+    <div className="absolute -bottom-3 left-1/2 -translate-x-1/2 z-50 flex items-center gap-1.5 px-2.5 py-1.5 rounded-full bg-white border border-ink/10 shadow-[0_15px_30px_-10px_rgba(26,26,46,0.2)]">
       {Array.from({ length: total }).map((_, i) => (
         <ProgressDot key={i} index={i} total={total} progress={progress} />
       ))}
@@ -609,7 +612,7 @@ function ProgressDot({
   return (
     <motion.span
       style={{ opacity, scale }}
-      className="w-2 h-2 rounded-full bg-ink"
+      className="w-1.5 h-1.5 rounded-full bg-ink"
     />
   );
 }
@@ -642,7 +645,7 @@ function HospitalDemoVideo() {
   }, []);
 
   return (
-    <section className="relative bg-white pt-6 pb-14 md:pt-10 md:pb-20 px-4 md:px-6">
+    <section className="relative bg-white pt-20 pb-14 md:pt-28 md:pb-20 px-4 md:px-6">
       <div className="max-w-[1280px] mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 18 }}
@@ -840,7 +843,7 @@ function Pricing({ onContact }: { onContact: () => void }) {
             <div className="text-[11px] md:text-[12px] text-muted mb-1">
               Starting from
             </div>
-            <div className="display text-[clamp(48px,5vw,64px)] leading-none">
+            <div className="display text-[clamp(48px,5vw,64px)] leading-none tabular-nums">
               $10K
               <span className="text-base text-muted ml-1">/year</span>
             </div>
@@ -878,7 +881,7 @@ function Pricing({ onContact }: { onContact: () => void }) {
             <div className="text-[11px] md:text-[12px] text-bone/60 mb-1">
               Starting from
             </div>
-            <div className="display text-[clamp(48px,5vw,64px)] leading-none">
+            <div className="display text-[clamp(48px,5vw,64px)] leading-none tabular-nums">
               $50K
               <span className="text-base text-bone/60 ml-1">/year</span>
             </div>
@@ -935,50 +938,69 @@ function Bullet({
    the page see it before they reach the FAQ. */
 function PermHireCallout({ onContact }: { onContact: () => void }) {
   return (
-    <section className="relative bg-white py-10 md:py-14 px-6">
+    <section className="relative bg-white py-16 md:py-24 px-6">
       <div className="max-w-[1100px] mx-auto">
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-80px" }}
-          transition={{ duration: 0.6, ease: [0.2, 0.8, 0.2, 1] }}
-          className="relative overflow-hidden rounded-3xl border border-ocean/15 bg-lavender p-7 md:p-10"
+          viewport={{ once: true, margin: "-100px" }}
+          transition={{ duration: 0.7, ease: [0.2, 0.8, 0.2, 1] }}
+          className="text-center max-w-2xl mx-auto mb-10 md:mb-12"
         >
-          <div
-            aria-hidden
-            className="pointer-events-none absolute inset-y-0 right-0 w-1/2 opacity-40"
-            style={{
-              background:
-                "radial-gradient(50% 60% at 80% 50%, rgba(50,50,255,0.30), transparent 70%)",
-            }}
-          />
-          <div className="relative flex flex-col md:flex-row md:items-center md:justify-between gap-6 md:gap-10">
-            <div className="md:max-w-2xl">
-              <div className="text-[10px] tracking-[0.22em] uppercase text-muted mb-2">
-                No buy-out fees, ever
+          <div className="text-[10px] tracking-[0.22em] uppercase text-muted mb-3">
+            No buy-out fees, ever
+          </div>
+          <h3 className="display text-[clamp(28px,4.5vw,56px)] leading-[1.0]">
+            Convert a locum to permanent for{" "}
+            <span className="italic text-ocean">$0</span>.
+          </h3>
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-100px" }}
+          transition={{ duration: 0.8, delay: 0.15, ease: [0.2, 0.8, 0.2, 1] }}
+          className="relative overflow-hidden rounded-3xl bg-ink text-bone"
+        >
+          <div className="grid grid-cols-1 md:grid-cols-2">
+            <div className="px-8 md:px-12 py-10 md:py-14 border-b md:border-b-0 md:border-r border-bone/10">
+              <div className="text-[10px] tracking-[0.22em] uppercase text-bone/50 mb-4">
+                Most agencies
               </div>
-              <h3 className="display text-[clamp(22px,3vw,36px)] leading-[1.1] text-ink">
-                Like a locum? Hire them permanently{" "}
-                <span className="italic text-ocean">
-                  at no extra cost
-                </span>
-                .
-              </h3>
-              <p className="mt-3 text-[14px] md:text-[15px] text-ink/70 leading-relaxed max-w-xl">
-                Agencies charge 15-25% of first-year salary to convert a locum
-                to a permanent hire. We charge $0. If a hospital and a doctor
-                want to make it permanent, that&apos;s between you and them.
-                We&apos;re not in the middle.
+              <div className="display text-[clamp(48px,6.5vw,84px)] leading-none text-bone/85 tabular-nums">
+                15-25%
+              </div>
+              <p className="mt-5 text-[14px] md:text-[15px] text-bone/60 leading-relaxed max-w-xs">
+                of the doctor&apos;s first-year salary, charged the moment a
+                hospital wants to convert a locum to a permanent hire.
               </p>
             </div>
-            <button
-              onClick={onContact}
-              className="shrink-0 inline-flex items-center justify-center gap-2 px-5 py-3 rounded-full bg-ocean text-white text-sm font-semibold hover:bg-ink transition-colors"
-              data-hover
-            >
-              Talk to us
-              <span aria-hidden>→</span>
-            </button>
+            <div className="relative px-8 md:px-12 py-10 md:py-14 bg-electric/[0.08]">
+              <div className="text-[10px] tracking-[0.22em] uppercase text-electric mb-4 inline-flex items-center gap-2">
+                <span className="relative flex w-1.5 h-1.5">
+                  <span className="absolute inline-flex h-full w-full rounded-full bg-electric opacity-75 animate-ping-slow" />
+                  <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-electric" />
+                </span>
+                StatDoctor
+              </div>
+              <div className="display text-[clamp(48px,6.5vw,84px)] leading-none text-electric tabular-nums">
+                $0
+              </div>
+              <p className="mt-5 text-[14px] md:text-[15px] text-bone/80 leading-relaxed max-w-sm">
+                Like a locum? Hire them permanently at no extra cost. If a
+                hospital and a doctor want to make it permanent, that&apos;s
+                between you and them. We&apos;re not in the middle.
+              </p>
+              <button
+                onClick={onContact}
+                className="mt-6 inline-flex items-center justify-center gap-2 px-5 py-3 rounded-full bg-electric text-ink text-sm font-semibold hover:bg-bone transition-colors"
+                data-hover
+              >
+                Talk to us
+                <span aria-hidden>→</span>
+              </button>
+            </div>
           </div>
         </motion.div>
       </div>

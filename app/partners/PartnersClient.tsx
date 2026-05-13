@@ -132,9 +132,12 @@ function Hero() {
         </motion.div>
 
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.2 }}
+          initial="hidden"
+          animate="visible"
+          variants={{
+            hidden: {},
+            visible: { transition: { staggerChildren: 0.12, delayChildren: 0.25 } },
+          }}
           className="mt-12 md:mt-14 grid grid-cols-3 gap-4 md:gap-6 max-w-2xl mx-auto"
         >
           <HeroStat to={6} label="Partner brands" />
@@ -156,14 +159,25 @@ function HeroStat({
   label: string;
 }) {
   return (
-    <div className="rounded-3xl bg-lavender border border-ocean/10 px-4 py-5 md:py-6 text-center">
+    <motion.div
+      variants={{
+        hidden: { opacity: 0, y: 18 },
+        visible: {
+          opacity: 1,
+          y: 0,
+          transition: { duration: 0.6, ease: [0.2, 0.8, 0.2, 1] },
+        },
+      }}
+      className="rounded-3xl bg-lavender border border-ocean/10 px-4 py-5 md:py-6 text-center"
+    >
       <div className="display text-[clamp(28px,3.5vw,44px)] leading-none text-ink tabular-nums">
-        <Counter to={to} suffix={suffix} duration={1.6} />
+        {to}
+        {suffix}
       </div>
       <div className="mt-2 text-[10px] md:text-[11px] tracking-[0.18em] uppercase text-muted">
         {label}
       </div>
-    </div>
+    </motion.div>
   );
 }
 
@@ -246,7 +260,7 @@ function PerkCard({ perk, delay }: { perk: Perk; delay: number }) {
         />
       </div>
 
-      <h3 className="display text-[22px] md:text-[26px] leading-[1.15] text-ink mb-3 group-hover:text-ocean transition-colors">
+      <h3 className="display text-[22px] md:text-[26px] leading-[1.15] text-ink mb-3 min-h-[52px] md:min-h-[60px] group-hover:text-ocean transition-colors">
         {perk.brand}
       </h3>
       <p className="text-[13px] md:text-[14px] text-muted leading-relaxed mb-5 flex-1">

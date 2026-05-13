@@ -198,7 +198,7 @@ function FlowArrow({
       {/* Rate label as a pill — reads as the value being passed along, not
           as floating text disconnected from the line. */}
       <span
-        className={`inline-flex items-center px-2.5 py-0.5 rounded-full border ${labelBg[tone]} text-[10px] md:text-[11px] tracking-[0.18em] uppercase font-bold whitespace-nowrap`}
+        className={`inline-flex items-center px-2.5 py-0.5 rounded-full border ${labelBg[tone]} text-[10px] md:text-[11px] tracking-[0.14em] uppercase font-bold whitespace-nowrap`}
       >
         {amount}
       </span>

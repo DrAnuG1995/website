@@ -81,8 +81,28 @@ type Pin = {
 function buildMarkerElement(pin: Pin): HTMLDivElement {
   const el = document.createElement("div");
   el.className = pin.logoUrl ? "sd-marker sd-marker--logo" : "sd-marker sd-marker--dot";
+
+  // Teardrop SVG pin shape (44×56 viewBox). Same shape for logo + dot
+  // variants so every hospital reads as a "pin" on the map.
+  const svgNS = "http://www.w3.org/2000/svg";
+  const svg = document.createElementNS(svgNS, "svg");
+  svg.setAttribute("viewBox", "0 0 44 56");
+  svg.setAttribute("class", "sd-pin-shape");
+  svg.setAttribute("aria-hidden", "true");
+  const path = document.createElementNS(svgNS, "path");
+  path.setAttribute(
+    "d",
+    "M22 0 C9.85 0 0 9.85 0 22 C0 33 9 41 22 56 C35 41 44 33 44 22 C44 9.85 34.15 0 22 0 Z",
+  );
+  path.setAttribute("fill", "#ffffff");
+  path.setAttribute("stroke", "#1a1a2e");
+  path.setAttribute("stroke-width", "2");
+  svg.appendChild(path);
+  el.appendChild(svg);
+
   if (pin.logoUrl) {
     const img = document.createElement("img");
+    img.className = "sd-pin-logo";
     img.src = pin.logoUrl;
     img.alt = pin.name;
     img.loading = "lazy";
@@ -216,7 +236,8 @@ export default function HeroMap({
         maxZoom: MAX_ZOOM,
         restriction: { latLngBounds: AU_BOUNDS, strictBounds: false },
         disableDefaultUI: true,
-        zoomControl: true,
+        zoomControl: false,
+        keyboardShortcuts: false,
         // Disable Google's built-in scroll-wheel zoom — it ignores the
         // cursor under the elastic bounds restriction. We replace it below
         // with a wheel listener that explicitly zooms toward the cursor.
@@ -455,6 +476,38 @@ export default function HeroMap({
             </div>
           )}
 
+          {/* Compact custom zoom controls — Google's defaults are oversized
+              for this card. Plus/minus stepped by 1 zoom level each click. */}
+          {!keyMissing && ready && (
+            <div className="absolute bottom-4 right-4 md:bottom-5 md:right-5 z-10 inline-flex flex-col rounded-full bg-white/95 backdrop-blur-md border border-ink/10 shadow-md overflow-hidden">
+              <button
+                type="button"
+                aria-label="Zoom in"
+                onClick={() => {
+                  const z = mapRef.current?.getZoom();
+                  if (typeof z === "number") mapRef.current?.setZoom(Math.min(MAX_ZOOM, z + 1));
+                }}
+                className="w-7 h-7 grid place-items-center text-ink/80 hover:bg-ink hover:text-white transition-colors"
+                data-hover
+              >
+                <span aria-hidden className="text-lg leading-none">+</span>
+              </button>
+              <div aria-hidden className="h-px bg-ink/10" />
+              <button
+                type="button"
+                aria-label="Zoom out"
+                onClick={() => {
+                  const z = mapRef.current?.getZoom();
+                  if (typeof z === "number") mapRef.current?.setZoom(Math.max(zoomDefaultsRef.current.min, z - 1));
+                }}
+                className="w-7 h-7 grid place-items-center text-ink/80 hover:bg-ink hover:text-white transition-colors"
+                data-hover
+              >
+                <span aria-hidden className="text-lg leading-none">−</span>
+              </button>
+            </div>
+          )}
+
           <AnimatePresence mode="wait">
             {focusPin && (
               <motion.div
@@ -526,45 +579,57 @@ export default function HeroMap({
       <style jsx global>{`
         .sd-marker {
           --sd-state-scale: 1;
-          display: grid;
-          place-items: center;
-          background: #fff;
-          border-radius: 999px;
-          border: 2px solid #1a1a2e;
-          box-shadow: 0 4px 10px rgba(26, 26, 46, 0.25);
+          position: relative;
           cursor: pointer;
-          transition: transform 0.22s ease, box-shadow 0.18s ease;
-          transform-origin: center;
+          transition: transform 0.22s ease, filter 0.18s ease;
+          /* Anchor at the pin tip (bottom of the teardrop), not the centre,
+             so the geographic coordinate lines up with where the pin
+             points. */
+          transform-origin: 50% 100%;
           will-change: transform;
-          /* Zoom-driven scale set by JS on the map container */
           transform: scale(calc(var(--sd-marker-scale, 1) * var(--sd-state-scale)));
+          filter: drop-shadow(0 4px 6px rgba(26, 26, 46, 0.28));
         }
-        .sd-marker--dot {
-          width: 12px;
-          height: 12px;
-        }
-        .sd-marker--logo {
-          width: 44px;
-          height: 44px;
-          padding: 0;
-          overflow: hidden;
-        }
-        .sd-marker--logo img {
+        .sd-marker .sd-pin-shape {
+          display: block;
           width: 100%;
           height: 100%;
+        }
+        .sd-marker--logo {
+          width: 36px;
+          height: 46px;
+        }
+        .sd-marker--dot {
+          width: 22px;
+          height: 28px;
+        }
+        .sd-marker--dot .sd-pin-shape path {
+          fill: #1a1a2e;
+        }
+        .sd-marker--logo .sd-pin-logo {
+          position: absolute;
+          top: 4px;
+          left: 50%;
+          width: 28px;
+          height: 28px;
+          transform: translateX(-50%);
           object-fit: cover;
           display: block;
           pointer-events: none;
           border-radius: 999px;
+          background: #fff;
         }
         .sd-marker.is-hover {
-          --sd-state-scale: 1.15;
-          box-shadow: 0 6px 16px rgba(26, 26, 46, 0.35);
+          --sd-state-scale: 1.12;
+          filter: drop-shadow(0 6px 10px rgba(26, 26, 46, 0.35));
         }
         .sd-marker.is-active {
-          --sd-state-scale: 1.4;
-          border-width: 3px;
-          box-shadow: 0 0 0 4px rgba(50, 50, 255, 0.18), 0 8px 22px rgba(26, 26, 46, 0.4);
+          --sd-state-scale: 1.35;
+          filter: drop-shadow(0 0 0 rgba(50, 50, 255, 0.18)) drop-shadow(0 8px 14px rgba(26, 26, 46, 0.4));
+        }
+        .sd-marker.is-active .sd-pin-shape path {
+          stroke: #3232ff;
+          stroke-width: 3;
         }
       `}</style>
     </section>

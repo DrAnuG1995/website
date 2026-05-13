@@ -82,7 +82,7 @@ export default function AppShowcase() {
   // single horizontal row.
   const { scrollYProgress } = useScroll({
     target: sectionRef,
-    offset: ["start 0.7", "end 0.65"],
+    offset: ["start 0.85", "center 0.35"],
   });
   // Smooth the raw scroll progress through a spring so the reveal feels
   // eased rather than tracking every scroll-wheel tick — fixes the jumpy

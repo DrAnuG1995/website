@@ -45,7 +45,7 @@ export default function ForDoctorsClient({
             Stronger at the bottom where the copy sits. */}
         <div
           aria-hidden
-          className="absolute inset-0 bg-gradient-to-b from-ink/45 via-ink/30 to-ink/80"
+          className="absolute inset-0 bg-gradient-to-b from-ink/50 via-ink/55 to-ink/80"
         />
 
         <div className="relative h-full max-w-[1200px] mx-auto px-6 flex flex-col items-center justify-center text-center">
@@ -59,7 +59,7 @@ export default function ForDoctorsClient({
             </div>
             <h1 className="display text-white text-[clamp(40px,6.5vw,88px)] leading-[0.98] tracking-tight mx-auto max-w-[14ch]">
               Locum work,{" "}
-              <span className="italic text-ocean">on your terms.</span>
+              <span className="italic text-electric">on your terms.</span>
             </h1>
             <p className="mt-6 md:mt-8 mx-auto max-w-[560px] text-bone/85 text-[15px] md:text-[18px] leading-relaxed">
               Pick the shifts that fit your life. Posted rate visible upfront,
