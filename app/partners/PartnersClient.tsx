@@ -267,16 +267,18 @@ function PerkCard({ perk, delay }: { perk: Perk; delay: number }) {
         {perk.blurb}
       </p>
 
-      {/* Member-perk slate. Rendered only for partners with a real SD
-          offer (today: CPD Home). */}
+      {/* Member-perk callout. Italic display-serif treatment, no inner
+          box — sits inline as part of the card's content rather than
+          breaking it with a secondary container. Rendered only for
+          partners with a real SD offer (today: CPD Home). */}
       {perk.value && (
-        <div className="mb-4 rounded-2xl bg-white border border-ink/10 px-4 py-3.5">
-          <div className="text-[10px] tracking-[0.22em] uppercase text-muted mb-1">
+        <div className="mb-5">
+          <div className="text-[10px] tracking-[0.22em] uppercase text-ocean mb-1.5">
             Member perk
           </div>
-          <div className="text-[14px] md:text-[15px] text-ink font-medium leading-snug">
+          <p className="display italic text-[18px] md:text-[20px] leading-snug text-ink">
             {perk.value}
-          </div>
+          </p>
         </div>
       )}
 

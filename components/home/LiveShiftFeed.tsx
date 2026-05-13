@@ -36,10 +36,10 @@ const ACCENT_DOT: Record<Shift["accent"], string> = {
 };
 
 const ACCENT_TAG: Record<Shift["accent"], string> = {
-  ocean: "bg-ocean/18 text-ocean",
+  ocean: "bg-ocean-soft/30 text-ocean",
   electric: "bg-electric/30 text-ink",
   leaf: "bg-leaf/20 text-leaf",
-  stat: "bg-stat/18 text-stat",
+  stat: "bg-stat/25 text-stat",
 };
 
 type FeedItem = Shift & {

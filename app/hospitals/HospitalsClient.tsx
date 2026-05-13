@@ -938,69 +938,50 @@ function Bullet({
    the page see it before they reach the FAQ. */
 function PermHireCallout({ onContact }: { onContact: () => void }) {
   return (
-    <section className="relative bg-white py-16 md:py-24 px-6">
+    <section className="relative bg-white py-10 md:py-14 px-6">
       <div className="max-w-[1100px] mx-auto">
         <motion.div
-          initial={{ opacity: 0, y: 30 }}
+          initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-100px" }}
-          transition={{ duration: 0.7, ease: [0.2, 0.8, 0.2, 1] }}
-          className="text-center max-w-2xl mx-auto mb-10 md:mb-12"
+          viewport={{ once: true, margin: "-80px" }}
+          transition={{ duration: 0.6, ease: [0.2, 0.8, 0.2, 1] }}
+          className="relative overflow-hidden rounded-3xl border border-ocean/15 bg-lavender p-7 md:p-10"
         >
-          <div className="text-[10px] tracking-[0.22em] uppercase text-muted mb-3">
-            No buy-out fees, ever
-          </div>
-          <h3 className="display text-[clamp(28px,4.5vw,56px)] leading-[1.0]">
-            Convert a locum to permanent for{" "}
-            <span className="italic text-ocean">$0</span>.
-          </h3>
-        </motion.div>
-
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-100px" }}
-          transition={{ duration: 0.8, delay: 0.15, ease: [0.2, 0.8, 0.2, 1] }}
-          className="relative overflow-hidden rounded-3xl bg-ink text-bone"
-        >
-          <div className="grid grid-cols-1 md:grid-cols-2">
-            <div className="px-8 md:px-12 py-10 md:py-14 border-b md:border-b-0 md:border-r border-bone/10">
-              <div className="text-[10px] tracking-[0.22em] uppercase text-bone/50 mb-4">
-                Most agencies
+          <div
+            aria-hidden
+            className="pointer-events-none absolute inset-y-0 right-0 w-1/2 opacity-40"
+            style={{
+              background:
+                "radial-gradient(50% 60% at 80% 50%, rgba(50,50,255,0.30), transparent 70%)",
+            }}
+          />
+          <div className="relative flex flex-col md:flex-row md:items-center md:justify-between gap-6 md:gap-10">
+            <div className="md:max-w-2xl">
+              <div className="text-[10px] tracking-[0.22em] uppercase text-muted mb-2">
+                No buy-out fees, ever
               </div>
-              <div className="display text-[clamp(48px,6.5vw,84px)] leading-none text-bone/85 tabular-nums">
-                15-25%
-              </div>
-              <p className="mt-5 text-[14px] md:text-[15px] text-bone/60 leading-relaxed max-w-xs">
-                of the doctor&apos;s first-year salary, charged the moment a
-                hospital wants to convert a locum to a permanent hire.
-              </p>
-            </div>
-            <div className="relative px-8 md:px-12 py-10 md:py-14 bg-electric/[0.08]">
-              <div className="text-[10px] tracking-[0.22em] uppercase text-electric mb-4 inline-flex items-center gap-2">
-                <span className="relative flex w-1.5 h-1.5">
-                  <span className="absolute inline-flex h-full w-full rounded-full bg-electric opacity-75 animate-ping-slow" />
-                  <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-electric" />
+              <h3 className="display text-[clamp(22px,3vw,36px)] leading-[1.1] text-ink">
+                Like a locum? Hire them permanently{" "}
+                <span className="italic text-ocean">
+                  at no extra cost
                 </span>
-                StatDoctor
-              </div>
-              <div className="display text-[clamp(48px,6.5vw,84px)] leading-none text-electric tabular-nums">
-                $0
-              </div>
-              <p className="mt-5 text-[14px] md:text-[15px] text-bone/80 leading-relaxed max-w-sm">
-                Like a locum? Hire them permanently at no extra cost. If a
-                hospital and a doctor want to make it permanent, that&apos;s
-                between you and them. We&apos;re not in the middle.
+                .
+              </h3>
+              <p className="mt-3 text-[14px] md:text-[15px] text-ink/70 leading-relaxed max-w-xl">
+                Agencies charge 15-25% of first-year salary to convert a locum
+                to a permanent hire. We charge $0. If a hospital and a doctor
+                want to make it permanent, that&apos;s between you and them.
+                We&apos;re not in the middle.
               </p>
-              <button
-                onClick={onContact}
-                className="mt-6 inline-flex items-center justify-center gap-2 px-5 py-3 rounded-full bg-electric text-ink text-sm font-semibold hover:bg-bone transition-colors"
-                data-hover
-              >
-                Talk to us
-                <span aria-hidden>→</span>
-              </button>
             </div>
+            <button
+              onClick={onContact}
+              className="shrink-0 inline-flex items-center justify-center gap-2 px-5 py-3 rounded-full bg-ocean text-white text-sm font-semibold hover:bg-ink transition-colors"
+              data-hover
+            >
+              Talk to us
+              <span aria-hidden>→</span>
+            </button>
           </div>
         </motion.div>
       </div>

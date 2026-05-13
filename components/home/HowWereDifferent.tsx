@@ -27,7 +27,7 @@ export default function HowWereDifferent() {
         <FlowDiagram />
 
         <div className="text-center mt-16 md:mt-24 mb-10 md:mb-14">
-          <h2 className="display text-[clamp(28px,4.5vw,56px)] leading-[1.0]">
+          <h2 className="display text-[clamp(28px,4.5vw,52px)] leading-[1.05]">
             The way locuming{" "}
             <span className="italic text-ocean">should work</span>.
           </h2>

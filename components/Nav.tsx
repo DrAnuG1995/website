@@ -49,7 +49,7 @@ export default function Nav() {
         initial={{ maxWidth: 1280 }}
         animate={{ maxWidth: scrolled ? 880 : 1280 }}
         transition={{ duration: 0.5, ease: [0.2, 0.8, 0.2, 1] }}
-        className="flex items-center gap-2 md:gap-4 rounded-full bg-white/85 backdrop-blur-xl border border-ink/10 shadow-[0_10px_40px_-15px_rgba(26,26,46,0.18)] px-3 md:px-5 py-1.5 w-full"
+        className="relative flex items-center justify-between gap-2 md:gap-4 rounded-full bg-white/85 backdrop-blur-xl border border-ink/10 shadow-[0_10px_40px_-15px_rgba(26,26,46,0.18)] px-3 md:px-5 py-1.5 w-full"
       >
         {/* Logo — always visible */}
         <Link
@@ -66,8 +66,10 @@ export default function Nav() {
           />
         </Link>
 
-        {/* Desktop menu — center-grows, hidden on mobile */}
-        <div className="hidden md:flex items-center gap-5 lg:gap-7 flex-1 justify-center text-sm font-semibold">
+        {/* Desktop menu — absolutely centered to the nav pill so the
+            center of the link cluster matches the pill's horizontal
+            center, regardless of how wide the logo or right-group are. */}
+        <div className="hidden md:flex items-center gap-5 lg:gap-7 text-sm font-semibold absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
           {NAV_LINKS.map((link) => (
             <Link
               key={link.href}
@@ -84,10 +86,6 @@ export default function Nav() {
             </Link>
           ))}
         </div>
-
-        {/* Spacer to push the right group to the edge on mobile (where the
-            center menu is hidden). */}
-        <div className="md:hidden flex-1" />
 
         {/* Right group: Log in (desktop) + Download */}
         <div className="flex items-center gap-1 md:gap-2 shrink-0">
