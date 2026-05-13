@@ -15,7 +15,10 @@ type Perk = {
   brand: string;
   category: "Finance" | "Compliance" | "Career";
   blurb: string;
-  value: string; // the actual member benefit
+  // The actual SD-specific member offer. Null when the partnership is a
+  // curated relationship without a dedicated discount/perk — the card
+  // hides the offer slate in that case and shows only the description.
+  value: string | null;
   accent: "ocean" | "electric" | "leaf";
   // Outbound URL to the partner's website. Cards are wrapped in an
   // anchor so doctors can click straight through. Links taken directly
@@ -26,12 +29,18 @@ type Perk = {
   logo: string;
 };
 
+// Descriptive blurbs lifted from the live statdoctor.app/partners page so
+// the per-card copy reads consistently with the existing brand pages.
+// Member perks are only shown when the partner has a genuine SD-specific
+// offer — CPD Home gives a 10% AMA discount today; everyone else is just
+// a curated partner relationship (value = null → perk slate hidden).
 const PERKS: Perk[] = [
   {
     brand: "Hnry",
     category: "Finance",
-    blurb: "All-in-one tax, invoicing, and accounting for sole-trader doctors.",
-    value: "First month free + priority onboarding",
+    blurb:
+      "Hnry simplifies finances for independent doctors. Tax, GST, invoicing, and compliance are handled automatically in real time. No spreadsheets or surprises — just clear insight into what you earn and owe, so you can focus on your work, not admin.",
+    value: null,
     accent: "ocean",
     href: "https://hnry.com.au/",
     logo: "https://cdn.prod.website-files.com/68dfbc30660b4fef0269fe47/696f628eb419d93c7b03ea7e_HNRY-img.png",
@@ -39,8 +48,9 @@ const PERKS: Perk[] = [
   {
     brand: "Acceptance Finance",
     category: "Finance",
-    blurb: "Mortgage broking and lending built around medical professionals.",
-    value: "No-fee broker review for SD members",
+    blurb:
+      "Acceptance Finance is a Melbourne-based mortgage broker helping clients across Australia. They compare lenders to secure the right loan for homes, investments, SMSFs, refinancing, and more — managing the entire process from application to approval.",
+    value: null,
     accent: "ocean",
     href: "https://www.acceptancefinance.com.au/",
     logo: "https://cdn.prod.website-files.com/68dfbc30660b4fef0269fe47/696f62a5721564e39d24f18f_Acceptance-Finance.png",
@@ -48,8 +58,9 @@ const PERKS: Perk[] = [
   {
     brand: "By Invite Finance",
     category: "Finance",
-    blurb: "Bespoke financing tailored for doctors at every career stage.",
-    value: "Dedicated SD doctor concierge",
+    blurb:
+      "By Invite Finance creates tailored lending solutions for locum doctors. With deep knowledge of locum income and lending structures, they manage the process end-to-end — helping with home purchases, investments, clinics, and SMSF property finance.",
+    value: null,
     accent: "ocean",
     href: "https://byinvitefinance.com.au/",
     logo: "https://cdn.prod.website-files.com/68dfbc30660b4fef0269fe47/69810cc5f360268b2d220e80_BI_LOGO_.png",
@@ -57,8 +68,9 @@ const PERKS: Perk[] = [
   {
     brand: "CPD Home",
     category: "Compliance",
-    blurb: "CPD tracking integrated with the College frameworks.",
-    value: "Complimentary first-year membership",
+    blurb:
+      "CPD Home provides practical, high-quality CPD designed for real medical practice. From mandatory requirements to lifelong learning, it supports how doctors actually work — with relevant education that fits into busy professional lives.",
+    value: "Get 10% off CPD Home AMA",
     accent: "leaf",
     href: "https://www.cpdhome.org.au/",
     logo: "https://cdn.prod.website-files.com/68dfbc30660b4fef0269fe47/696f6471905de39418bb2920_CPD-Home.png",
@@ -66,8 +78,9 @@ const PERKS: Perk[] = [
   {
     brand: "Validex",
     category: "Compliance",
-    blurb: "Continuous credential verification and AHPRA monitoring.",
-    value: "Free credential audit for SD doctors",
+    blurb:
+      "Validex provides national criminal history checks for doctors, nurses, allied health, and aged care workers. Identity is verified digitally using government document validation and live facial matching through TrueVault.",
+    value: null,
     accent: "leaf",
     href: "https://validex.com.au/medical.html?utm_source=statdoctor&utm_medium=referral&utm_campaign=medical_checks",
     logo: "https://cdn.prod.website-files.com/68dfbc30660b4fef0269fe47/69b3e148ccb2494596b44ad9_img-26420503-deff-4423-a6d8-94bcee10777c%20(1).png",
@@ -75,8 +88,9 @@ const PERKS: Perk[] = [
   {
     brand: "Milford Specialist Recruitment",
     category: "Career",
-    blurb: "Permanent specialist placements that complement locum work.",
-    value: "Priority placement queue for SD members",
+    blurb:
+      "Milford Specialist Recruitment focuses on permanent doctor placements across New Zealand. Their approach is personal and thoughtful, built on honest conversations, careful matching, and long-term relationships — not mass placements or pressure tactics.",
+    value: null,
     accent: "electric",
     href: "https://www.milfordspecialistrecruitment.com/",
     logo: "https://cdn.prod.website-files.com/68dfbc30660b4fef0269fe47/696f63cc4192740a9a92bd6f_Milford-Specialist.png",
@@ -246,14 +260,16 @@ function PerkCard({ perk, delay }: { perk: Perk; delay: number }) {
       <p className="text-[13px] md:text-[14px] text-muted leading-relaxed mb-5">
         {perk.blurb}
       </p>
-      <div className="mt-auto rounded-2xl bg-white border border-ink/10 px-4 py-3.5">
-        <div className="text-[10px] tracking-[0.2em] uppercase text-muted mb-1">
-          Member perk
+      {perk.value && (
+        <div className="mt-auto rounded-2xl bg-white border border-ink/10 px-4 py-3.5">
+          <div className="text-[10px] tracking-[0.2em] uppercase text-muted mb-1">
+            Member perk
+          </div>
+          <div className="text-[14px] md:text-[15px] text-ink font-medium leading-snug">
+            {perk.value}
+          </div>
         </div>
-        <div className="text-[14px] md:text-[15px] text-ink font-medium leading-snug">
-          {perk.value}
-        </div>
-      </div>
+      )}
 
       {/* Visit-link affordance — small arrow row at the bottom that
           telegraphs the whole card is clickable without competing with
