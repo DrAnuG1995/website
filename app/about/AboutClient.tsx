@@ -78,8 +78,8 @@ function Hero() {
         >
           <div className="relative aspect-[5/6] md:aspect-[4/5] lg:min-h-[640px] rounded-3xl overflow-hidden bg-lavender border border-ocean/10">
             <Image
-              src="/author-anu.png"
-              alt="Dr Anu, founder of StatDoctor"
+              src="/author-anu-speaking.png"
+              alt="Dr Anu, founder of StatDoctor, speaking on stage"
               fill
               priority
               sizes="(max-width: 768px) 100vw, 60vw"
