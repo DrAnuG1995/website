@@ -19,6 +19,7 @@ export default function AboutClient() {
     <div className="bg-white text-ink">
       <Hero />
       <Story />
+      <TravelAgentParallel />
       <PullQuote />
       <Closing />
     </div>
@@ -149,6 +150,56 @@ function Story() {
             </div>
           </motion.div>
         ))}
+      </div>
+    </section>
+  );
+}
+
+/* ---------- TRAVEL-AGENT PARALLEL ----------
+   A short thesis interlude between the personal Story and the
+   founder PullQuote. Re-uses the chapter grid (eyebrow column left,
+   body column right) so it feels of-a-piece with the chapters, but
+   the eyebrow signals "argument, not narrative". */
+function TravelAgentParallel() {
+  return (
+    <section className="relative bg-white py-12 md:py-16 px-6">
+      <div className="max-w-[1100px] mx-auto">
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-100px" }}
+          transition={{ duration: 0.9, ease: [0.2, 0.8, 0.2, 1] }}
+          className="grid md:grid-cols-[0.8fr_1.2fr] gap-6 md:gap-12 items-start"
+        >
+          <div className="md:sticky md:top-32">
+            <div className="text-[10px] tracking-[0.22em] uppercase text-muted">
+              The parallel
+            </div>
+            <div className="mt-2 text-[11px] tracking-[0.18em] uppercase text-muted/60">
+              Why now
+            </div>
+          </div>
+          <div>
+            <h2 className="display text-[clamp(28px,4vw,52px)] leading-[1.05]">
+              Nobody books a flight through a{" "}
+              <span className="italic text-ocean">travel agent</span> anymore.
+            </h2>
+            <p className="mt-5 text-muted text-[15px] md:text-[17px] leading-relaxed max-w-prose">
+              You open the airline app, pick the seat, pay the fare. The
+              middleman existed because flight schedules and fares used to
+              live in a back office. Once the information moved onto a phone,
+              the agent&apos;s only remaining job was collecting a margin for
+              connecting two parties who could now find each other in one tap.
+            </p>
+            <p className="mt-4 text-muted text-[15px] md:text-[17px] leading-relaxed max-w-prose">
+              Locum work was the last holdout. There&apos;s no good reason for
+              an agency to sit between a doctor and a hospital that both want
+              the same thing on the same Wednesday night. The shift is on a
+              phone. So is the contract. So is the credential. The middleman
+              is just the friction.
+            </p>
+          </div>
+        </motion.div>
       </div>
     </section>
   );
