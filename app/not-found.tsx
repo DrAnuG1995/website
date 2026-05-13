@@ -51,9 +51,9 @@ export default function NotFound() {
           >
             <div
               className="display leading-none text-ink select-none"
-              style={{ fontSize: "clamp(120px, 22vw, 280px)" }}
+              style={{ fontSize: "clamp(80px, 14vw, 180px)" }}
             >
-              <span className="italic text-ocean">lost</span>
+              <span className="italic text-ocean">soon</span>
               <span className="text-ink">.</span>
             </div>
           </motion.div>
