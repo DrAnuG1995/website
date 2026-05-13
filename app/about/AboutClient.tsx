@@ -164,7 +164,7 @@ function Story() {
       eyebrow: "Chapter 02 · The lawsuit",
       head: "Then they sued me for staying.",
       body:
-        "Seven months after a one-off locum shift at a regional hospital, the team asked me to stay on. We both wanted it. They wanted continuity of care. I wanted to belong somewhere again.\n\nThe agency that had originally placed me, who had not been part of any of the seven months in between, sent a lawyer's letter demanding a buy-out fee. Twenty-five percent of my first-year salary. Three months of pay. For making the introduction once, half a year earlier.\n\nI paid the lawyers. I wrote the cheque. And I went home and started building.",
+        "Seven months after a one-off locum shift at a regional hospital, the team asked me to stay on. We both wanted it. They wanted continuity of care. I wanted to belong somewhere again.\n\nThe agency that had originally placed me, who had not been part of any of the seven months in between, sent a lawyer's letter demanding a buy-out fee. Twenty-five percent of my first-year salary. Three months of pay. For making the introduction once, half a year earlier.\n\nI ignored the letter. I kept working. So the agency went after the hospital instead. The hospital paid the buy-out fee just to make it stop. That was the moment I saw the problem clearly, and decided to do something about it.",
     },
     {
       eyebrow: "Chapter 03 · The build",
