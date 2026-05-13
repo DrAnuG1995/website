@@ -201,17 +201,31 @@ function FounderVideo() {
               {muted ? "Tap for sound" : "Sound on"}
             </button>
 
-            {/* Founder credit */}
+            {/* Founder credit — desktop only inside the video frame.
+                On mobile it would collide with the sound toggle, so we
+                render a mobile-only version below the frame. */}
             <a
               href="https://www.linkedin.com/in/dr-anu-g-%F0%9F%A9%BA-3b330a248/"
               target="_blank"
               rel="noopener noreferrer"
-              className="absolute bottom-4 left-4 md:bottom-5 md:left-5 px-3.5 py-2 rounded-full bg-white/90 backdrop-blur-md border border-ink/10 text-[12px] font-medium hover:bg-white hover:text-ocean transition-colors inline-flex items-center"
+              className="hidden md:inline-flex absolute md:bottom-5 md:left-5 px-3.5 py-2 rounded-full bg-white/90 backdrop-blur-md border border-ink/10 text-[12px] font-medium hover:bg-white hover:text-ocean transition-colors items-center"
               data-hover
             >
               Dr Anu, CEO &amp; Founder StatDoctor
             </a>
           </div>
+
+          {/* Mobile founder credit — sits below the video so the sound
+              toggle inside the frame doesn't collide with the name pill. */}
+          <a
+            href="https://www.linkedin.com/in/dr-anu-g-%F0%9F%A9%BA-3b330a248/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="md:hidden mt-3 inline-flex items-center justify-center text-[12px] font-medium text-muted hover:text-ocean transition-colors w-full"
+            data-hover
+          >
+            Dr Anu, CEO &amp; Founder StatDoctor
+          </a>
         </div>
       </div>
     </section>
@@ -353,25 +367,31 @@ function DoctorVoicesPinned() {
         </motion.div>
       </div>
 
-      {/* Mobile: single vertical-rolling column — auto-scrolls every
-          testimonial through the viewport showing ~1-2 cards at a time. */}
-      <div className="md:hidden relative max-w-[1280px] mx-auto h-[440px] overflow-hidden">
-        <div
-          aria-hidden
-          className="absolute inset-x-0 top-0 h-16 z-10 pointer-events-none"
-          style={{ background: "linear-gradient(to bottom, white, transparent)" }}
-        />
-        <div
-          aria-hidden
-          className="absolute inset-x-0 bottom-0 h-16 z-10 pointer-events-none"
-          style={{ background: "linear-gradient(to top, white, transparent)" }}
-        />
-        <TestimonialColumn
-          cards={DOCTORS}
-          direction="up"
-          duration={48}
-          paused={!inView}
-        />
+      {/* Mobile: single horizontal-rolling row — one card visible at a
+          time, marquees right-to-left. The marquee-mask class handles
+          the left/right fade. */}
+      <div className="md:hidden relative -mx-6">
+        <div className="marquee-mask">
+          <div
+            className="flex w-max gap-4 px-6"
+            style={{
+              animation: "scrollRowLeft 56s linear infinite",
+              animationPlayState: inView ? "running" : "paused",
+            }}
+          >
+            {[...DOCTORS, ...DOCTORS].map((d, i) => (
+              <div key={i} className="w-[280px] shrink-0">
+                <TestimonialCard d={d} />
+              </div>
+            ))}
+          </div>
+        </div>
+        <style jsx>{`
+          @keyframes scrollRowLeft {
+            from { transform: translateX(0); }
+            to   { transform: translateX(-50%); }
+          }
+        `}</style>
       </div>
 
       {/* Desktop: three auto-scrolling columns with fade masks. */}

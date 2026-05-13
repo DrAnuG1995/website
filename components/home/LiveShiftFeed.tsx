@@ -246,48 +246,39 @@ export default function LiveShiftFeed({ initialShifts }: { initialShifts: LiveSh
                       )}
                     </div>
 
-                    {/* Info column. On mobile the rate sits inline with the
-                        role pill on row 2; on desktop it lifts out into its
-                        own aligned column to the right. */}
+                    {/* Info column. On mobile we drop the state mini-chip
+                        (most hospital names include the city anyway) so the
+                        hospital name + role pill have room to breathe. */}
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center gap-2 mb-1">
                         <div className="text-[13px] md:text-[14px] font-semibold text-ink truncate flex-1 min-w-0">
                           {item.hospital}
                         </div>
-                        <span className="text-[10px] text-muted shrink-0 w-9 md:w-10 text-right tracking-[0.18em] uppercase font-semibold">
+                        <span className="hidden md:inline text-[10px] text-muted shrink-0 w-10 text-right tracking-[0.18em] uppercase font-semibold">
                           {item.state || "-"}
                         </span>
                       </div>
-                      <div className="flex items-center gap-2 text-[11px] md:text-[12px]">
-                        <span
-                          className={`inline-flex items-center px-2 py-0.5 rounded-full ${ACCENT_TAG[item.accent]} text-[9px] md:text-[10px] tracking-[0.18em] uppercase font-semibold truncate max-w-[60%] md:max-w-none`}
-                        >
-                          {item.role}
-                        </span>
-                        {/* Rate appears inline only on mobile; desktop uses
-                            the dedicated rate column further right. */}
-                        <span className="md:hidden display text-[13px] text-ink leading-none tabular-nums ml-auto pr-1">
-                          {item.rate}
-                        </span>
-                      </div>
-                    </div>
-
-                    {/* Desktop-only rate column so $250/hr, $200/hr etc. all
-                        line up regardless of role pill length. */}
-                    <div className="hidden md:block shrink-0 text-right min-w-[78px]">
-                      <span className="display text-[16px] text-ink leading-none tabular-nums">
-                        {item.rate}
+                      <span
+                        className={`inline-flex items-center px-2 py-0.5 rounded-full ${ACCENT_TAG[item.accent]} text-[9px] md:text-[10px] tracking-[0.18em] uppercase font-semibold max-w-full truncate`}
+                      >
+                        {item.role}
                       </span>
                     </div>
 
-                    <div className="text-right shrink-0 flex flex-col items-end gap-1 min-w-[78px] md:min-w-[120px]">
+                    {/* Rate + time-ago stack — mobile and desktop share this
+                        column. Rate above, smaller time-ago/posted chip
+                        below, both right-aligned for clean rhythm. */}
+                    <div className="shrink-0 text-right flex flex-col items-end gap-1.5 min-w-[78px] md:min-w-[120px]">
+                      <span className="display text-[15px] md:text-[16px] text-ink leading-none tabular-nums">
+                        {item.rate}
+                      </span>
                       {item.variant === "upcoming" ? (
-                        <span className="inline-flex items-center gap-1 md:gap-1.5 px-1.5 md:px-2 py-1 rounded-full bg-ocean/10 text-ocean text-[8px] md:text-[9px] tracking-[0.18em] uppercase font-bold whitespace-nowrap">
+                        <span className="inline-flex items-center gap-1 md:gap-1.5 px-1.5 md:px-2 py-0.5 md:py-1 rounded-full bg-ocean/10 text-ocean text-[8px] md:text-[9px] tracking-[0.18em] uppercase font-bold whitespace-nowrap">
                           <span className="w-1.5 h-1.5 rounded-full bg-ocean" />
                           <span className="hidden md:inline">Starts </span>{displayWhen(item, now)}
                         </span>
                       ) : i === 0 ? (
-                        <span className="inline-flex items-center gap-1 md:gap-1.5 px-1.5 md:px-2 py-1 rounded-full bg-electric text-ink text-[8px] md:text-[9px] tracking-[0.18em] uppercase font-bold whitespace-nowrap">
+                        <span className="inline-flex items-center gap-1 md:gap-1.5 px-1.5 md:px-2 py-0.5 md:py-1 rounded-full bg-electric text-ink text-[8px] md:text-[9px] tracking-[0.18em] uppercase font-bold whitespace-nowrap">
                           <span className={`w-1.5 h-1.5 rounded-full ${ACCENT_DOT[item.accent]}`} />
                           <span className="hidden md:inline">Just </span>posted
                         </span>
