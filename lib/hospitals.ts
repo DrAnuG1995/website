@@ -63,9 +63,20 @@ export async function fetchActiveHospitals(): Promise<MapHospital[]> {
     }
 
     if (error || !data) return [];
-    return data.filter(
+    const withCoords = data.filter(
       (h): h is MapHospital => typeof h.latitude === "number" && typeof h.longitude === "number",
     );
+    // Dedupe duplicate CRM rows that point at the same physical
+    // hospital, keyed by normaliseHospitalKey so trailing-punctuation
+    // variants ("Echuca Regional Health" vs "Echuca Regional Health.")
+    // collapse to one row. First occurrence wins.
+    const seen = new Set<string>();
+    return withCoords.filter((h) => {
+      const key = normaliseHospitalKey(h.name);
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    });
   } catch {
     return [];
   }
@@ -97,7 +108,17 @@ export async function fetchActiveShiftCounts(): Promise<Record<string, number>> 
 }
 
 export function normaliseHospitalKey(name: string): string {
-  return name.toLowerCase().trim().replace(/\s+/g, " ");
+  return name
+    .toLowerCase()
+    .trim()
+    .replace(/\s+/g, " ")
+    // Strip trailing punctuation (periods, commas) so a CRM row like
+    // "Echuca Regional Health." matches shifts saved under "Echuca
+    // Regional Health". Duplicate hospital rows with/without a trailing
+    // dot were causing pins to show "No live shifts" even when the
+    // counterpart row's name had matching active shifts.
+    .replace(/[.,!?;:]+$/, "")
+    .trim();
 }
 
 export type AusState = "VIC" | "NSW" | "QLD" | "WA" | "SA" | "TAS" | "ACT" | "NT";
