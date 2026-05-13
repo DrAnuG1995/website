@@ -62,7 +62,7 @@ function Hero() {
           backgroundSize: "200% 200%",
         }}
       />
-      <div className="relative max-w-[1320px] mx-auto grid md:grid-cols-[0.85fr_1.15fr] gap-10 md:gap-14 items-center">
+      <div className="relative max-w-[1320px] mx-auto grid md:grid-cols-[1.15fr_0.85fr] gap-10 md:gap-14 items-center">
         <motion.div
           initial="hidden"
           animate="visible"
@@ -119,7 +119,7 @@ function Hero() {
           style={{ y: portraitY, scale: portraitScale }}
           className="relative"
         >
-          <div className="relative aspect-[5/6] md:aspect-[4/5] lg:min-h-[640px] rounded-3xl overflow-hidden bg-lavender border border-ocean/10">
+          <div className="relative aspect-[5/6] md:aspect-[4/5] max-w-[440px] mx-auto md:mx-0 md:ml-auto rounded-3xl overflow-hidden bg-lavender border border-ocean/10">
             <Image
               src="/author-anu-speaking.png"
               alt="Dr Anu, founder of StatDoctor, speaking on stage"
@@ -458,7 +458,7 @@ function Closing() {
             variants={pullQuoteBeat}
             className="mt-6 text-ink/70 max-w-md text-[15px] md:text-[17px] leading-relaxed"
           >
-            Doctor, hospital, partner, investor, or just curious —
+            Doctor, hospital, partner, investor, or just curious.
             I read every message myself.
           </motion.p>
 
