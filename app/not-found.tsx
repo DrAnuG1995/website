@@ -62,16 +62,15 @@ export default function NotFound() {
             variants={beat}
             className="display text-[clamp(28px,4.5vw,56px)] leading-[1.02] max-w-2xl mx-auto"
           >
-            This page didn&apos;t make rounds.
+            This page is still in progress.
           </motion.h1>
 
           <motion.p
             variants={beat}
             className="mt-6 text-ink/70 max-w-xl mx-auto text-[15px] md:text-[17px] leading-relaxed"
           >
-            The page you were after isn&apos;t at this URL. It may have been
-            moved, retired, or never existed. Head back to the homepage and
-            we&apos;ll get you where you need to be.
+            We&apos;re building it. Head back to the homepage in the
+            meantime, and check in soon.
           </motion.p>
 
           <motion.div
