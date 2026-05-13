@@ -15,6 +15,10 @@ type Perk = {
   brand: string;
   category: "Finance" | "Compliance" | "Career";
   blurb: string;
+  // Optional SD-specific member offer. Only shown when present. Today
+  // CPD Home is the only partner with an offer; the rest are curated
+  // relationships without a discount code.
+  value?: string;
   accent: "ocean" | "electric" | "leaf";
   // Outbound URL to the partner's website. Cards are wrapped in an
   // anchor so doctors can click straight through. Links taken directly
@@ -60,6 +64,7 @@ const PERKS: Perk[] = [
     category: "Compliance",
     blurb:
       "CPD Home provides practical, high-quality CPD designed for real medical practice. From mandatory requirements to lifelong learning, it supports how doctors actually work, with relevant education that fits into busy professional lives.",
+    value: "Get 10% off AMA CPD Home by using code SD 10",
     accent: "leaf",
     href: "https://www.cpdhome.org.au/",
     logo: "https://cdn.prod.website-files.com/68dfbc30660b4fef0269fe47/696f6471905de39418bb2920_CPD-Home.png",
@@ -248,10 +253,23 @@ function PerkCard({ perk, delay }: { perk: Perk; delay: number }) {
         {perk.blurb}
       </p>
 
-      {/* Visit-link affordance — small arrow row at the bottom that
+      {/* Member-perk slate. Rendered only for partners with a real SD
+          offer (today: CPD Home). */}
+      {perk.value && (
+        <div className="mb-4 rounded-2xl bg-white border border-ink/10 px-4 py-3.5">
+          <div className="text-[10px] tracking-[0.2em] uppercase text-muted mb-1">
+            Member perk
+          </div>
+          <div className="text-[14px] md:text-[15px] text-ink font-medium leading-snug">
+            {perk.value}
+          </div>
+        </div>
+      )}
+
+      {/* Visit-link affordance: small arrow row at the bottom that
           telegraphs the whole card is clickable without competing with
           the perk value. */}
-      <div className="mt-4 inline-flex items-center gap-1.5 text-[11px] tracking-[0.18em] uppercase font-semibold text-muted group-hover:text-ocean transition-colors">
+      <div className="inline-flex items-center gap-1.5 text-[11px] tracking-[0.18em] uppercase font-semibold text-muted group-hover:text-ocean transition-colors">
         Visit
         <span aria-hidden className="transition-transform group-hover:translate-x-0.5">
           →
