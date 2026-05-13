@@ -308,70 +308,209 @@ function TravelAgentParallel() {
 /* ---------- PULL QUOTE ---------- */
 function PullQuote() {
   return (
-    <section className="relative bg-white py-12 md:py-16 px-6">
-      <div className="max-w-[1100px] mx-auto">
-        <motion.blockquote
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
+    <section className="relative bg-white py-24 md:py-36 px-6 overflow-hidden border-t border-b border-ink/10">
+      {/* Ambient ocean-soft wash so the section reads as its own beat
+          without needing the heavy lavender card. */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 opacity-60"
+        style={{
+          background:
+            "radial-gradient(45% 60% at 15% 30%, rgba(123,123,244,0.18), transparent 70%), radial-gradient(40% 60% at 85% 80%, rgba(205,227,93,0.14), transparent 70%)",
+        }}
+      />
+
+      <div className="relative max-w-[1200px] mx-auto">
+        {/* Oversized italic Cormorant quotation mark as a watermark
+            behind the quote. Scales with vw so it dominates on desktop
+            but never overflows mobile. */}
+        <motion.span
+          aria-hidden
+          initial={{ opacity: 0, scale: 0.92 }}
+          whileInView={{ opacity: 1, scale: 1 }}
           viewport={{ once: true, margin: "-100px" }}
-          transition={{ duration: 0.9, ease: [0.2, 0.8, 0.2, 1] }}
-          className="rounded-3xl bg-lavender border border-ocean/10 px-8 md:px-14 py-12 md:py-16"
+          transition={{ duration: 1.2, ease: [0.2, 0.8, 0.2, 1] }}
+          className="display italic absolute -top-6 md:-top-16 -left-2 md:-left-6 select-none leading-none text-ocean/[0.14]"
+          style={{ fontSize: "clamp(200px, 32vw, 460px)" }}
         >
-          <div className="text-[10px] tracking-[0.22em] uppercase text-muted mb-5">
-            The why
+          &ldquo;
+        </motion.span>
+
+        <motion.blockquote
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: "-100px" }}
+          variants={{
+            hidden: {},
+            visible: { transition: { staggerChildren: 0.12, delayChildren: 0.15 } },
+          }}
+          className="relative grid md:grid-cols-[1.4fr_1fr] gap-10 md:gap-16 items-center"
+        >
+          <div>
+            <motion.div
+              variants={pullQuoteBeat}
+              className="text-[10px] tracking-[0.22em] uppercase text-muted mb-6 inline-flex items-center gap-2"
+            >
+              <span className="w-1.5 h-1.5 rounded-full bg-ocean" />
+              The why
+            </motion.div>
+
+            <motion.p
+              variants={pullQuoteBeat}
+              className="display text-[clamp(28px,3.8vw,54px)] leading-[1.08] max-w-[22ch] text-ink"
+            >
+              No agencies. Zero commission. Doctors keep every dollar.
+              <span className="block mt-4 italic text-ink/85">
+                That isn&apos;t a feature.
+              </span>
+              <span className="block italic text-ocean">
+                It&apos;s the whole point.
+              </span>
+            </motion.p>
+
+            <motion.footer
+              variants={pullQuoteBeat}
+              className="mt-10 text-[11px] tracking-[0.22em] uppercase text-muted flex items-center gap-3"
+            >
+              <span className="h-px w-10 bg-ink/30" />
+              Dr Anu  ·  Founder
+            </motion.footer>
           </div>
-          <p className="display text-[clamp(26px,3.5vw,46px)] leading-[1.15]">
-            “No agencies. Zero commission. Doctors keep{" "}
-            <span className="italic text-ocean">100%</span>. That isn&apos;t a
-            feature, it&apos;s the whole point.”
-          </p>
-          <footer className="mt-6 text-[11px] tracking-[0.22em] uppercase text-muted">
-            Dr Anu, Founder
-          </footer>
+
+          {/* Hero "100%" pulled out as the right-column display
+              number — the figure becomes the visual anchor instead of
+              sitting buried in the quote text. */}
+          <motion.div
+            variants={pullQuoteBeat}
+            className="relative md:justify-self-end text-left md:text-right"
+          >
+            <div
+              className="display italic text-ocean leading-none tabular-nums select-none"
+              style={{ fontSize: "clamp(64px, 9vw, 120px)" }}
+            >
+              100<span className="not-italic text-ink/35">%</span>
+            </div>
+            <div className="mt-3 text-[10px] tracking-[0.22em] uppercase text-muted">
+              To the doctor, every time
+            </div>
+          </motion.div>
         </motion.blockquote>
       </div>
     </section>
   );
 }
 
-/* ---------- CLOSING CTA ---------- */
+const pullQuoteBeat = {
+  hidden: { opacity: 0, y: 24 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.8, ease: [0.2, 0.8, 0.2, 1] },
+  },
+};
+
+/* ---------- CLOSING CTA ----------
+   Personal founder sign-off. Treats the end of the essay like the
+   end of a letter — italic signature, real email shown, one CTA.
+   Drops the generic three-button cluster from the previous version
+   in favour of a more human, less "marketing footer" feel. */
 function Closing() {
   return (
-    <section className="relative bg-white">
-      <div className="relative max-w-[1100px] mx-auto px-6 py-16 md:py-20 text-center">
-        <h2 className="display text-[clamp(28px,4.5vw,56px)] leading-[1.0] max-w-3xl mx-auto">
-          Want to{" "}
-          <span className="italic text-ocean">talk</span>?
-        </h2>
-        <p className="mt-4 text-muted max-w-xl mx-auto text-[14px] md:text-[15px] leading-relaxed">
-          Doctor, hospital, partner, investor, or just curious. I read every
-          message.
-        </p>
-        <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3">
-          <Link
-            href="/for-doctors"
-            className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-full bg-electric text-ink text-sm font-semibold hover:bg-ocean hover:text-white transition-colors"
-            data-hover
+    <section className="relative bg-white overflow-hidden">
+      {/* Faint accent wash, anchored low-left so the signature reads
+          against a warmer background than pure white. */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 opacity-70"
+        style={{
+          background:
+            "radial-gradient(45% 65% at 12% 80%, rgba(123,123,244,0.15), transparent 70%)",
+        }}
+      />
+
+      <div className="relative max-w-[1100px] mx-auto px-6 py-20 md:py-28 grid md:grid-cols-[1fr_auto] gap-10 md:gap-16 items-end">
+        <motion.div
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: "-100px" }}
+          variants={{
+            hidden: {},
+            visible: { transition: { staggerChildren: 0.12, delayChildren: 0.1 } },
+          }}
+        >
+          <motion.div
+            variants={pullQuoteBeat}
+            className="text-[10px] tracking-[0.22em] uppercase text-muted mb-5 inline-flex items-center gap-2"
           >
-            Join as a doctor →
-          </Link>
-          <Link
-            href="/contact"
-            className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-full border border-ink/20 text-ink text-sm font-medium hover:bg-ink hover:text-white transition-colors"
-            data-hover
+            <span className="w-1.5 h-1.5 rounded-full bg-ocean" />
+            A note from the founder
+          </motion.div>
+
+          <motion.p
+            variants={pullQuoteBeat}
+            className="display text-[clamp(28px,3.8vw,52px)] leading-[1.05] max-w-[22ch] text-ink"
           >
-            Talk to me
-          </Link>
-          <a
-            href="https://www.linkedin.com/in/dr-anu-g-%F0%9F%A9%BA-3b330a248/"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-full text-ink/70 text-sm font-medium hover:text-ocean transition-colors"
-            data-hover
+            If you&apos;ve read this far,{" "}
+            <span className="italic text-ocean">let&apos;s talk</span>.
+          </motion.p>
+
+          <motion.p
+            variants={pullQuoteBeat}
+            className="mt-6 text-ink/70 max-w-md text-[15px] md:text-[17px] leading-relaxed"
           >
-            LinkedIn ↗
-          </a>
-        </div>
+            Doctor, hospital, partner, investor, or just curious —
+            I read every message myself.
+          </motion.p>
+
+          <motion.div
+            variants={pullQuoteBeat}
+            className="mt-8 flex flex-wrap items-center gap-x-6 gap-y-3"
+          >
+            <a
+              href="mailto:anu@statdoctor.net?subject=Hi%20Anu"
+              className="group inline-flex items-center gap-2 text-[15px] md:text-[16px] font-medium text-ink hover:text-ocean transition-colors"
+              data-hover
+            >
+              <span className="underline underline-offset-[5px] decoration-ocean/40 group-hover:decoration-ocean transition-colors">
+                anu@statdoctor.net
+              </span>
+              <span aria-hidden className="transition-transform group-hover:translate-x-0.5">→</span>
+            </a>
+            <span aria-hidden className="hidden sm:inline w-px h-5 bg-ink/15" />
+            <a
+              href="https://www.linkedin.com/in/dr-anu-g-%F0%9F%A9%BA-3b330a248/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-[12px] tracking-[0.18em] uppercase text-ink/60 hover:text-ocean transition-colors inline-flex items-center gap-1.5"
+              data-hover
+            >
+              LinkedIn
+              <span aria-hidden>↗</span>
+            </a>
+          </motion.div>
+        </motion.div>
+
+        {/* Italic-script signature treatment. Big, hand-signed feel,
+            even with the existing serif — italic Cormorant at hero
+            scale next to a hairline rule. */}
+        <motion.div
+          initial={{ opacity: 0, y: 18 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-100px" }}
+          transition={{ duration: 1, delay: 0.4, ease: [0.2, 0.8, 0.2, 1] }}
+          className="relative md:justify-self-end text-left md:text-right"
+        >
+          <div
+            aria-hidden
+            className="display italic text-ink leading-none select-none"
+            style={{ fontSize: "clamp(40px, 5.5vw, 80px)" }}
+          >
+            Anu
+          </div>
+          <div className="mt-3 text-[10px] tracking-[0.22em] uppercase text-muted">
+            Founder &amp; CEO  ·  Brisbane
+          </div>
+        </motion.div>
       </div>
     </section>
   );
