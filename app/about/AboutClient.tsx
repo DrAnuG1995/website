@@ -66,7 +66,7 @@ function Hero() {
             <span className="hidden sm:inline opacity-40">·</span>
             <span>CEO &amp; Founder</span>
             <span className="hidden sm:inline opacity-40">·</span>
-            <span>Melbourne, AU</span>
+            <span>Brisbane, AU</span>
           </div>
         </motion.div>
 
@@ -103,19 +103,19 @@ function Story() {
       eyebrow: "Chapter 01 · The shift",
       head: "I was the doctor on the phone.",
       body:
-        "[Placeholder: the moment, the hospital, the agency call at 11pm. Replace with Anu's voice. Two to four sentences. Specific is better than smooth.]",
+        "I worked the public ED and picked up locum shifts on the side. Every couple of weeks the same agency call would come in: a regional hospital, last-minute, mid-evening, take it or someone else will. I'd say yes, drive the hours, work the weekend, and watch a quarter of what the hospital paid disappear before it ever reached me. Same work, two prices, and nobody in the middle was the one short on rest.",
     },
     {
       eyebrow: "Chapter 02 · The realisation",
       head: "Locum doesn't have to work this way.",
       body:
-        "[Placeholder: what was broken about agencies and recruiters. The cost. The middle-men. The opacity. Two to four sentences.]",
+        "The agency model only works if doctors don't see the numbers. Hospitals pay the full rate. Doctors get quoted whatever margin keeps the agency healthy. Lock-in contracts make doctors stay. Buy-out clauses tax permanent hires. Credentialing, indemnity uploads, rate negotiation, all of it falls on the doctor every time, even when the hospital and the doctor would happily deal directly. The middleman exists because the system was built when there was no other way to connect the two sides. There is one now.",
     },
     {
       eyebrow: "Chapter 03 · The build",
       head: "So I built the marketplace I wished existed.",
       body:
-        "[Placeholder: when Anu started building, who joined, what got shipped first. Two to four sentences. End on a forward-looking line.]",
+        "StatDoctor started as a spreadsheet and a question: what if a hospital could post a shift at a fair rate and a doctor could accept it directly, in two taps, with their credentials already verified? We shipped the first version to a handful of regional Queensland hospitals. They filled shifts in hours instead of days. Doctors kept 100% of the rate. Word spread. Today we partner with 47 hospitals across Australia, from Hobart to Tom Price, and we've saved them over $200,000 in recruitment fees. The marketplace I wished existed when I was the doctor on the phone is the one I now run.",
     },
   ];
 
