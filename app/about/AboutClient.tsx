@@ -115,7 +115,7 @@ function Story() {
       eyebrow: "Chapter 03 · The build",
       head: "So I built the marketplace I wished existed.",
       body:
-        "StatDoctor started as a spreadsheet and a question: what if a hospital could post a shift at a fair rate and a doctor could accept it directly, in two taps, with their credentials already verified? We shipped the first version to a handful of regional Queensland hospitals. They filled shifts in hours instead of days. Doctors kept 100% of the rate. Word spread. Today we partner with 47 hospitals across Australia, from Hobart to Tom Price, and we've saved them over $200,000 in recruitment fees. The marketplace I wished existed when I was the doctor on the phone is the one I now run.",
+        "StatDoctor started as a spreadsheet and a question: what if a hospital could post a shift at a fair rate and a doctor could accept it directly, in two taps, with their credentials already verified? In January 2025 we launched in Victoria with a handful of rural locum doctors and the hospitals that needed them most. Portland District Health was the first to post. A doctor accepted that same evening. Word spread. Today a team of three (me, Seif, and Prahlad) partners with 47 hospitals across Australia, from Hobart to Tom Price, and we've saved them over $200,000 in recruitment fees. The marketplace I wished existed when I was the doctor on the phone is the one I now run.",
     },
   ];
 
