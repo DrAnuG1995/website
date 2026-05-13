@@ -255,7 +255,7 @@ export default function LiveShiftFeed({ initialShifts }: { initialShifts: LiveSh
                           {item.hospital}
                         </div>
                         <span className="text-[10px] text-muted shrink-0 w-9 md:w-10 text-right tracking-[0.1em] uppercase font-semibold">
-                          {item.state || "—"}
+                          {item.state || "-"}
                         </span>
                       </div>
                       <div className="flex items-center gap-2 text-[11px] md:text-[12px]">

@@ -8,7 +8,7 @@ import {
 } from "@/lib/blog/posts";
 
 export const metadata = {
-  title: "Journal — StatDoctor",
+  title: "Journal, StatDoctor",
   description:
     "Reporting from the locum frontline: pay rates, AHPRA, hospital systems, and the working week of an Australian locum doctor.",
 };

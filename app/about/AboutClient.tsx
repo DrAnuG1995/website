@@ -53,7 +53,7 @@ function Hero() {
             for doctors.
           </h1>
           <p className="mt-6 text-muted max-w-xl text-[15px] md:text-[17px] leading-relaxed">
-            StatDoctor exists because the locum system was broken — and the
+            StatDoctor exists because the locum system was broken, and the
             person who built it has worked the shifts, made the phone calls,
             and lost the weekends to agency admin.
           </p>
@@ -103,19 +103,19 @@ function Story() {
       eyebrow: "Chapter 01 · The shift",
       head: "I was the doctor on the phone.",
       body:
-        "[Placeholder — the moment, the hospital, the agency call at 11pm. Replace with Anu's voice. Two to four sentences. Specific is better than smooth.]",
+        "[Placeholder: the moment, the hospital, the agency call at 11pm. Replace with Anu's voice. Two to four sentences. Specific is better than smooth.]",
     },
     {
       eyebrow: "Chapter 02 · The realisation",
       head: "Locum doesn't have to work this way.",
       body:
-        "[Placeholder — what was broken about agencies and recruiters. The cost. The middle-men. The opacity. Two to four sentences.]",
+        "[Placeholder: what was broken about agencies and recruiters. The cost. The middle-men. The opacity. Two to four sentences.]",
     },
     {
       eyebrow: "Chapter 03 · The build",
       head: "So I built the marketplace I wished existed.",
       body:
-        "[Placeholder — when Anu started building, who joined, what got shipped first. Two to four sentences. End on a forward-looking line.]",
+        "[Placeholder: when Anu started building, who joined, what got shipped first. Two to four sentences. End on a forward-looking line.]",
     },
   ];
 
@@ -172,10 +172,10 @@ function PullQuote() {
           <p className="display text-[clamp(26px,3.5vw,46px)] leading-[1.15]">
             “No agencies. Zero commission. Doctors keep{" "}
             <span className="italic text-ocean">100%</span>. That isn&apos;t a
-            feature — it&apos;s the whole point.”
+            feature, it&apos;s the whole point.”
           </p>
           <footer className="mt-6 text-[11px] tracking-[0.22em] uppercase text-muted">
-            — Dr Anu, Founder
+            Dr Anu, Founder
           </footer>
         </motion.blockquote>
       </div>
@@ -193,7 +193,7 @@ function Closing() {
           <span className="italic text-ocean">talk</span>?
         </h2>
         <p className="mt-4 text-muted max-w-xl mx-auto text-[14px] md:text-[15px] leading-relaxed">
-          Doctor, hospital, partner, investor, or just curious — I read every
+          Doctor, hospital, partner, investor, or just curious. I read every
           message.
         </p>
         <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3">

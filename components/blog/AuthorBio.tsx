@@ -4,7 +4,7 @@ export default function AuthorBio() {
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         src="/author-anu.png"
-        alt="Dr. Anu Ganugapati — Founder & CEO, StatDoctor"
+        alt="Dr. Anu Ganugapati, Founder & CEO, StatDoctor"
         width={96}
         height={96}
         className="author-bio-photo"

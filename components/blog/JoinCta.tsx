@@ -5,7 +5,7 @@ export default function JoinCta() {
       <p>
         StatDoctor connects hospitals and clinics with verified locum doctors
         across Australia. Streamlined onboarding, instant bookings, and
-        transparent rates — no middlemen.
+        transparent rates, no middlemen.
       </p>
       <div
         style={{
@@ -22,7 +22,7 @@ export default function JoinCta() {
           rel="noopener noreferrer"
           className="post-cta-btn"
         >
-          I&apos;m a Doctor — Find Shifts
+          I&apos;m a Doctor, Find Shifts
         </a>
         <a
           href="https://statdoctor.app"

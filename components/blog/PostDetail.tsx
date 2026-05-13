@@ -561,11 +561,11 @@ export default function PostDetail({
             <p>
               StatDoctor connects hospitals and clinics with verified locum
               doctors across Australia. Streamlined onboarding, instant
-              bookings, and transparent rates — no middlemen.
+              bookings, and transparent rates, no middlemen.
             </p>
             <div>
               <a href="https://statdoctor.app" className="post-cta-btn">
-                I&apos;m a Doctor — Find Shifts
+                I&apos;m a Doctor, Find Shifts
               </a>
               <a
                 href="https://statdoctor.app"
@@ -721,7 +721,7 @@ export default function PostDetail({
             if (ct === "news") {
               return (
                 <div className="mb-6 px-4 py-3 rounded-xl bg-ocean/5 border border-ocean/15 text-xs text-ink/70">
-                  <strong className="text-ink">Published {generated} — news cycle.</strong>{" "}
+                  <strong className="text-ink">Published {generated}, news cycle.</strong>{" "}
                   Confirm latest figures on AHPRA, Services Australia, or the cited primary source before acting.
                 </div>
               );
@@ -730,7 +730,7 @@ export default function PostDetail({
               return (
                 <div className="mb-6 px-4 py-3 rounded-xl bg-electric/15 border border-electric/30 text-xs text-ink/70">
                   <strong className="text-ink">Last reviewed: {generated}.</strong>{" "}
-                  Pay rates, AHPRA fees, and tax thresholds change — verify time-sensitive figures before relying on them.
+                  Pay rates, AHPRA fees, and tax thresholds change. Verify time-sensitive figures before relying on them.
                 </div>
               );
             }

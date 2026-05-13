@@ -6,7 +6,7 @@ export default function DisclaimerBanner() {
         <strong>Medical Disclaimer:</strong> This article is for general
         informational purposes only and does not constitute medical or legal
         advice. AHPRA registration requirements, Medicare billing rules, and
-        industrial award rates change regularly — always verify with{" "}
+        industrial award rates change regularly. Always verify with{" "}
         <a href="https://www.ahpra.gov.au" target="_blank" rel="noopener noreferrer">
           AHPRA
         </a>

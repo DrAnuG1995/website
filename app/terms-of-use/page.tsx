@@ -337,18 +337,18 @@ export default function Page() {
 
       <h2>14. General</h2>
       <p>
-        <strong>Assignment</strong> – Neither party may assign, encumber, declare a trust over, or otherwise
+        <strong>Assignment</strong>: Neither party may assign, encumber, declare a trust over, or otherwise
         create an interest in its rights in this Agreement without the other party&apos;s consent, which must not be
         unreasonably withheld.
       </p>
       <p>
-        <strong>Entire agreement</strong> – This Agreement, including the Medical Facility and Locum schedules,
+        <strong>Entire agreement</strong>: This Agreement, including the Medical Facility and Locum schedules,
         sets out all the parties&apos; rights and obligations relating to the subject matter of the Agreement, and it
         supersedes all previous agreements or understandings between the parties in connection with the relevant
         subject matter.
       </p>
       <p>
-        <strong>Event of Force Majeure</strong> – means an act of war (whether declared or not) or terrorism,
+        <strong>Event of Force Majeure</strong>: means an act of war (whether declared or not) or terrorism,
         the mobilisation of armed forces, civil commotion or riot, natural disaster, health epidemic, industrial
         action or labour disturbance, currency restriction, embargo, action or inaction by a government, a failure
         of a supplier, public utility or common carrier, or computer disruption due to the effects of a computer
@@ -357,12 +357,12 @@ export default function Page() {
         they are affected by an Event of Force Majeure.
       </p>
       <p>
-        <strong>Governing law</strong> – This Agreement is governed by and is to be construed in accordance with
+        <strong>Governing law</strong>: This Agreement is governed by and is to be construed in accordance with
         the laws applicable in Victoria. Each party irrevocably and unconditionally submits to the exclusive
         jurisdiction of the courts of Victoria.
       </p>
       <p>
-        <strong>Notices</strong> – The parties agree all notices, disclosures, and other communications that are
+        <strong>Notices</strong>: The parties agree all notices, disclosures, and other communications that are
         provided in accordance with this clause satisfy any legal requirement that such communications be in
         writing. Any communication under or in connection with this Agreement which StatDoctor sends to you will
         be sent to you via a mobile application push notification or the email address provided to StatDoctor in
@@ -372,20 +372,20 @@ export default function Page() {
         to you on StatDoctor&apos;s Website.
       </p>
       <p>
-        <strong>Relationship of the parties</strong> – Nothing in this Agreement is intended to create any
+        <strong>Relationship of the parties</strong>: Nothing in this Agreement is intended to create any
         partnership, joint venture, agency, or employment relationship between the parties.
       </p>
       <p>
-        <strong>Survival</strong> – Clauses 7, 8, 10, 12, the Indemnity Clauses, and any other clause in this
+        <strong>Survival</strong>: Clauses 7, 8, 10, 12, the Indemnity Clauses, and any other clause in this
         Agreement which is expressed to survive or by its nature survives, will survive termination or expiry of
         this Agreement for any reason.
       </p>
       <p>
-        <strong>Severance</strong> – If anything in this Agreement is unenforceable, illegal, or void, then it is
+        <strong>Severance</strong>: If anything in this Agreement is unenforceable, illegal, or void, then it is
         severed, and the rest of this Agreement remains in full force and effect.
       </p>
       <p>
-        <strong>Variations to this Agreement</strong> – StatDoctor may vary this Agreement at any time by posting
+        <strong>Variations to this Agreement</strong>: StatDoctor may vary this Agreement at any time by posting
         the new Terms of Use on its Website. The Terms of Use come into effect after 30 days for Locums and
         immediately after the end of the then current Subscription Period for Medical Facilities. If you do not
         accept the terms of the variation, you may terminate this Agreement in accordance with the Termination
@@ -421,7 +421,7 @@ export default function Page() {
 
       <hr />
 
-      <h2>Schedule 1 — Medical Facility Terms</h2>
+      <h2>Schedule 1: Medical Facility Terms</h2>
       <p>
         If you are a hospital, clinic, or other medical facility seeking the services of Locums (Medical
         Facility), then you acknowledge and agree to the additional terms set out in this Schedule 1.
@@ -479,7 +479,7 @@ export default function Page() {
 
       <hr />
 
-      <h2>Schedule 2 — Additional Locum Terms</h2>
+      <h2>Schedule 2: Additional Locum Terms</h2>
       <p>
         If you are an independent medical professional seeking work opportunities (Locum), then you acknowledge
         and agree to the additional terms set out in this Schedule 2.

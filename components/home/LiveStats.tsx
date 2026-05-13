@@ -69,7 +69,7 @@ export default function LiveStatsStrip({ initial }: { initial: LiveStats }) {
     },
     {
       to: stats.avgRate,
-      format: (n) => (stats.avgRate > 0 ? `$${Math.round(n)}/hr` : "—"),
+      format: (n) => (stats.avgRate > 0 ? `$${Math.round(n)}/hr` : "-"),
       label: "Avg rate",
       icon: "dollar",
       accent: "ink",

@@ -15,10 +15,6 @@ type Perk = {
   brand: string;
   category: "Finance" | "Compliance" | "Career";
   blurb: string;
-  // The actual SD-specific member offer. Null when the partnership is a
-  // curated relationship without a dedicated discount/perk — the card
-  // hides the offer slate in that case and shows only the description.
-  value: string | null;
   accent: "ocean" | "electric" | "leaf";
   // Outbound URL to the partner's website. Cards are wrapped in an
   // anchor so doctors can click straight through. Links taken directly
@@ -31,16 +27,12 @@ type Perk = {
 
 // Descriptive blurbs lifted from the live statdoctor.app/partners page so
 // the per-card copy reads consistently with the existing brand pages.
-// Member perks are only shown when the partner has a genuine SD-specific
-// offer — CPD Home gives a 10% AMA discount today; everyone else is just
-// a curated partner relationship (value = null → perk slate hidden).
 const PERKS: Perk[] = [
   {
     brand: "Hnry",
     category: "Finance",
     blurb:
-      "Hnry simplifies finances for independent doctors. Tax, GST, invoicing, and compliance are handled automatically in real time. No spreadsheets or surprises — just clear insight into what you earn and owe, so you can focus on your work, not admin.",
-    value: null,
+      "Hnry simplifies finances for independent doctors. Tax, GST, invoicing, and compliance are handled automatically in real time. No spreadsheets or surprises, just clear insight into what you earn and owe, so you can focus on your work, not admin.",
     accent: "ocean",
     href: "https://hnry.com.au/",
     logo: "https://cdn.prod.website-files.com/68dfbc30660b4fef0269fe47/696f628eb419d93c7b03ea7e_HNRY-img.png",
@@ -49,8 +41,7 @@ const PERKS: Perk[] = [
     brand: "Acceptance Finance",
     category: "Finance",
     blurb:
-      "Acceptance Finance is a Melbourne-based mortgage broker helping clients across Australia. They compare lenders to secure the right loan for homes, investments, SMSFs, refinancing, and more — managing the entire process from application to approval.",
-    value: null,
+      "Acceptance Finance is a Melbourne-based mortgage broker helping clients across Australia. They compare lenders to secure the right loan for homes, investments, SMSFs, refinancing, and more, managing the entire process from application to approval.",
     accent: "ocean",
     href: "https://www.acceptancefinance.com.au/",
     logo: "https://cdn.prod.website-files.com/68dfbc30660b4fef0269fe47/696f62a5721564e39d24f18f_Acceptance-Finance.png",
@@ -59,8 +50,7 @@ const PERKS: Perk[] = [
     brand: "By Invite Finance",
     category: "Finance",
     blurb:
-      "By Invite Finance creates tailored lending solutions for locum doctors. With deep knowledge of locum income and lending structures, they manage the process end-to-end — helping with home purchases, investments, clinics, and SMSF property finance.",
-    value: null,
+      "By Invite Finance creates tailored lending solutions for locum doctors. With deep knowledge of locum income and lending structures, they manage the process end-to-end, helping with home purchases, investments, clinics, and SMSF property finance.",
     accent: "ocean",
     href: "https://byinvitefinance.com.au/",
     logo: "https://cdn.prod.website-files.com/68dfbc30660b4fef0269fe47/69810cc5f360268b2d220e80_BI_LOGO_.png",
@@ -69,8 +59,7 @@ const PERKS: Perk[] = [
     brand: "CPD Home",
     category: "Compliance",
     blurb:
-      "CPD Home provides practical, high-quality CPD designed for real medical practice. From mandatory requirements to lifelong learning, it supports how doctors actually work — with relevant education that fits into busy professional lives.",
-    value: "Get 10% off CPD Home AMA",
+      "CPD Home provides practical, high-quality CPD designed for real medical practice. From mandatory requirements to lifelong learning, it supports how doctors actually work, with relevant education that fits into busy professional lives.",
     accent: "leaf",
     href: "https://www.cpdhome.org.au/",
     logo: "https://cdn.prod.website-files.com/68dfbc30660b4fef0269fe47/696f6471905de39418bb2920_CPD-Home.png",
@@ -80,7 +69,6 @@ const PERKS: Perk[] = [
     category: "Compliance",
     blurb:
       "Validex provides national criminal history checks for doctors, nurses, allied health, and aged care workers. Identity is verified digitally using government document validation and live facial matching through TrueVault.",
-    value: null,
     accent: "leaf",
     href: "https://validex.com.au/medical.html?utm_source=statdoctor&utm_medium=referral&utm_campaign=medical_checks",
     logo: "https://cdn.prod.website-files.com/68dfbc30660b4fef0269fe47/69b3e148ccb2494596b44ad9_img-26420503-deff-4423-a6d8-94bcee10777c%20(1).png",
@@ -89,8 +77,7 @@ const PERKS: Perk[] = [
     brand: "Milford Specialist Recruitment",
     category: "Career",
     blurb:
-      "Milford Specialist Recruitment focuses on permanent doctor placements across New Zealand. Their approach is personal and thoughtful, built on honest conversations, careful matching, and long-term relationships — not mass placements or pressure tactics.",
-    value: null,
+      "Milford Specialist Recruitment focuses on permanent doctor placements across New Zealand. Their approach is personal and thoughtful, built on honest conversations, careful matching, and long-term relationships, not mass placements or pressure tactics.",
     accent: "electric",
     href: "https://www.milfordspecialistrecruitment.com/",
     logo: "https://cdn.prod.website-files.com/68dfbc30660b4fef0269fe47/696f63cc4192740a9a92bd6f_Milford-Specialist.png",
@@ -134,7 +121,7 @@ function Hero() {
           </h1>
           <p className="mt-5 text-muted max-w-xl mx-auto text-[15px] md:text-base leading-relaxed">
             StatDoctor doctors get discounts, priority access, and dedicated
-            support across finance, compliance, and career — from the partners
+            support across finance, compliance, and career, from the partners
             we&apos;d use ourselves.
           </p>
         </motion.div>
@@ -196,7 +183,7 @@ function PerkGrid() {
             account.
           </h2>
           <p className="mt-4 text-muted max-w-xl mx-auto text-[14px] md:text-[15px] leading-relaxed">
-            One membership covers the lot. Activate from inside the app — no
+            One membership covers the lot. Activate from inside the app, no
             promo codes, no hoops.
           </p>
         </motion.div>
@@ -257,19 +244,9 @@ function PerkCard({ perk, delay }: { perk: Perk; delay: number }) {
       <h3 className="display text-[22px] md:text-[26px] leading-[1.15] text-ink mb-3 group-hover:text-ocean transition-colors">
         {perk.brand}
       </h3>
-      <p className="text-[13px] md:text-[14px] text-muted leading-relaxed mb-5">
+      <p className="text-[13px] md:text-[14px] text-muted leading-relaxed mb-5 flex-1">
         {perk.blurb}
       </p>
-      {perk.value && (
-        <div className="mt-auto rounded-2xl bg-white border border-ink/10 px-4 py-3.5">
-          <div className="text-[10px] tracking-[0.2em] uppercase text-muted mb-1">
-            Member perk
-          </div>
-          <div className="text-[14px] md:text-[15px] text-ink font-medium leading-snug">
-            {perk.value}
-          </div>
-        </div>
-      )}
 
       {/* Visit-link affordance — small arrow row at the bottom that
           telegraphs the whole card is clickable without competing with

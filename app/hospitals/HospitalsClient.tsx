@@ -704,8 +704,8 @@ function HospitalDemoVideo() {
 
 /* ---------- COMPARISON ---------- */
 const COMPARE: { dim: string; agency: string; sd: string }[] = [
-  { dim: "Agency fee", agency: "15–25%", sd: "0%" },
-  { dim: "Time to fill", agency: "2–10 days", sd: "2–48 hours" },
+  { dim: "Agency fee", agency: "15-25%", sd: "0%" },
+  { dim: "Time to fill", agency: "2-10 days", sd: "2-48 hours" },
   { dim: "Credential check", agency: "Manual, ongoing", sd: "Continuous & automated" },
   { dim: "Doctor quality control", agency: "Agency-mediated", sd: "Direct ratings & reviews" },
   { dim: "Payment", agency: "Via agency", sd: "Direct, 48 hours" },
@@ -846,7 +846,7 @@ function Pricing({ onContact }: { onContact: () => void }) {
             </div>
             <p className="mt-3 text-[13px] md:text-[14px] text-muted leading-relaxed">
               Unlimited access for one hospital. Locum shifts, permanent
-              hiring, and locum-to-permanent conversion — all included, no
+              hiring, and locum-to-permanent conversion all included, no
               per-shift fees, no buy-out fees.
             </p>
             <ul className="mt-5 space-y-2.5 text-[13px] md:text-[14px] text-ink/85 flex-1">
@@ -965,10 +965,10 @@ function PermHireCallout({ onContact }: { onContact: () => void }) {
                 .
               </h3>
               <p className="mt-3 text-[14px] md:text-[15px] text-ink/70 leading-relaxed max-w-xl">
-                Agencies charge 15–25% of first-year salary to convert a locum
+                Agencies charge 15-25% of first-year salary to convert a locum
                 to a permanent hire. We charge $0. If a hospital and a doctor
-                want to make it permanent, that&apos;s between you and them —
-                we&apos;re not in the middle.
+                want to make it permanent, that&apos;s between you and them.
+                We&apos;re not in the middle.
               </p>
             </div>
             <button
@@ -998,7 +998,7 @@ const HOSPITAL_FAQ: { q: string; a: string }[] = [
   },
   {
     q: "What's the platform fee, exactly?",
-    a: "Flat annual pricing, starting from $10K/year for a single hospital — unlimited shifts, unlimited doctors, locum and permanent hiring all included. Starting from $50K/year for health services or state services managing up to 10 hospitals through a single admin account. No per-shift fees, no buy-out fees, no per-seat charges.",
+    a: "Flat annual pricing, starting from $10K/year for a single hospital, with unlimited shifts, unlimited doctors, and locum and permanent hiring all included. Starting from $50K/year for health services or state services managing up to 10 hospitals through a single admin account. No per-shift fees, no buy-out fees, no per-seat charges.",
   },
   {
     q: "Can we set a maximum hourly rate?",
@@ -1010,7 +1010,7 @@ const HOSPITAL_FAQ: { q: string; a: string }[] = [
   },
   {
     q: "Can we hire one of the doctors permanently?",
-    a: "Yes, at no extra cost. Most agencies charge 15–25% of first-year salary as a buy-out fee when a locum converts to a permanent hire — we charge $0. If a hospital and doctor want to formalise a permanent role, that's between you and them.",
+    a: "Yes, at no extra cost. Most agencies charge 15-25% of first-year salary as a buy-out fee when a locum converts to a permanent hire. We charge $0. If a hospital and doctor want to formalise a permanent role, that's between you and them.",
   },
 ];
 
