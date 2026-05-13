@@ -41,6 +41,7 @@ export default function HomeClient({
       <LiveShiftFeed initialShifts={liveShifts} />
       <DoctorVoicesPinned />
       <FAQGrid />
+      <StateHealthBand />
       <FinalCTA />
     </div>
   );
@@ -643,6 +644,91 @@ const SOCIALS: { label: string; href: string; Icon: () => JSX.Element }[] = [
   },
   { label: "Email", href: "mailto:info@statdoctor.app", Icon: MailIcon },
 ];
+
+/* ============================================================
+   STATE HEALTH BAND
+   Government-affiliated trust signal. Eight state/territory health
+   service wordmarks rendered as typographic placeholders for now —
+   drop a real PNG/SVG into `/public/partners/state-health/<slug>.png`
+   and set `logo:` on the matching entry to swap in the actual mark.
+
+   Designed to read as a quiet trust band, not a hero — muted greys,
+   no marquee, one editorial eyebrow above. The layout mirrors the
+   competitor's "Some of our clients" treatment but tightened for
+   the StatDoctor brand: serif eyebrow line, two-row responsive grid,
+   subtle hairline rules top + bottom so the band feels structural
+   rather than promotional.
+   ============================================================ */
+const STATE_HEALTH: Array<{ alt: string; slug: string; logo: string }> = [
+  { alt: "NSW Health, NSW Government",                            slug: "nsw", logo: "/partners/state-health/nsw.png" },
+  { alt: "Department of Health, Victoria State Government",       slug: "vic", logo: "/partners/state-health/vic.png" },
+  { alt: "Queensland Health, Queensland Government",              slug: "qld", logo: "/partners/state-health/qld.png" },
+  { alt: "SA Health, Government of South Australia",              slug: "sa",  logo: "/partners/state-health/sa.png"  },
+  { alt: "Department of Health, Government of Western Australia", slug: "wa",  logo: "/partners/state-health/wa.png"  },
+  { alt: "Tasmanian Health Service, Tasmanian Government",        slug: "tas", logo: "/partners/state-health/tas.png" },
+  { alt: "Northern Territory Government",                         slug: "nt",  logo: "/partners/state-health/nt.png"  },
+  { alt: "ACT Government Health",                                  slug: "act", logo: "/partners/state-health/act.png" },
+];
+
+function StateHealthBand() {
+  return (
+    <section className="relative bg-white border-t border-ink/8 py-16 md:py-20 px-6">
+      <div className="max-w-[1280px] mx-auto">
+        <motion.div
+          initial={{ opacity: 0, y: 18 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-80px" }}
+          transition={{ duration: 0.7 }}
+          className="text-center mb-10 md:mb-14"
+        >
+          <div className="text-[10px] tracking-[0.22em] uppercase text-muted mb-3">
+            Some of our clients
+          </div>
+          <h2 className="display text-[clamp(22px,3vw,36px)] leading-[1.1] max-w-2xl mx-auto">
+            State health services across Australia.
+          </h2>
+        </motion.div>
+
+        <motion.div
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: "-60px" }}
+          variants={{
+            hidden: {},
+            visible: { transition: { staggerChildren: 0.05, delayChildren: 0.1 } },
+          }}
+          className="grid grid-cols-2 sm:grid-cols-4 gap-x-6 gap-y-10 md:gap-y-12 items-center justify-items-center"
+        >
+          {STATE_HEALTH.map((s) => (
+            <motion.div
+              key={s.slug}
+              variants={{
+                hidden: { opacity: 0, y: 12 },
+                visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: [0.2, 0.8, 0.2, 1] } },
+              }}
+              className="flex items-center justify-center w-full h-28 md:h-32"
+              title={s.alt}
+            >
+              {/* Equalised bounding box per logo cell: each logo scales
+                  to fit a fixed h-20/h-24 container via object-contain,
+                  so wide wordmarks (NSW), tall stacks (SA), and circle
+                  marks (ACT) all read at visually equal weight in the
+                  row. Match the partner-logos marquee treatment: muted
+                  grayscale at 60% opacity → full colour at 100% on
+                  hover. */}
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={s.logo}
+                alt={s.alt}
+                className="max-h-full max-w-full w-auto h-auto object-contain opacity-60 hover:opacity-100 transition-opacity duration-500 grayscale hover:grayscale-0"
+              />
+            </motion.div>
+          ))}
+        </motion.div>
+      </div>
+    </section>
+  );
+}
 
 function FinalCTA() {
   return (
