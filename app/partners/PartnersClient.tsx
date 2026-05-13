@@ -138,11 +138,10 @@ function Hero() {
             hidden: {},
             visible: { transition: { staggerChildren: 0.12, delayChildren: 0.25 } },
           }}
-          className="mt-12 md:mt-14 grid grid-cols-3 gap-4 md:gap-6 max-w-2xl mx-auto"
+          className="mt-12 md:mt-14 grid grid-cols-2 gap-4 md:gap-6 max-w-md mx-auto"
         >
           <HeroStat to={6} label="Partner brands" />
           <HeroStat to={3} label="Perk categories" />
-          <HeroStat to={1} label="Membership" />
         </motion.div>
       </div>
     </section>
