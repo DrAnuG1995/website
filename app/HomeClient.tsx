@@ -32,13 +32,13 @@ export default function HomeClient({
   return (
     <div className="bg-white text-ink">
       <HeroMap hospitals={hospitals} shiftCounts={shiftCounts} />
+      <LiveStatsStrip initial={liveStats} />
       <LogosStrip partnerCount={partnerCount} />
       <FounderVideo />
       <AppShowcase />
       <NotAnAgency />
       <HowWereDifferent />
       <LiveShiftFeed initialShifts={liveShifts} />
-      <LiveStatsStrip initial={liveStats} />
       <DoctorVoicesPinned />
       <FAQGrid />
       <FinalCTA />
