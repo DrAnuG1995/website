@@ -462,7 +462,7 @@ export default function HeroMap({
         <div className="relative rounded-[24px] md:rounded-[28px] border border-ink/15 bg-white overflow-hidden shadow-[0_30px_90px_-40px_rgba(26,26,46,0.25)]">
           <div
             ref={mapContainer}
-            className="relative w-full h-[64vh] min-h-[480px] md:h-[72vh] md:min-h-[600px]"
+            className="relative w-full h-[58vh] min-h-[420px] md:h-[72vh] md:min-h-[600px]"
           />
 
           {keyMissing && (
@@ -537,7 +537,7 @@ export default function HeroMap({
             animate={ready ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
             transition={{ duration: 0.7, ease: [0.2, 0.8, 0.2, 1] }}
             style={{ pointerEvents: ready ? "auto" : "none" }}
-            className="absolute left-4 right-4 bottom-4 md:left-5 md:right-auto md:bottom-5 z-10 max-w-md md:w-[400px] p-5 rounded-2xl bg-white/92 backdrop-blur-xl border border-ink/12 shadow-[0_30px_70px_-20px_rgba(26,26,46,0.25)]"
+            className="relative md:absolute left-0 right-0 md:left-5 md:right-auto md:bottom-5 z-10 max-w-none md:max-w-md md:w-[400px] p-5 rounded-none md:rounded-2xl bg-white md:bg-white/92 md:backdrop-blur-xl border-t md:border border-ink/12 shadow-none md:shadow-[0_30px_70px_-20px_rgba(26,26,46,0.25)]"
           >
             <AnimatePresence mode="wait" initial={false}>
               {activeId && focusPin ? (
