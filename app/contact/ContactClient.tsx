@@ -43,7 +43,7 @@ function Hero() {
           <div className="text-[10px] tracking-[0.22em] uppercase text-muted mb-3">
             Get in touch
           </div>
-          <h1 className="display text-[clamp(36px,6vw,84px)] leading-[0.98]">
+          <h1 className="display text-[clamp(40px,6.5vw,88px)] leading-[0.98]">
             Let&apos;s talk.{" "}
             <span className="italic text-ocean">No scripts</span>.
           </h1>

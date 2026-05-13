@@ -81,7 +81,7 @@ function Hero() {
           </motion.div>
           <motion.h1
             variants={heroItem}
-            className="display text-[clamp(40px,7vw,96px)] leading-[0.95]"
+            className="display text-[clamp(40px,6.5vw,88px)] leading-[0.98]"
           >
             Built by a{" "}
             <span className="italic text-ocean">doctor</span>,
@@ -203,7 +203,7 @@ function Story() {
             <div>
               <motion.h2
                 variants={chapterItem}
-                className="display text-[clamp(28px,4vw,52px)] leading-[1.05]"
+                className="display text-[clamp(28px,4.5vw,56px)] leading-[1.05]"
               >
                 {c.head}
               </motion.h2>

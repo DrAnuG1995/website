@@ -66,7 +66,7 @@ function LogosStrip({ partnerCount }: { partnerCount: number }) {
         >
           <div>
             <div className="text-[10px] tracking-[0.22em] uppercase text-muted mb-2">The network</div>
-            <h2 className="display text-[clamp(24px,3.2vw,40px)] leading-[1.05] max-w-2xl mx-auto">
+            <h2 className="display text-[clamp(24px,3.6vw,44px)] leading-[1.05] max-w-2xl mx-auto">
               Trusted by hospitals from <span className="italic text-ocean">Cairns to Hobart</span>.
             </h2>
           </div>

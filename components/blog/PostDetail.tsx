@@ -691,7 +691,7 @@ export default function PostDetail({
                 {pillarLabel} · {post.reading_time_minutes} min read
               </span>
 
-              <h1 className="display text-3xl md:text-5xl lg:text-6xl text-white mb-4 leading-[1.02] max-w-3xl">
+              <h1 className="display text-[clamp(40px,6.5vw,88px)] text-white mb-4 leading-[0.98] max-w-3xl">
                 {post.title}
               </h1>
 

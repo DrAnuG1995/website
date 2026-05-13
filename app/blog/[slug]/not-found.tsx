@@ -5,7 +5,7 @@ export default function NotFound() {
     <section className="pt-40 pb-32 px-6 text-center bg-white">
       <div className="max-w-2xl mx-auto">
         <div className="eyebrow mb-4">404</div>
-        <h1 className="display text-5xl md:text-6xl leading-[1.05] mb-4">
+        <h1 className="display text-[clamp(40px,6.5vw,88px)] leading-[0.98] mb-4">
           That post is not <span className="italic text-ocean">on file.</span>
         </h1>
         <p className="text-muted mb-8">

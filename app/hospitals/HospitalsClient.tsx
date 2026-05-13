@@ -121,7 +121,7 @@ function Hero({
           <div className="text-[10px] tracking-[0.22em] uppercase text-bone/70 mb-3">
             For hospitals
           </div>
-          <h1 className="display text-white text-[clamp(36px,6vw,84px)] leading-[0.98]">
+          <h1 className="display text-white text-[clamp(40px,6.5vw,88px)] leading-[0.98]">
             Fill shifts faster.{" "}
             <span className="italic text-electric">Pay agencies less</span>.
           </h1>
@@ -214,7 +214,7 @@ function HospitalLogosStrip({ partnerCount }: { partnerCount: number }) {
             <div className="text-[10px] tracking-[0.22em] uppercase text-muted mb-2">
               The network
             </div>
-            <h2 className="display text-[clamp(22px,3vw,38px)] leading-[1.05] max-w-2xl mx-auto">
+            <h2 className="display text-[clamp(24px,3.6vw,44px)] leading-[1.05] max-w-2xl mx-auto">
               Hospitals from{" "}
               <span className="italic text-ocean">Cairns to Hobart</span>{" "}
               fill shifts here.

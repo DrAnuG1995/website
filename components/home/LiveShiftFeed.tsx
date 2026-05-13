@@ -254,13 +254,13 @@ export default function LiveShiftFeed({ initialShifts }: { initialShifts: LiveSh
                         <div className="text-[13px] md:text-[14px] font-semibold text-ink truncate flex-1 min-w-0">
                           {item.hospital}
                         </div>
-                        <span className="text-[10px] text-muted shrink-0 w-9 md:w-10 text-right tracking-[0.1em] uppercase font-semibold">
+                        <span className="text-[10px] text-muted shrink-0 w-9 md:w-10 text-right tracking-[0.18em] uppercase font-semibold">
                           {item.state || "-"}
                         </span>
                       </div>
                       <div className="flex items-center gap-2 text-[11px] md:text-[12px]">
                         <span
-                          className={`inline-flex items-center px-2 py-0.5 rounded-full ${ACCENT_TAG[item.accent]} text-[9px] md:text-[10px] tracking-[0.1em] uppercase font-semibold truncate max-w-[60%] md:max-w-none`}
+                          className={`inline-flex items-center px-2 py-0.5 rounded-full ${ACCENT_TAG[item.accent]} text-[9px] md:text-[10px] tracking-[0.18em] uppercase font-semibold truncate max-w-[60%] md:max-w-none`}
                         >
                           {item.role}
                         </span>
@@ -282,17 +282,17 @@ export default function LiveShiftFeed({ initialShifts }: { initialShifts: LiveSh
 
                     <div className="text-right shrink-0 flex flex-col items-end gap-1 min-w-[78px] md:min-w-[120px]">
                       {item.variant === "upcoming" ? (
-                        <span className="inline-flex items-center gap-1 md:gap-1.5 px-1.5 md:px-2 py-1 rounded-full bg-ocean/10 text-ocean text-[8px] md:text-[9px] tracking-[0.14em] md:tracking-[0.18em] uppercase font-bold whitespace-nowrap">
+                        <span className="inline-flex items-center gap-1 md:gap-1.5 px-1.5 md:px-2 py-1 rounded-full bg-ocean/10 text-ocean text-[8px] md:text-[9px] tracking-[0.18em] uppercase font-bold whitespace-nowrap">
                           <span className="w-1.5 h-1.5 rounded-full bg-ocean" />
                           <span className="hidden md:inline">Starts </span>{displayWhen(item, now)}
                         </span>
                       ) : i === 0 ? (
-                        <span className="inline-flex items-center gap-1 md:gap-1.5 px-1.5 md:px-2 py-1 rounded-full bg-electric text-ink text-[8px] md:text-[9px] tracking-[0.14em] md:tracking-[0.18em] uppercase font-bold whitespace-nowrap">
+                        <span className="inline-flex items-center gap-1 md:gap-1.5 px-1.5 md:px-2 py-1 rounded-full bg-electric text-ink text-[8px] md:text-[9px] tracking-[0.18em] uppercase font-bold whitespace-nowrap">
                           <span className={`w-1.5 h-1.5 rounded-full ${ACCENT_DOT[item.accent]}`} />
                           <span className="hidden md:inline">Just </span>posted
                         </span>
                       ) : (
-                        <span className="text-[10px] text-muted tracking-[0.12em] uppercase">
+                        <span className="text-[10px] text-muted tracking-[0.18em] uppercase">
                           {displayWhen(item, now)}
                         </span>
                       )}

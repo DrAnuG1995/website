@@ -125,7 +125,7 @@ export default function Footer() {
           {Array.from({ length: 14 }).map((_, i) => (
             <span
               key={i}
-              className="text-[10px] tracking-[0.28em] uppercase text-bone/30 whitespace-nowrap"
+              className="text-[10px] tracking-[0.22em] uppercase text-bone/30 whitespace-nowrap"
             >
               No agencies · Zero commission · Doctors keep 100% ·
             </span>

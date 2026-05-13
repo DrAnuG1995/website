@@ -30,7 +30,7 @@ const config: Config = {
       fontFamily: {
         display: ['"Cormorant Garamond"', '"Instrument Serif"', "Georgia", "serif"],
         sans: ['"Inter"', "system-ui", "sans-serif"],
-        mono: ['"Inter"', "system-ui", "sans-serif"],
+        mono: ["ui-monospace", "SFMono-Regular", "Menlo", "monospace"],
       },
       transitionTimingFunction: {
         editorial: "cubic-bezier(.2,.8,.2,1)",

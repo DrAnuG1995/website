@@ -27,7 +27,7 @@ export default function HowWereDifferent() {
         <FlowDiagram />
 
         <div className="text-center mt-16 md:mt-24 mb-10 md:mb-14">
-          <h2 className="display text-[clamp(28px,4.5vw,52px)] leading-[1.05]">
+          <h2 className="display text-[clamp(28px,4.5vw,56px)] leading-[1.0]">
             The way locuming{" "}
             <span className="italic text-ocean">should work</span>.
           </h2>
@@ -198,7 +198,7 @@ function FlowArrow({
       {/* Rate label as a pill — reads as the value being passed along, not
           as floating text disconnected from the line. */}
       <span
-        className={`inline-flex items-center px-2.5 py-0.5 rounded-full border ${labelBg[tone]} text-[10px] md:text-[11px] tracking-[0.14em] uppercase font-bold whitespace-nowrap`}
+        className={`inline-flex items-center px-2.5 py-0.5 rounded-full border ${labelBg[tone]} text-[10px] md:text-[11px] tracking-[0.18em] uppercase font-bold whitespace-nowrap`}
       >
         {amount}
       </span>

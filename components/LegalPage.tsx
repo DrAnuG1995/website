@@ -30,7 +30,7 @@ export default function LegalPage({
             <div className="text-[10px] tracking-[0.22em] uppercase text-muted mb-3">
               {eyebrow}
             </div>
-            <h1 className="display text-[clamp(36px,5.5vw,72px)] leading-[1.0]">
+            <h1 className="display text-[clamp(40px,6.5vw,88px)] leading-[0.98]">
               {title}
             </h1>
           </motion.div>

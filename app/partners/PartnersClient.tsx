@@ -120,7 +120,7 @@ function Hero() {
           <div className="text-[10px] tracking-[0.22em] uppercase text-muted mb-3">
             Doctor perks
           </div>
-          <h1 className="display text-[clamp(36px,6vw,84px)] leading-[0.98]">
+          <h1 className="display text-[clamp(40px,6.5vw,88px)] leading-[0.98]">
             Membership has its{" "}
             <span className="italic text-ocean">perks</span>.
           </h1>
@@ -257,7 +257,7 @@ function PerkCard({ perk, delay }: { perk: Perk; delay: number }) {
           offer (today: CPD Home). */}
       {perk.value && (
         <div className="mb-4 rounded-2xl bg-white border border-ink/10 px-4 py-3.5">
-          <div className="text-[10px] tracking-[0.2em] uppercase text-muted mb-1">
+          <div className="text-[10px] tracking-[0.22em] uppercase text-muted mb-1">
             Member perk
           </div>
           <div className="text-[14px] md:text-[15px] text-ink font-medium leading-snug">

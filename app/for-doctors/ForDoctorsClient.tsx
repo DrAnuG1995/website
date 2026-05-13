@@ -54,10 +54,10 @@ export default function ForDoctorsClient({
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.9, ease: [0.2, 0.8, 0.2, 1], delay: 0.2 }}
           >
-            <div className="text-[10px] md:text-[11px] tracking-[0.32em] uppercase text-bone/80 mb-5 md:mb-6">
+            <div className="text-[10px] md:text-[11px] tracking-[0.22em] uppercase text-bone/80 mb-5 md:mb-6">
               For doctors
             </div>
-            <h1 className="display text-white text-[clamp(44px,8vw,112px)] leading-[0.98] tracking-tight mx-auto max-w-[14ch]">
+            <h1 className="display text-white text-[clamp(40px,6.5vw,88px)] leading-[0.98] tracking-tight mx-auto max-w-[14ch]">
               Locum work,{" "}
               <span className="italic text-ocean">on your terms.</span>
             </h1>
@@ -90,7 +90,7 @@ export default function ForDoctorsClient({
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 1.2, duration: 0.6 }}
-          className="absolute bottom-4 md:bottom-6 left-1/2 -translate-x-1/2 text-bone/60 text-[10px] tracking-[0.3em] uppercase hidden md:flex items-center gap-2"
+          className="absolute bottom-4 md:bottom-6 left-1/2 -translate-x-1/2 text-bone/60 text-[10px] tracking-[0.22em] uppercase hidden md:flex items-center gap-2"
         >
           Scroll
           <motion.span
@@ -203,7 +203,7 @@ function PartnerNetwork({
             <div className="text-[10px] tracking-[0.22em] uppercase text-muted mb-3">
               The network
             </div>
-            <h2 className="display text-[clamp(24px,3.5vw,40px)] leading-[1.05]">
+            <h2 className="display text-[clamp(24px,3.6vw,44px)] leading-[1.05]">
               Filling shifts at{" "}
               {partnerCount && partnerCount > 0 ? `${partnerCount} hospitals` : "hospitals"}{" "}
               <span className="italic text-ocean">across Australia</span>.
@@ -255,7 +255,7 @@ function PartnerNetwork({
                       {p.name}
                     </div>
                     {p.state && (
-                      <div className="mt-1 text-[10px] tracking-[0.15em] uppercase text-muted">
+                      <div className="mt-1 text-[10px] tracking-[0.18em] uppercase text-muted">
                         {p.state}
                       </div>
                     )}

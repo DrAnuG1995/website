@@ -114,7 +114,7 @@ export default function BlogClient({ posts }: { posts: BlogCard[] }) {
           >
             The Journal
           </div>
-          <h1 className="display text-[clamp(34px,4.5vw,64px)] leading-[1.05]">
+          <h1 className="display text-[clamp(40px,6.5vw,88px)] leading-[0.98]">
             <SplitText>Notes from</SplitText>{" "}
             <SplitText start={0.6} className="italic text-ocean">
               the front desk.
@@ -258,7 +258,7 @@ export default function BlogClient({ posts }: { posts: BlogCard[] }) {
                                 <p className="display italic text-electric text-3xl leading-none mb-1">
                                   {cover.month}
                                 </p>
-                                <p className="mono text-[10px] tracking-[0.32em] text-white/70 uppercase">
+                                <p className="mono text-[10px] tracking-[0.22em] text-white/70 uppercase">
                                   {cover.year} · Issue {String(i + 1).padStart(2, "0")}
                                 </p>
                               </div>

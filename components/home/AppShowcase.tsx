@@ -276,7 +276,7 @@ function SecondaryPop({
           <span className="absolute inline-flex h-full w-full rounded-full bg-white opacity-75 animate-ping" />
           <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-white" />
         </span>
-        <span className="text-[9px] tracking-[0.2em] uppercase font-bold">
+        <span className="text-[9px] tracking-[0.18em] uppercase font-bold">
           Live
         </span>
       </motion.div>
