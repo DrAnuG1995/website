@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
+import Image from "next/image";
 import { AnimatePresence, motion } from "framer-motion";
 
 // Shared Ken-Burns–style hero background. One <CitySlideshow> renders:
@@ -67,17 +68,22 @@ export default function CitySlideshow({
             animate={{ opacity: i === active ? 1 : 0 }}
             transition={{ duration: CROSSFADE_MS / 1000, ease: "easeInOut" }}
           >
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <motion.img
-              src={s.src}
-              alt={s.alt}
-              loading={i === 0 ? "eager" : "lazy"}
-              fetchPriority={i === 0 ? "high" : "auto"}
-              className="w-full h-full object-cover"
+            <motion.div
+              className="relative w-full h-full"
               initial={{ scale: 1.08 }}
               animate={{ scale: i === active ? 1.2 : 1.08 }}
               transition={{ duration: intervalMs / 1000, ease: "linear" }}
-            />
+            >
+              <Image
+                src={s.src}
+                alt={s.alt}
+                fill
+                priority={i === 0}
+                sizes="100vw"
+                quality={72}
+                className="object-cover"
+              />
+            </motion.div>
           </motion.div>
         ))}
       </div>
