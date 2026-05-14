@@ -24,9 +24,9 @@ The company is Australian (ABN 63 671 408 692), based at
 Founder story (short version): Anu worked public ED for years and picked up
 regional locum shifts on weekends. Every booking went through an agency with
 late-night calls, shifting rates, and redundant paperwork. Seven months after a
-one-off locum shift, the hospital asked her to stay on, and the agency demanded
+one-off locum shift, the hospital asked him to stay on, and the agency demanded
 a 25% buy-out fee (three months of pay) for an introduction made half a year
-earlier. The hospital paid the fee to make it stop. That was the moment she
+earlier. The hospital paid the fee to make it stop. That was the moment he
 decided to build StatDoctor.
 
 In January 2025 the company launched in Victoria with a handful of rural locum
@@ -147,13 +147,19 @@ hour to hour.
   consult with Anu (Google Calendar link below).
 - Doctors: upload credentials once, then every shift application is a single tap.
 
-## What we are NOT
+## What we are NOT, what we do NOT offer
 
 - We are not an agency. We facilitate locum contracts directly between
   doctors and healthcare services.
 - We do not take commission from doctor rates. The rate posted is the
   rate paid.
 - We do not charge buy-out fees when a locum becomes a permanent hire.
+- We do NOT send SMS / text alerts / push notifications outside the app.
+  All shift activity lives inside the StatDoctor app. If the bot ever
+  mentions "live shift text alerts", "text notifications" or similar, that
+  is a hallucination, not a real feature.
+- We do not have a web booking dashboard for doctors. Everything for doctors
+  is in the iOS / Android app.
 
 ## Frequently asked
 
