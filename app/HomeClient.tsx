@@ -32,15 +32,16 @@ export default function HomeClient({
   return (
     <div className="bg-white text-ink">
       <HeroMap hospitals={hospitals} shiftCounts={shiftCounts} />
+      <LiveStatsStrip initial={liveStats} />
       <LogosStrip partnerCount={partnerCount} />
       <FounderVideo />
       <AppShowcase />
       <NotAnAgency />
       <HowWereDifferent />
       <LiveShiftFeed initialShifts={liveShifts} />
-      <LiveStatsStrip initial={liveStats} />
       <DoctorVoicesPinned />
       <FAQGrid />
+      <StateHealthBand />
       <FinalCTA />
     </div>
   );
@@ -201,17 +202,31 @@ function FounderVideo() {
               {muted ? "Tap for sound" : "Sound on"}
             </button>
 
-            {/* Founder credit */}
+            {/* Founder credit — desktop only inside the video frame.
+                On mobile it would collide with the sound toggle, so we
+                render a mobile-only version below the frame. */}
             <a
               href="https://www.linkedin.com/in/dr-anu-g-%F0%9F%A9%BA-3b330a248/"
               target="_blank"
               rel="noopener noreferrer"
-              className="absolute bottom-4 left-4 md:bottom-5 md:left-5 px-3.5 py-2 rounded-full bg-white/90 backdrop-blur-md border border-ink/10 text-[12px] font-medium hover:bg-white hover:text-ocean transition-colors inline-flex items-center"
+              className="hidden md:inline-flex absolute md:bottom-5 md:left-5 px-3.5 py-2 rounded-full bg-white/90 backdrop-blur-md border border-ink/10 text-[12px] font-medium hover:bg-white hover:text-ocean transition-colors items-center"
               data-hover
             >
               Dr Anu, CEO &amp; Founder StatDoctor
             </a>
           </div>
+
+          {/* Mobile founder credit — sits below the video so the sound
+              toggle inside the frame doesn't collide with the name pill. */}
+          <a
+            href="https://www.linkedin.com/in/dr-anu-g-%F0%9F%A9%BA-3b330a248/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="md:hidden mt-3 inline-flex items-center justify-center text-[12px] font-medium text-muted hover:text-ocean transition-colors w-full"
+            data-hover
+          >
+            Dr Anu, CEO &amp; Founder StatDoctor
+          </a>
         </div>
       </div>
     </section>
@@ -353,25 +368,31 @@ function DoctorVoicesPinned() {
         </motion.div>
       </div>
 
-      {/* Mobile: single vertical-rolling column — auto-scrolls every
-          testimonial through the viewport showing ~1-2 cards at a time. */}
-      <div className="md:hidden relative max-w-[1280px] mx-auto h-[440px] overflow-hidden">
-        <div
-          aria-hidden
-          className="absolute inset-x-0 top-0 h-16 z-10 pointer-events-none"
-          style={{ background: "linear-gradient(to bottom, white, transparent)" }}
-        />
-        <div
-          aria-hidden
-          className="absolute inset-x-0 bottom-0 h-16 z-10 pointer-events-none"
-          style={{ background: "linear-gradient(to top, white, transparent)" }}
-        />
-        <TestimonialColumn
-          cards={DOCTORS}
-          direction="up"
-          duration={48}
-          paused={!inView}
-        />
+      {/* Mobile: single horizontal-rolling row — one card visible at a
+          time, marquees right-to-left. The marquee-mask class handles
+          the left/right fade. */}
+      <div className="md:hidden relative -mx-6">
+        <div className="marquee-mask">
+          <div
+            className="flex w-max gap-4 px-6"
+            style={{
+              animation: "scrollRowLeft 56s linear infinite",
+              animationPlayState: inView ? "running" : "paused",
+            }}
+          >
+            {[...DOCTORS, ...DOCTORS].map((d, i) => (
+              <div key={i} className="w-[280px] shrink-0">
+                <TestimonialCard d={d} />
+              </div>
+            ))}
+          </div>
+        </div>
+        <style jsx>{`
+          @keyframes scrollRowLeft {
+            from { transform: translateX(0); }
+            to   { transform: translateX(-50%); }
+          }
+        `}</style>
       </div>
 
       {/* Desktop: three auto-scrolling columns with fade masks. */}
@@ -623,6 +644,91 @@ const SOCIALS: { label: string; href: string; Icon: () => JSX.Element }[] = [
   },
   { label: "Email", href: "mailto:info@statdoctor.app", Icon: MailIcon },
 ];
+
+/* ============================================================
+   STATE HEALTH BAND
+   Government-affiliated trust signal. Eight state/territory health
+   service wordmarks rendered as typographic placeholders for now —
+   drop a real PNG/SVG into `/public/partners/state-health/<slug>.png`
+   and set `logo:` on the matching entry to swap in the actual mark.
+
+   Designed to read as a quiet trust band, not a hero — muted greys,
+   no marquee, one editorial eyebrow above. The layout mirrors the
+   competitor's "Some of our clients" treatment but tightened for
+   the StatDoctor brand: serif eyebrow line, two-row responsive grid,
+   subtle hairline rules top + bottom so the band feels structural
+   rather than promotional.
+   ============================================================ */
+const STATE_HEALTH: Array<{ alt: string; slug: string; logo: string }> = [
+  { alt: "NSW Health, NSW Government",                            slug: "nsw", logo: "/partners/state-health/nsw.png" },
+  { alt: "Department of Health, Victoria State Government",       slug: "vic", logo: "/partners/state-health/vic.png" },
+  { alt: "Queensland Health, Queensland Government",              slug: "qld", logo: "/partners/state-health/qld.png" },
+  { alt: "SA Health, Government of South Australia",              slug: "sa",  logo: "/partners/state-health/sa.png"  },
+  { alt: "Department of Health, Government of Western Australia", slug: "wa",  logo: "/partners/state-health/wa.png"  },
+  { alt: "Tasmanian Health Service, Tasmanian Government",        slug: "tas", logo: "/partners/state-health/tas.png" },
+  { alt: "Northern Territory Government",                         slug: "nt",  logo: "/partners/state-health/nt.png"  },
+  { alt: "ACT Government Health",                                  slug: "act", logo: "/partners/state-health/act.png" },
+];
+
+function StateHealthBand() {
+  return (
+    <section className="relative bg-white border-t border-ink/8 py-16 md:py-20 px-6">
+      <div className="max-w-[1280px] mx-auto">
+        <motion.div
+          initial={{ opacity: 0, y: 18 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-80px" }}
+          transition={{ duration: 0.7 }}
+          className="text-center mb-10 md:mb-14"
+        >
+          <div className="text-[10px] tracking-[0.22em] uppercase text-muted mb-3">
+            Some of our clients
+          </div>
+          <h2 className="display text-[clamp(22px,3vw,36px)] leading-[1.1] max-w-2xl mx-auto">
+            State health services across Australia.
+          </h2>
+        </motion.div>
+
+        <motion.div
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: "-60px" }}
+          variants={{
+            hidden: {},
+            visible: { transition: { staggerChildren: 0.05, delayChildren: 0.1 } },
+          }}
+          className="grid grid-cols-2 sm:grid-cols-4 gap-x-6 gap-y-10 md:gap-y-12 items-center justify-items-center"
+        >
+          {STATE_HEALTH.map((s) => (
+            <motion.div
+              key={s.slug}
+              variants={{
+                hidden: { opacity: 0, y: 12 },
+                visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: [0.2, 0.8, 0.2, 1] } },
+              }}
+              className="flex items-center justify-center w-full h-28 md:h-32"
+              title={s.alt}
+            >
+              {/* Equalised bounding box per logo cell: each logo scales
+                  to fit a fixed h-20/h-24 container via object-contain,
+                  so wide wordmarks (NSW), tall stacks (SA), and circle
+                  marks (ACT) all read at visually equal weight in the
+                  row. Match the partner-logos marquee treatment: muted
+                  grayscale at 60% opacity → full colour at 100% on
+                  hover. */}
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={s.logo}
+                alt={s.alt}
+                className="max-h-full max-w-full w-auto h-auto object-contain opacity-60 hover:opacity-100 transition-opacity duration-500 grayscale hover:grayscale-0"
+              />
+            </motion.div>
+          ))}
+        </motion.div>
+      </div>
+    </section>
+  );
+}
 
 function FinalCTA() {
   return (

@@ -1,5 +1,6 @@
 "use client";
 import { useRef } from "react";
+import Image from "next/image";
 import {
   motion,
   useScroll,
@@ -221,11 +222,13 @@ function PhonePreview({
         <div className="relative w-[160px] md:w-[170px]">
           <div className="relative aspect-[9/19] rounded-t-[30px] bg-ink shadow-[0_30px_70px_-25px_rgba(26,26,46,0.4)] p-[7px] pb-0 -mb-4">
             <div className="relative w-full h-full rounded-t-[24px] bg-white overflow-hidden">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
+              <Image
                 src={step.screen}
                 alt={step.title}
-                className="absolute inset-0 w-full h-full object-cover object-top"
+                fill
+                sizes="(max-width: 768px) 50vw, 200px"
+                quality={75}
+                className="object-cover object-top"
               />
             </div>
           </div>

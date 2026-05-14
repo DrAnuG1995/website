@@ -163,7 +163,6 @@ export default function HeroMap({
   const advCtorRef = useRef<typeof google.maps.marker.AdvancedMarkerElement | null>(null);
   const activeIdRef = useRef<string | null>(null);
   const idleTimerRef = useRef<number | null>(null);
-  const wheelHandlerRef = useRef<((e: WheelEvent) => void) | null>(null);
 
   const [crmHospitals, setCrmHospitals] = useState<MapHospital[]>(initial);
   const [shiftCounts, setShiftCounts] = useState<Record<string, number>>(initialShiftCounts ?? {});
@@ -238,11 +237,13 @@ export default function HeroMap({
         disableDefaultUI: true,
         zoomControl: false,
         keyboardShortcuts: false,
-        // Disable Google's built-in scroll-wheel zoom — it ignores the
-        // cursor under the elastic bounds restriction. We replace it below
-        // with a wheel listener that explicitly zooms toward the cursor.
+        // Scroll-wheel zoom disabled entirely + cooperative gesture
+        // handling so the map does NOT capture page scroll. Visitors
+        // can still scroll past the hero with their cursor anywhere
+        // on the map. To zoom they use the +/- buttons in the corner,
+        // ctrl/cmd + wheel, or a two-finger pinch on touch.
         scrollwheel: false,
-        gestureHandling: "greedy",
+        gestureHandling: "cooperative",
         clickableIcons: false,
         // Matches the `bone` palette token (tailwind.config.ts) so the
         // map tiles fade into the page bg seamlessly while loading.
@@ -257,36 +258,6 @@ export default function HeroMap({
       if (typeof window !== "undefined") {
         (window as unknown as { __sdMap?: google.maps.Map }).__sdMap = map;
       }
-
-      // Cursor-centric wheel zoom: keep the geographic point under the
-      // mouse cursor fixed on screen as the user zooms in or out.
-      // Wheel events are accumulated so a trackpad's many small events
-      // result in one zoom step per ~100 units of deltaY.
-      let wheelAccum = 0;
-      const onWheel = (e: WheelEvent) => {
-        e.preventDefault();
-        wheelAccum += e.deltaY;
-        const threshold = 60;
-        if (Math.abs(wheelAccum) < threshold) return;
-        const direction = wheelAccum < 0 ? 1 : -1;
-        wheelAccum = 0;
-
-        const oldZoom = map.getZoom() ?? OVERVIEW_ZOOM;
-        const newZoom = Math.max(MIN_ZOOM, Math.min(MAX_ZOOM, Math.round(oldZoom) + direction));
-        if (newZoom === oldZoom) return;
-
-        const rect = mapContainer.current!.getBoundingClientRect();
-        const dx = e.clientX - rect.left - rect.width / 2;
-        const dy = e.clientY - rect.top - rect.height / 2;
-
-        map.setZoom(newZoom);
-        const f = Math.pow(2, newZoom - oldZoom);
-        // Pan so the geographic point that was under the cursor stays
-        // under the cursor after the zoom step (formula: dx * (f - 1)).
-        map.panBy(dx * (f - 1), dy * (f - 1));
-      };
-      mapContainer.current.addEventListener("wheel", onWheel, { passive: false });
-      wheelHandlerRef.current = onWheel;
 
       // Push the current zoom-based scale into a CSS var on the map container
       // so all markers (existing + future) read from it.
@@ -304,10 +275,6 @@ export default function HeroMap({
       cancelled = true;
       markersRef.current.forEach(({ marker }) => (marker.map = null));
       markersRef.current = [];
-      if (wheelHandlerRef.current && mapContainer.current) {
-        mapContainer.current.removeEventListener("wheel", wheelHandlerRef.current);
-      }
-      wheelHandlerRef.current = null;
       mapRef.current = null;
     };
   }, []);
@@ -462,7 +429,7 @@ export default function HeroMap({
         <div className="relative rounded-[24px] md:rounded-[28px] border border-ink/15 bg-white overflow-hidden shadow-[0_30px_90px_-40px_rgba(26,26,46,0.25)]">
           <div
             ref={mapContainer}
-            className="relative w-full h-[64vh] min-h-[480px] md:h-[72vh] md:min-h-[600px]"
+            className="relative w-full h-[58vh] min-h-[420px] md:h-[72vh] md:min-h-[600px]"
           />
 
           {keyMissing && (
@@ -537,7 +504,7 @@ export default function HeroMap({
             animate={ready ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
             transition={{ duration: 0.7, ease: [0.2, 0.8, 0.2, 1] }}
             style={{ pointerEvents: ready ? "auto" : "none" }}
-            className="absolute left-4 right-4 bottom-4 md:left-5 md:right-auto md:bottom-5 z-10 max-w-md md:w-[400px] p-5 rounded-2xl bg-white/92 backdrop-blur-xl border border-ink/12 shadow-[0_30px_70px_-20px_rgba(26,26,46,0.25)]"
+            className="relative md:absolute left-0 right-0 md:left-5 md:right-auto md:bottom-5 z-10 max-w-none md:max-w-md md:w-[400px] p-5 rounded-none md:rounded-2xl bg-white md:bg-white/92 md:backdrop-blur-xl border-t md:border border-ink/12 shadow-none md:shadow-[0_30px_70px_-20px_rgba(26,26,46,0.25)]"
           >
             <AnimatePresence mode="wait" initial={false}>
               {activeId && focusPin ? (

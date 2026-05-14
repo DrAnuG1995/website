@@ -8,7 +8,9 @@ A vendor-neutral guide for AI coding agents (Claude, GPT, Cursor, etc.) working 
 
 The marketing site for **StatDoctor** — Australia's first locum doctor marketplace. Two-sided: doctors and hospitals. The product is a mobile app; this site exists to drive doctor sign-ups and hospital onboarding.
 
-Live at `statdoctor.app`. The current redesign happens on the **`jasmine-frontend`** branch.
+Live at `statdoctor.app`. Production deploy is **Vercel**, watching the **`jasmine-frontend`** branch on the fork at `jasmineraj2005/statdoctor_frontend` (the `jasmine` remote in this clone). The upstream at `DrAnuG1995/website` (the `origin` remote) is **not** the deploy source — pushing to `origin/main` does not trigger a deploy.
+
+To deploy: merge work into local `main`, then `git push jasmine main:jasmine-frontend`.
 
 The category (locum doctor recruitment) is design-poor. Every competitor — Medrecruit, Wavelength, Blugibbon, Hopmedic, Locumate, Go Locum — is either a 2010s-era WordPress recruitment site or a flat B2B SaaS page. **The brief is to ship a genuinely well-designed motion-driven editorial site** that doesn't look like anything else in the category. That's the moat.
 
@@ -23,8 +25,9 @@ The category (locum doctor recruitment) is design-poor. Every competitor — Med
 | Styling | Tailwind 3.4 | Brand tokens extended in `tailwind.config.ts` |
 | Motion | Framer Motion 11 | Default for all animation. GSAP is installed but rarely needed — prefer Framer |
 | Smooth scroll | Lenis 1.1 | Wired via `LenisProvider` in `app/layout.tsx` |
-| Maps | Mapbox GL JS 3.8 | See **Mapbox guardrails** section below |
-| Deploy | Vercel | Production = `main` branch |
+| Maps | Google Maps JavaScript API (via `@googlemaps/js-api-loader` v2) | Hero map only. AdvancedMarkerElement for pins. See **Google Maps guardrails** below |
+| Data | Supabase | Live hospitals + shifts (`lib/hospitals.ts`). Anon-key SSR fetch on home + realtime channel on the client |
+| Deploy | Vercel | Watches `jasmine/jasmine-frontend`. See deploy note above |
 
 No state library, no CSS-in-JS runtime, no UI-library components. If you want a primitive, build it.
 
@@ -44,11 +47,20 @@ muted       #6b7a73   Secondary text only — never as a fill or border
 
 **Base background is white (`#ffffff`).** Bone is an accent, not a canvas. The minimalist white-page aesthetic is core to the redesign — do not flood the page with bone or any other colour. Use ocean and electric for emphasis and energy; let white do the work.
 
-Legacy tokens still exist in `tailwind.config.ts` (`bone-2`, `gauze`, `parchment`, `ink-soft`, `electric-deep`, `light-blue`, `stat`) — these are **referenced by the older hospitals/partners/blog/contact pages** which haven't been redesigned yet. **Do not use legacy tokens in new code.** Cleanup will happen page-by-page.
+Legacy tokens still exist in `tailwind.config.ts` (`bone-2`, `gauze`, `parchment`, `ink-soft`, `electric-deep`, `light-blue`, `stat`) — these are **referenced by the older hospitals/partners/contact pages** which haven't been fully redesigned yet. **Do not use legacy tokens in new code.** Cleanup will happen page-by-page.
 
-Typography:
-- Display: **Instrument Serif** (italics used for emphasis lines)
-- Body / UI: **Inter** (also used for the legacy `.mono` class)
+Typography (the site is **two fonts only** as of 2026-05-13):
+- Display: **Cormorant Garamond** (italics used for emphasis lines). Loaded via Google Fonts in `app/globals.css` and exposed as the `display` font-family and `.display` class.
+- Body / UI: **Inter**. Also used by the legacy `.mono` class.
+
+Type tokens (lock these in for new sections — see `2026-05-13` decision log for the audit that established them):
+- **H1 page hero**: `text-[clamp(40px,6.5vw,88px)] leading-[0.98]` (one token site-wide).
+- **H2 primary section**: `text-[clamp(28px,4.5vw,56px)] leading-[1.0]`.
+- **H2 secondary section** (smaller subhead under a marquee/intro): `text-[clamp(24px,3.6vw,44px)] leading-[1.05]`.
+- **Eyebrow primary**: `text-[10px] tracking-[0.22em] uppercase text-muted`.
+- **Eyebrow secondary** (chapter counters, sub-labels): `text-[11px] tracking-[0.18em] uppercase`.
+
+There should only be two eyebrow tracking values in the codebase (`0.22em` / `0.18em`) outside of the `VideoSlot` dev component. If you find yourself reaching for `0.14em` / `0.25em` / etc., snap to the nearest token instead.
 
 ---
 
@@ -66,53 +78,73 @@ Typography:
 ```
 app/
   layout.tsx            Root layout: Lenis + Cursor + Nav + Footer
-  page.tsx              SSR shell that renders <HomeClient />
-  HomeClient.tsx        Homepage sections (client component)
+  page.tsx              SSR shell — fetches hospitals/shifts/stats from Supabase, renders <HomeClient />
+  HomeClient.tsx        Homepage sections (client component). Order: HeroMap → LiveStatsStrip → LogosStrip → FounderVideo → AppShowcase → NotAnAgency → HowWereDifferent → LiveShiftFeed → DoctorVoicesPinned → FAQGrid → StateHealthBand → FinalCTA
+  not-found.tsx         Site-wide 404 — editorial "soon." treatment matching the /blog placeholder
   globals.css           Body bg, typography classes, Lenis CSS, marquee mask
-  hospitals/            Legacy page — pending redesign
-  partners/             Legacy page — pending redesign
-  blog/                 Legacy page — pending redesign
-  contact/              Legacy page — pending redesign
+  about/                Founder essay (Hero + 3-chapter Story + TravelAgentParallel + PullQuote + Closing)
+  hospitals/            Hospitals landing — full redesign (city-slideshow hero, pricing, demo, FAQ)
+  for-doctors/          Doctor funnel — full redesign (city-slideshow hero, AppShowcase, network grid)
+  partners/             Doctor perks (CPD Home + Validex + etc.) — full redesign
+  contact/              Contact form — legacy, pending redesign
+  blog/                 PAUSED. /blog renders an editorial "soon." placeholder; /blog/[slug] inherits the global 404. Posts pipeline lives in a separate repo (STATDOCTOR_BLOGPOSTING).
   privacy-policy/       Legal — kept as-is
   terms-of-use/         Legal — kept as-is
 components/
-  Nav.tsx               Slim: logo + Login + Sign-up popover
+  Nav.tsx               Slim: logo + centered Doctors/Hospitals/Partners links + Login + Download App
   Footer.tsx            Editorial footer — every page link lives here now
   LenisProvider.tsx     Smooth scroll wrapper
   Cursor.tsx            Custom cursor (data-hover targets)
+  CitySlideshow.tsx     Ken-Burns crossfade slideshow used as background on /hospitals + /for-doctors hero. next/Image-backed.
+  DownloadModal.tsx     App-store / Play-store modal triggered by Nav "Download App"
   MagneticButton.tsx    Magnetic hover button (legacy pages still use it)
-  SplitText.tsx         Per-character reveal — legacy
-  Counter.tsx           Animated counter — legacy
-  VideoSlot.tsx         Video frame — legacy
+  SplitText.tsx         Per-character reveal — used on /blog (placeholder), legacy elsewhere
+  Counter.tsx           Animated counter — used on LiveStats only. Removed from Partners hero (was too slow on small numbers).
+  VideoSlot.tsx         Video frame — legacy, only used as a dev scaffold. The two outlier tracking values (0.25em, 0.3em) live here intentionally.
   LegalPage.tsx         Shared legal layout
   home/
-    HeroMap.tsx         Mapbox AU hero with auto-cycling pin tour
-    hospitals.ts        Hardcoded hospital coordinates + tour subset
+    HeroMap.tsx         Google Maps AU hero. Teardrop SVG pins (logo in head). Elastic Australia bounds. Cooperative gesture handling so the map does NOT capture page scroll.
+    hospitals.ts        Fallback hospital coordinates (used only if Supabase is empty)
+    LiveStats.tsx       Aggregate metrics tile row (active shifts / confirmed / avg rate / total value)
+    LiveShiftFeed.tsx   Real shifts pulled from Supabase. Realtime channel subscribed.
+    AppShowcase.tsx     4-step phone-screens reveal driven by scroll progress
+    AgencyCompare.tsx   Numbers-side comparison (legacy, not in current HomeClient flow)
+    FeatureShowcase.tsx (legacy alt feature grid — not in current flow)
+    HowWereDifferent.tsx Agency-vs-StatDoctor flow diagram (Hospital → Doctor pill chain)
+    NotAnAgency.tsx     "We are not an agency" beat
+lib/
+  hospitals.ts          Supabase fetches: hospitals, shift counts, live shifts, live stats. Also state/suburb-extraction helpers.
+  partner-logos.ts      Curated partner-logos marquee (used on home + /hospitals)
+  hero-slides.ts        City-slideshow source list
+  marketing-stats.ts    Curated marketing numbers (e.g. VERIFIED_DOCTORS, AGENCY_FEES_SAVED_AUD)
+  blog/                 Blog data layer — kept while pipeline is paused
 public/
   doctors/              Doctor headshots
+  hospitals/            City photos for the CitySlideshow hero (17 cities, 1.5-3MB JPGs each — served via next/Image so they render as resized WebP/AVIF, not raw)
+  screens/              Phone-screenshot PNGs for AppShowcase + Hospitals stacked-card
+  partners/state-health/ Eight state/territory health-service logos (NSW, VIC, QLD, SA, WA, TAS, NT, ACT)
 reference.md            Design inspirations + competitor URLs
-StatDoctor Hospitals - Sheet1 (2).csv   Source CSV for partner hospitals
+scripts/                Local debug + screenshot scripts (Playwright). Not part of the build — safe to leave untracked.
 ```
 
 Convention: components specific to one route live in `components/<route>/`. Shared primitives live at `components/` root.
 
 ---
 
-## Mapbox guardrails (free-tier discipline)
+## Google Maps guardrails
 
-Mapbox GL JS web tier: **50,000 monthly map loads free**. Beyond that, $5 per 1,000 loads. **The user does not want any billing.** Treat the free tier as a hard ceiling.
+The site moved off Mapbox onto **Google Maps JavaScript API** (via `@googlemaps/js-api-loader` v2) because the brief wanted real logo-pin markers (AdvancedMarkerElement) and the Supabase-driven hospital list grew beyond the original 12-stop tour. The map is the **single most billable surface** on the site — treat it carefully.
 
 Rules in this repo:
 
-1. **One `new mapboxgl.Map()` per page load.** The hero is the only map on the site. Re-using the existing instance via refs is mandatory — never create a second map for any feature.
-2. **No Geocoding API.** Hospital coordinates are hardcoded in `components/home/hospitals.ts`. If you need a new location, add the lat/lng manually — do **not** add a `mapbox-sdk` dependency or call the geocoding endpoint.
-3. **No Static Images, Directions, Tilequery, or Isochrone APIs.** None of these are in use. Don't introduce them.
-4. **IntersectionObserver pause.** The hero auto-tour halts when the section scrolls off-screen. Preserve this behaviour. Reason: prevents tile fetches on background tabs.
-5. **`collectResourceTiming: false`** is set on the map constructor to disable Mapbox's telemetry beacon. Keep it that way.
-6. **Cached tiles only.** The auto-tour cycles through 12 hospitals within Australia. After the first cycle, every visible tile is cached — subsequent cycles fetch nothing new. Don't add zoom-out / fly-to-Antarctica / tilt-to-90° camera moves that pull fresh tiles unnecessarily.
-7. **Token is in `.env.local`** as `NEXT_PUBLIC_MAPBOX_TOKEN`. This is a public token (`pk.*`) and is safe to ship to the client — but rotate via the Mapbox dashboard if it ever leaks.
-
-If the free tier is ever exhausted: it resets monthly. Don't switch to a different paid provider — disable the map (the hero already has a fallback `Map disabled` state) and wait.
+1. **One map per page load.** Only the homepage hero has a map. Don't add a second map anywhere — re-use the existing instance via refs if you need to drive it.
+2. **Map ID is `DEMO_MAP_ID`** (a free Google-provided demo Map ID that enables vector rendering + AdvancedMarkerElement). Swap this for a production-owned Map ID via Google Cloud Console → Map Management if/when ops sets one up. Map styling can ONLY be configured via that Map ID — inline `styles` arrays are ignored by Google when a Map ID is set, so don't try.
+3. **No Geocoding / Static Images / Directions / Places API calls.** Hospital coordinates come from Supabase. Marketing only needs the rendered map.
+4. **AdvancedMarkerElement only.** Pins are teardrop SVGs built in `buildMarkerElement()` inside `HeroMap.tsx`. Logo loads from the hospital's `logo_url` (Supabase storage). Don't fall back to deprecated `google.maps.Marker`.
+5. **`gestureHandling: "cooperative"`** — locked in 2026-05-13. The map must NOT capture page-scroll wheel events. Users zoom via the corner +/- buttons, ctrl/cmd+wheel, or pinch on touch. Don't restore `"greedy"` or re-introduce a custom wheel listener with `e.preventDefault()`.
+6. **`restriction: { latLngBounds: AU_BOUNDS, strictBounds: false }`** — the elastic bounds keep the camera nudged into Australia without preventing the full continent from being visible at overview zoom. Don't flip to `strictBounds: true` (we tried — it cropped the view).
+7. **Referrer allowlist matters.** The API key has a "Website restrictions" list in Google Cloud Console. Production domain must be added there; localhost:3000 is already in. If you ever start the dev server on a different port (3001 etc.), the map will fail with `RefererNotAllowedMapError` until you add it.
+8. **Keys are in `.env.local`** as `NEXT_PUBLIC_GOOGLE_MAPS_API_KEY`, `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`. All three must also be set in the Vercel project settings for the live deploy.
 
 ---
 
@@ -130,6 +162,23 @@ If the free tier is ever exhausted: it resets monthly. Don't switch to a differe
 ## Recent decision log
 
 Newest first. Update when you make architectural moves.
+
+### 2026-05-13 — Polish pass + typography lockdown + blog pause + state-health band
+
+- **Two fonts only.** Dropped Instrument Serif (was a never-used fallback) and Caveat (`.handwritten` class never referenced). Site is now **Cormorant Garamond + Inter** loaded from a single Google Fonts URL in `globals.css`. `tailwind.config.ts` `fontFamily.mono` swapped from the bogus Inter alias to a real `ui-monospace` stack — `font-mono` is now actually monospace if anyone ever uses it.
+- **Typography lockdown** (full audit in `2026-05-13` git history). H1 had 5+ different clamp formulas — collapsed to one: `clamp(40px,6.5vw,88px) leading-[0.98]`. H2 had 25 distinct clamps — collapsed to two (primary `clamp(28px,4.5vw,56px)`, secondary `clamp(24px,3.6vw,44px)`). Eyebrow tracking had 11 distinct values — collapsed to two (`0.22em` primary, `0.18em` secondary). Body text proliferation (text-[13/14/15/16/17/sm/base]) is **not yet cleaned up** — deferred because the surface area is huge and some hierarchy is intentional.
+- **Map redesign.**
+  - Markers rebuilt from flat circles to teardrop **SVG pin shapes** (logo in the round head, dark tail pointing to coordinate). Inline SVG, no asset dependency. Transform-origin moved to `50% 100%` so scale anchors the pin tip, not the centre.
+  - Custom compact zoom controls in the bottom-right (Google's defaults are oversized for the card). Google's defaults disabled via `zoomControl: false`. The "Keyboard shortcuts" link disabled via `keyboardShortcuts: false`.
+  - **Gesture handling switched to `cooperative`** + the cursor-centric wheel listener removed. Page now scrolls past the map normally. Zoom = +/- buttons, ctrl/cmd+wheel, or two-finger pinch. This is the locked-in behaviour — don't revert.
+- **Home flow re-sequenced.** Final order: `HeroMap → LiveStatsStrip → LogosStrip → FounderVideo → AppShowcase → NotAnAgency → HowWereDifferent → LiveShiftFeed → DoctorVoicesPinned → FAQGrid → StateHealthBand → FinalCTA`.
+- **State health band (new section).** Eight wordmark logos at the bottom of the home page (`NSW Health`, `Department of Health Victoria`, `Queensland Health`, `SA Health`, `Department of Health WA`, `Tasmanian Health Service`, `Northern Territory Government`, `ACT Government Health`). Each cell is an equalised bounding box (`h-28 md:h-32`, full grid-cell width) with `object-contain` so wide/tall/circular logos all read at the same visual weight. Files live in `public/partners/state-health/{slug}.png`. Eyebrow reads `SOME OF OUR CLIENTS` — neutral phrasing only, never "endorsed by" / "official partner" without written permission from each state.
+- **About page redesign.** Hero portrait shrunk to a 440px-max-width right-anchored inset; pull-quote rebuilt as a two-column composition (quote left, `100%` hero numeric right, oversized italic `❝` watermark at 14% ocean behind); closing CTA replaced with a personal sign-off (italic Cormorant `Anu` signature, real `anu@statdoctor.net` mailto link, LinkedIn as a small secondary text link — no em-dash on the signature, no `Join as a doctor` button cluster).
+- **Blog paused.** All 4 post JSONs deleted from `content/posts/`. `/blog` now renders an editorial **"soon."** placeholder (oversized italic Cormorant + headline + body + Back-to-home + Email-me-when-it's-live mailto). `/blog/[slug]` falls through to the global 404. Components in `components/blog/*` and `lib/blog/*` left untouched for when the pipeline comes back online — they're dead code for now.
+- **Site-wide 404.** New `app/not-found.tsx` matches the `/blog` placeholder style — `LIVE PIL · 404` eyebrow + oversized italic Cormorant **`soon.`** + "This page is still in progress." + Back-to-home + Contact-support CTAs.
+- **Image perf.** Converted `CitySlideshow` (17× 1.5-3MB city JPGs) and `AppShowcase` phone screens (4× 1-2.5MB PNGs) to `next/Image`. Now served as resized AVIF/WebP at the actual viewport size instead of raw originals — expected ~10× smaller payload on phones.
+- **Deploy lesson learned.** Vercel watches `jasmineraj2005/statdoctor_frontend` (the `jasmine` remote, branch `jasmine-frontend`). Pushing to `origin/main` (`DrAnuG1995/website`) does NOT trigger a deploy. Always `git push jasmine main:jasmine-frontend` to ship.
+- **Em-dash sweep.** Removed every `—` from user-visible copy (kept in code comments). The signature treatment on About uses just `Anu` (italic Cormorant), not `— Anu`.
 
 ### 2026-05-01 — Round 2.3 (founder video, real testimonials, real FAQs)
 - **CEO/founder video** added between DNA and testimonials. Source: `StatDoctor Welcome Video.mov` (1080p HEVC, 85s, 100MB). Re-encoded with `ffmpeg -c:v libx264 -crf 27 -preset slow -vf "scale=-2:1080" -c:a aac -b:a 96k -movflags +faststart` → `public/founder-video.mp4` (21MB). Poster generated at `public/founder-video-poster.jpg`. Component `FounderVideo` in `app/HomeClient.tsx` autoplays muted on scroll via IntersectionObserver (threshold 0.4), pauses when out of view. Mute toggle bottom-right, founder credit chip bottom-left. Heading: "A note to my fellow locum doctors."
@@ -192,12 +241,18 @@ Newest first. Update when you make architectural moves.
 
 ## Things NOT to do
 
-- **Don't** add a paid Mapbox feature, geocoding call, or analytics SDK without explicit approval.
-- **Don't** revert the body to bone. White is the canvas now.
+- **Don't** add a Google Maps API beyond the JS Maps + Places-already-set Map ID. No Geocoding, Directions, Static Images, Places, or Distance Matrix calls without explicit approval.
+- **Don't** restore `gestureHandling: "greedy"` on the hero map or re-add a custom wheel listener with `e.preventDefault()`. The map must not capture page scroll.
+- **Don't** restore Instrument Serif, Caveat, or any third font without explicit approval. The site is intentionally two fonts.
+- **Don't** add a third eyebrow tracking value — snap to `0.22em` or `0.18em`. Same for headings — snap to the H1/H2 tokens above.
+- **Don't** revert the body to bone. White is the canvas.
 - **Don't** introduce a UI library (shadcn, Radix, MUI, etc.). The codebase is hand-built on purpose.
 - **Don't** restore the agency-tax / comparison / roadmap sections without checking — they were intentionally removed.
-- **Don't** put navigation links back in the top bar. Nav is logo + Login + Sign-up only.
-- **Don't** edit hospital coordinates without verifying the lat/lng. A wrong pin in the hero is more visible than anywhere else on the site.
+- **Don't** edit hospital coordinates by hand in `components/home/hospitals.ts` unless you're updating the fallback list — the live pins come from Supabase.
+- **Don't** push to `origin/main` and assume Vercel will deploy — it watches `jasmine/jasmine-frontend`. Always push to the `jasmine` remote.
+- **Don't** restore blog posts or imply the journal is live — `/blog` is intentionally a Coming Soon page until the pipeline is rebuilt.
+- **Don't** add state-coat-of-arms logos as "government endorsements". The `StateHealthBand` uses health-service wordmarks only, with neutral "Some of our clients" framing. Don't change that phrasing without written endorsement letters in hand.
+- **Don't** use em-dashes (`—`) in user-visible copy. They were swept out on 2026-05-13. Use periods, commas, or restructure the sentence.
 - **Don't** leave stale entries in this file. If you change something architectural, log it in the decision log above.
 
 ---
@@ -212,4 +267,12 @@ npm run lint
 npx tsc --noEmit     # type-check
 ```
 
-`.env.local` must contain `NEXT_PUBLIC_MAPBOX_TOKEN` for the hero map to render.
+`.env.local` must contain:
+
+```
+NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=...   # hero map; restricted by referrer in Cloud Console
+NEXT_PUBLIC_SUPABASE_URL=...          # for hospital + shift data
+NEXT_PUBLIC_SUPABASE_ANON_KEY=...     # public anon key, safe to ship to client
+```
+
+All three are also required on Vercel (Project Settings → Environment Variables) for the production build to render the map + live data.

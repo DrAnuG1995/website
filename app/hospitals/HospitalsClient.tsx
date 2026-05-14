@@ -85,7 +85,7 @@ function Hero({
     },
   ];
   return (
-    <section className="relative overflow-hidden text-bone min-h-[640px] md:min-h-[720px] flex items-center pt-32 md:pt-36 pb-12 md:pb-16 px-6">
+    <section className="relative w-full md:h-[100svh] md:min-h-[640px] md:max-h-[920px] overflow-hidden text-bone flex items-center pt-32 md:pt-36 pb-16 md:pb-16 px-6">
       {/* Ken Burns–style city slideshow as the hero background, same
           component + same source list /for-doctors uses so the two
           pages stay in lock-step. Drop a new photo into
