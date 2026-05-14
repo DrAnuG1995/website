@@ -8,7 +8,7 @@ type Persona = "doctor" | "hospital";
 type LeadBody = {
   persona: Persona;
   email: string;
-  phone?: string;
+  name?: string;
   conversation?: { role: "user" | "assistant"; content: string }[];
 };
 
@@ -52,16 +52,16 @@ function buildHtml(b: LeadBody) {
   return `<div style="font-family:Inter,system-ui,sans-serif;color:#1a1a2e;max-width:640px;">
     <h2 style="margin:0 0 12px 0;">New chatbot lead ${tag}</h2>
     <table style="border-collapse:collapse;font-size:14px;margin-bottom:16px;">
+      ${
+        b.name
+          ? `<tr><td style="padding:4px 12px 4px 0;color:#6b7a73;">Name</td><td><strong>${escapeHtml(
+              b.name
+            )}</strong></td></tr>`
+          : ""
+      }
       <tr><td style="padding:4px 12px 4px 0;color:#6b7a73;">Email</td><td><a href="mailto:${escapeHtml(
         b.email
       )}">${escapeHtml(b.email)}</a></td></tr>
-      ${
-        b.phone
-          ? `<tr><td style="padding:4px 12px 4px 0;color:#6b7a73;">Phone</td><td><a href="tel:${escapeHtml(
-              b.phone
-            )}">${escapeHtml(b.phone)}</a></td></tr>`
-          : ""
-      }
       <tr><td style="padding:4px 12px 4px 0;color:#6b7a73;">Captured</td><td>${new Date().toISOString()}</td></tr>
     </table>
     <h3 style="margin:16px 0 8px 0;font-size:13px;letter-spacing:0.1em;text-transform:uppercase;color:#6b7a73;">Conversation excerpt</h3>
@@ -92,17 +92,17 @@ export async function POST(req: NextRequest) {
     return new Response("Valid email required.", { status: 400 });
   }
   if (
-    body.phone !== undefined &&
-    body.phone !== null &&
-    (typeof body.phone !== "string" || body.phone.length > 40)
+    body.name !== undefined &&
+    body.name !== null &&
+    (typeof body.name !== "string" || body.name.length > 120)
   ) {
-    return new Response("Invalid phone.", { status: 400 });
+    return new Response("Invalid name.", { status: 400 });
   }
 
   const lead: LeadBody = {
     persona: body.persona,
     email: body.email.trim().slice(0, 200),
-    phone: body.phone?.trim().slice(0, 40) || undefined,
+    name: body.name?.trim().slice(0, 120) || undefined,
     conversation: Array.isArray(body.conversation)
       ? body.conversation.slice(-20).map((m) => ({
           role: m.role,
@@ -112,10 +112,11 @@ export async function POST(req: NextRequest) {
   };
 
   const resend = new Resend(process.env.RESEND_API_KEY);
-  const subject =
-    lead.persona === "doctor"
-      ? `New doctor lead from chatbot: ${lead.email}`
-      : `New hospital lead from chatbot: ${lead.email}`;
+  // Subject leads with name when we have it, so Anu's inbox preview is useful.
+  const personaWord = lead.persona === "doctor" ? "doctor" : "hospital";
+  const subject = lead.name
+    ? `New ${personaWord} lead: ${lead.name} (${lead.email})`
+    : `New ${personaWord} lead from chatbot: ${lead.email}`;
 
   try {
     const { error } = await resend.emails.send({

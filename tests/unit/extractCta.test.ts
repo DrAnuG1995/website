@@ -101,27 +101,47 @@ describe("extractCta", () => {
 });
 
 describe("extractLead", () => {
-  it("parses a doctor lead with email + phone", () => {
+  it("parses a doctor lead with name + email", () => {
     const r = extractLead(
-      "Got it. Grab the app here.\n[LEAD:persona=doctor;email=foo@bar.com;phone=+61400000000]"
+      "Thanks Sarah, Anu's team will be in touch.\n[LEAD:persona=doctor;name=Sarah Patel;email=foo@bar.com]"
     );
     expect(r.lead).toEqual({
       persona: "doctor",
+      name: "Sarah Patel",
       email: "foo@bar.com",
-      phone: "+61400000000",
     });
-    expect(r.text).toBe("Got it. Grab the app here.");
+    expect(r.text).toBe("Thanks Sarah, Anu's team will be in touch.");
   });
 
-  it("parses a doctor lead with empty phone", () => {
-    const r = extractLead("[LEAD:persona=doctor;email=foo@bar.com;phone=]");
+  it("parses a doctor lead with empty name (visitor refused to give it)", () => {
+    const r = extractLead("[LEAD:persona=doctor;name=;email=foo@bar.com]");
     expect(r.lead).toEqual({ persona: "doctor", email: "foo@bar.com" });
   });
 
-  it("parses a hospital lead (no phone)", () => {
+  it("ignores stray phone fields if a legacy bot reply includes them", () => {
+    // Bot prompt was updated to drop phone, but tolerate it from older
+    // cached replies in localStorage. The phone is just discarded.
+    const r = extractLead("[LEAD:persona=doctor;name=Jamie;email=foo@bar.com;phone=+61400000000]");
+    expect(r.lead).toEqual({
+      persona: "doctor",
+      name: "Jamie",
+      email: "foo@bar.com",
+    });
+  });
+
+  it("parses a hospital lead with name", () => {
     const r = extractLead(
-      "Anu's diary opens here.\n[LEAD:persona=hospital;email=admin@hospital.com.au]"
+      "Anu's diary opens here.\n[LEAD:persona=hospital;name=Dr Smith;email=admin@hospital.com.au]"
     );
+    expect(r.lead).toEqual({
+      persona: "hospital",
+      name: "Dr Smith",
+      email: "admin@hospital.com.au",
+    });
+  });
+
+  it("still parses a hospital lead WITHOUT a name field (backward compatible)", () => {
+    const r = extractLead("[LEAD:persona=hospital;email=admin@hospital.com.au]");
     expect(r.lead).toEqual({
       persona: "hospital",
       email: "admin@hospital.com.au",
@@ -159,11 +179,11 @@ describe("extractLead", () => {
   });
 
   it("ignores extra whitespace in fields", () => {
-    const r = extractLead("[LEAD: persona = doctor ; email = a@b.com ; phone = 123 ]");
+    const r = extractLead("[LEAD: persona = doctor ; name = Sam ; email = a@b.com ]");
     expect(r.lead).toEqual({
       persona: "doctor",
+      name: "Sam",
       email: "a@b.com",
-      phone: "123",
     });
   });
 });

@@ -180,7 +180,12 @@ export function useChat() {
               fetch("/api/lead", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ ...lead, conversation }),
+                body: JSON.stringify({
+                  persona: lead.persona,
+                  email: lead.email,
+                  name: lead.name,
+                  conversation,
+                }),
               }).catch(() => {
                 // Non-fatal: the visitor still gets their CTA, we just don't
                 // notify Anu. The lead is in the chat transcript regardless.

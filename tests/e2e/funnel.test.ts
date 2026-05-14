@@ -160,9 +160,9 @@ describe("E2E: lead capture", () => {
   );
 
   itLive(
-    "doctor: emits [LEAD:persona=doctor;email=...] after email is provided",
+    "doctor: emits [LEAD:persona=doctor;name=...;email=...] after name+email given",
     async () => {
-      const r = await ask("My email is doc.test@example.com.", [
+      const r = await ask("I'm Sarah Patel, email is doc.test@example.com.", [
         { role: "user", content: "I'm a doctor" },
         {
           role: "assistant",
@@ -172,32 +172,83 @@ describe("E2E: lead capture", () => {
         {
           role: "assistant",
           content:
-            "Want me to flag your sign-up to our team? What's the best email to reach you on?",
+            "Want me to flag your sign-up to Anu? What's your name and the best email to reach you on?",
         },
       ]);
-      expect(r.text).toMatch(/\[LEAD:[^\]]*persona=doctor[^\]]*email=doc\.test@example\.com/i);
+      expect(r.text).toMatch(
+        /\[LEAD:[^\]]*persona=doctor[^\]]*email=doc\.test@example\.com/i
+      );
+      // Should capture the name we just provided.
+      expect(r.text).toMatch(/\[LEAD:[^\]]*name=Sarah\s+Patel/i);
+      // Should NOT ask for or include phone anymore.
+      expect(r.text.toLowerCase()).not.toMatch(/phone number|text alert/);
     }
   );
 
   itLive(
-    "hospital: emits [LEAD:persona=hospital;email=...] after email is provided",
+    "doctor: emits [LEAD:...] even when only email is given (no name forced)",
     async () => {
-      const r = await ask("Best email is admin@acme-hospital.com.au.", [
+      const r = await ask("doc.no.name@example.com", [
+        { role: "user", content: "I'm a doctor" },
+        {
+          role: "assistant",
+          content: "Got it. What would you like to know?",
+        },
+        { role: "user", content: "How do I sign up?" },
+        {
+          role: "assistant",
+          content:
+            "Want me to flag your sign-up to our team? What's your name and the best email to reach you on?",
+        },
+      ]);
+      expect(r.text).toMatch(
+        /\[LEAD:[^\]]*persona=doctor[^\]]*email=doc\.no\.name@example\.com/i
+      );
+      // Bot must NOT keep grilling for the missing name.
+      expect(r.text.toLowerCase()).not.toMatch(/what.{0,15}(your )?name|may i (have|ask) your name/);
+    }
+  );
+
+  itLive(
+    "doctor: offers an out after lead is captured (asks if they want to continue)",
+    async () => {
+      const r = await ask("Sarah, sarah@example.com", [
+        { role: "user", content: "I'm a doctor" },
+        {
+          role: "assistant",
+          content: "Got it. What can I help with?",
+        },
+        { role: "user", content: "How do I sign up?" },
+        {
+          role: "assistant",
+          content:
+            "Want me to flag your sign-up to our team? What's your name and the best email?",
+        },
+      ]);
+      // After emitting [LEAD:...], the bot should signal the visitor can ask
+      // something else or stop. "anything else", "let me know", "happy to",
+      // "feel free to ask" etc.
+      expect(r.text.toLowerCase()).toMatch(
+        /anything else|let me know|happy to|grab the app|further|other questions|ask away/
+      );
+    }
+  );
+
+  itLive(
+    "hospital: does NOT collect email; bot directs to the Calendar booking instead",
+    async () => {
+      const r = await ask("I'd like to book a demo with Anu.", [
         { role: "user", content: "I'm with a hospital" },
         {
           role: "assistant",
           content: "Got it. What would you like to know?",
         },
-        { role: "user", content: "I'd like to book a demo." },
-        {
-          role: "assistant",
-          content:
-            "Happy to set you up with Anu for a 30-minute onboarding consult. What's the best work email?",
-        },
       ]);
-      expect(r.text).toMatch(
-        /\[LEAD:[^\]]*persona=hospital[^\]]*email=admin@acme-hospital\.com\.au/i
-      );
+      // Bot must NOT emit a hospital LEAD token — Google Calendar captures
+      // hospital contact details at booking time, the bot doesn't duplicate.
+      expect(r.text).not.toMatch(/\[LEAD:/);
+      // Bot SHOULD show the booking CTA.
+      expect(r.text).toMatch(/\[[A-Za-z_]*_DEMO\]/);
     }
   );
 

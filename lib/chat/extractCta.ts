@@ -1,6 +1,10 @@
 export type Cta = "book" | "download" | null;
 export type Persona = "doctor" | "hospital";
-export type Lead = { persona: Persona; email: string; phone?: string };
+export type Lead = {
+  persona: Persona;
+  email: string;
+  name?: string;
+};
 
 // Tolerate small LLM spelling slips on the funnel tokens
 // (e.g. [DOWLOAD_APP] instead of [DOWNLOAD_APP]). We anchor on the suffix
@@ -53,10 +57,14 @@ export function extractLead(raw: string): { text: string; lead: Lead | null } {
     return { text, lead: null };
   }
 
-  const phone = fields.get("phone");
+  const name = fields.get("name");
   return {
     text,
-    lead: { persona, email, phone: phone && phone.length > 0 ? phone : undefined },
+    lead: {
+      persona,
+      email,
+      name: name && name.length > 0 ? name : undefined,
+    },
   };
 }
 

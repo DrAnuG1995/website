@@ -70,14 +70,14 @@ describe("POST /api/lead", () => {
       ).toBe(400);
     });
 
-    it("400 when phone is non-string or absurdly long", async () => {
+    it("400 when name is non-string or absurdly long", async () => {
       expect(
         (
           await POST(
             makeRequest({
               persona: "doctor",
               email: "x@y.com",
-              phone: 123,
+              name: 123,
             })
           )
         ).status
@@ -88,7 +88,7 @@ describe("POST /api/lead", () => {
             makeRequest({
               persona: "doctor",
               email: "x@y.com",
-              phone: "x".repeat(100),
+              name: "x".repeat(200),
             })
           )
         ).status
@@ -108,44 +108,51 @@ describe("POST /api/lead", () => {
   });
 
   describe("happy path", () => {
-    it("sends a doctor lead email with correct subject", async () => {
+    it("sends a doctor lead email with name in the subject", async () => {
       const res = await POST(
         makeRequest({
           persona: "doctor",
+          name: "Sarah Patel",
           email: "doc@example.com",
-          phone: "+61400000000",
           conversation: [
             { role: "user", content: "I'm a doctor" },
-            { role: "assistant", content: "Great. What's your email?" },
-            { role: "user", content: "doc@example.com" },
+            {
+              role: "assistant",
+              content: "Great. What's your name and email?",
+            },
+            { role: "user", content: "Sarah, doc@example.com" },
           ],
         })
       );
       expect(res.status).toBe(200);
       expect(mockSend).toHaveBeenCalledTimes(1);
       const args = mockSend.mock.calls[0][0];
-      expect(args.subject).toMatch(/doctor/i);
+      expect(args.subject).toMatch(/Sarah Patel/);
       expect(args.subject).toContain("doc@example.com");
       expect(args.to).toBe("anu@statdoctor.net");
       expect(args.replyTo).toBe("doc@example.com");
+      expect(args.html).toContain("Sarah Patel");
       expect(args.html).toContain("doc@example.com");
-      expect(args.html).toContain("+61400000000");
+      // Phone row must NOT exist anymore.
+      expect(args.html).not.toContain("Phone");
       // Conversation excerpt is in the email body.
       expect(args.html).toContain("I&#39;m a doctor");
     });
 
-    it("sends a hospital lead without a phone field", async () => {
+    it("sends a doctor lead even without a name", async () => {
       const res = await POST(
         makeRequest({
-          persona: "hospital",
-          email: "admin@hospital.com.au",
+          persona: "doctor",
+          email: "doc.no.name@example.com",
         })
       );
       expect(res.status).toBe(200);
       const args = mockSend.mock.calls[0][0];
-      expect(args.subject).toMatch(/hospital/i);
-      // No phone row in the html.
-      expect(args.html).not.toContain("Phone");
+      // Subject falls back to the no-name format.
+      expect(args.subject).toMatch(/doctor/i);
+      expect(args.subject).toContain("doc.no.name@example.com");
+      // No name row.
+      expect(args.html).not.toContain("Name");
     });
 
     it("escapes HTML in conversation content (no XSS in email)", async () => {
