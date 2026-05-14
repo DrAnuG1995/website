@@ -91,7 +91,7 @@ function Hero({
           pages stay in lock-step. Drop a new photo into
           public/hospitals/<city>.jpg and append it to HERO_CITY_SLIDES
           to add a slide. */}
-      <CitySlideshow slides={HERO_CITY_SLIDES} />
+      <CitySlideshow slides={HERO_CITY_SLIDES} startIndex={9} />
       {/* Layered overlay: a strong ink wash for legibility + the same
           ocean/electric radial accents we use elsewhere so the hero
           still reads as part of the site's visual language. */}

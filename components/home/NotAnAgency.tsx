@@ -4,6 +4,9 @@ import { motion, useScroll, useTransform, type MotionValue } from "framer-motion
 
 const TEXT = "We are not an agency, and we are proud of that.";
 const WORDS = TEXT.split(" ");
+// Mirror the "From download to first shift in 24 hours" treatment in
+// AppShowcase: straight up to the comma, italic for the rest.
+const ITALIC_FROM = 5;
 
 // Each word lights up from a very-pale blue to the full brand blue as the
 // scroll progress passes over it — so the line reads like ink being drawn
@@ -42,6 +45,7 @@ export default function NotAnAgency() {
               progress={scrollYProgress}
               index={i}
               total={WORDS.length}
+              italic={i >= ITALIC_FROM}
             >
               {word}
             </RevealWord>
@@ -61,11 +65,13 @@ function RevealWord({
   index,
   total,
   children,
+  italic,
 }: {
   progress: MotionValue<number>;
   index: number;
   total: number;
   children: React.ReactNode;
+  italic?: boolean;
 }) {
   // Compress the whole reveal into the first ~45% of scroll progress so the
   // line goes fully blue before the user is even halfway through the
@@ -74,16 +80,21 @@ function RevealWord({
   const start = Math.max(0, index * slice - slice * 0.5);
   const end = Math.min(1, (index + 1) * slice + slice * 0.1);
 
+  // First half resolves to ink (#1a1a2e), italic second half to ocean
+  // (#3232ff) — same black/blue split as "From download to first shift
+  // in 24 hours".
   const color = useTransform(
     progress,
     [start, end],
-    ["rgba(50, 50, 255, 0.18)", "rgba(50, 50, 255, 1)"],
+    italic
+      ? ["rgba(50, 50, 255, 0.18)", "rgba(50, 50, 255, 1)"]
+      : ["rgba(26, 26, 46, 0.18)", "rgba(26, 26, 46, 1)"],
   );
 
   return (
     <motion.span
       style={{ color }}
-      className="inline-block mr-[0.22em] last:mr-0 transition-none"
+      className={`inline-block mr-[0.22em] last:mr-0 transition-none${italic ? " italic" : ""}`}
     >
       {children}
     </motion.span>

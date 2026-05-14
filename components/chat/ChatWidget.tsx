@@ -215,18 +215,18 @@ export default function ChatWidget() {
 function DocAvatar({ size = 40 }: { size?: number }) {
   return (
     <span
-      className="relative inline-block rounded-full bg-bone overflow-hidden border border-ink/10 shrink-0"
+      className="relative inline-grid place-items-center rounded-full bg-white overflow-hidden border border-ocean/15 shadow-[0_4px_12px_-6px_rgba(50,50,255,0.35)] shrink-0"
       style={{ width: size, height: size }}
       aria-hidden
     >
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
-        src="/chat-doc.png"
+        src="/favicon.svg"
         alt=""
         width={size}
         height={size}
-        className="w-full h-full object-cover object-top"
-        style={{ imageRendering: "pixelated" }}
+        className="object-contain"
+        style={{ width: size * 0.7, height: size * 0.7 }}
       />
     </span>
   );

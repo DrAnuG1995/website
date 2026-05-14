@@ -297,23 +297,12 @@ function BriefcaseIcon() {
 
 function StethIcon() {
   return (
-    <div className="w-12 h-12 md:w-14 md:h-14 rounded-2xl bg-ocean shadow-[0_8px_24px_-8px_rgba(50,50,255,0.6)] grid place-items-center text-white">
-      <svg
-        width="24"
-        height="24"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        aria-hidden
-      >
-        <path d="M4.5 3v6a4 4 0 008 0V3" />
-        <path d="M4.5 3h1.5M11 3h1.5" />
-        <path d="M8.5 13v3a5 5 0 0010 0v-1.5" />
-        <circle cx="18.5" cy="12" r="2.2" />
-      </svg>
+    <div className="w-12 h-12 md:w-14 md:h-14 rounded-2xl bg-white border border-ocean/15 shadow-[0_8px_24px_-8px_rgba(50,50,255,0.35)] grid place-items-center overflow-hidden">
+      <img
+        src="/favicon.svg"
+        alt="StatDoctor"
+        className="w-9 h-9 md:w-11 md:h-11 object-contain"
+      />
     </div>
   );
 }

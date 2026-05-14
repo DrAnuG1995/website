@@ -30,12 +30,16 @@ const CROSSFADE_MS = 1400;
 export default function CitySlideshow({
   slides,
   intervalMs = DEFAULT_INTERVAL_MS,
+  startIndex = 0,
 }: {
   slides: CitySlide[];
   intervalMs?: number;
+  startIndex?: number;
 }) {
-  const [active, setActive] = useState(0);
-  const [captionIndex, setCaptionIndex] = useState(0);
+  const initial =
+    slides.length > 0 ? ((startIndex % slides.length) + slides.length) % slides.length : 0;
+  const [active, setActive] = useState(initial);
+  const [captionIndex, setCaptionIndex] = useState(initial);
 
   useEffect(() => {
     if (slides.length <= 1) return;

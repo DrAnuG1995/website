@@ -40,7 +40,7 @@ export default function ForDoctorsClient({
           shared with /hospitals (lib/hero-slides.ts). To swap to a real
           video later, replace CitySlideshow with a <video ... /> element. */}
       <section className="relative w-full h-[100svh] min-h-[560px] max-h-[860px] overflow-hidden bg-ink">
-        <CitySlideshow slides={HERO_CITY_SLIDES} />
+        <CitySlideshow slides={HERO_CITY_SLIDES} startIndex={0} />
         {/* Gradient overlay so the white text reads against any frame.
             Stronger at the bottom where the copy sits. */}
         <div
