@@ -1,5 +1,4 @@
 import LegalPage from "@/components/LegalPage";
-export const metadata = { title: "Privacy Policy, StatDoctor" };
 
 export default function Page() {
   return (

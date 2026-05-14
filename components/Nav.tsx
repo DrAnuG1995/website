@@ -87,24 +87,23 @@ export default function Nav() {
           ))}
         </div>
 
-        {/* Right group: Log in (desktop) + Download */}
+        {/* Right group: Hospital login (desktop) + Doctor app */}
         <div className="flex items-center gap-1 md:gap-2 shrink-0">
           <a
             href="https://hospital.statdoctor.app/#/login"
             target="_blank"
             rel="noopener noreferrer"
-            className="hidden md:inline-flex px-3 lg:px-4 py-2 text-sm font-medium text-ink hover:text-ocean transition-colors"
+            className="hidden md:inline-flex px-3 lg:px-4 py-2 text-sm font-medium text-ink hover:text-ocean transition-colors whitespace-nowrap"
             data-hover
           >
-            Log in
+            Hospital login
           </a>
           <button
             onClick={() => setDownloadOpen(true)}
             className="px-4 md:px-5 py-2 md:py-2.5 rounded-full bg-ocean text-white text-xs md:text-sm font-semibold hover:bg-ink transition-colors whitespace-nowrap"
             data-hover
           >
-            <span className="md:hidden">Download</span>
-            <span className="hidden md:inline">Download App</span>
+            Doctor app
           </button>
           {/* Hamburger — mobile only */}
           <button
@@ -174,7 +173,7 @@ export default function Nav() {
                 className="px-4 py-3 rounded-xl text-[15px] font-medium text-ink hover:bg-ink/5 transition-colors"
                 data-hover
               >
-                Log in
+                Hospital login
               </a>
             </nav>
           </motion.div>

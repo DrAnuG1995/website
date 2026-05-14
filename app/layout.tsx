@@ -6,7 +6,7 @@ import Footer from "@/components/Footer";
 import ChatWidget from "@/components/chat/ChatWidget";
 
 export const metadata: Metadata = {
-  title: "StatDoctor, The Locum Marketplace for Australian Doctors",
+  title: "StatDoctor",
   description:
     "Australia's 1st locum doctor marketplace. Connect directly with hospitals and clinics. No agencies, no hidden fees, 0% commission.",
   icons: {

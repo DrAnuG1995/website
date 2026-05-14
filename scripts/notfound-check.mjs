@@ -1,0 +1,13 @@
+import { chromium } from "playwright";
+const browser = await chromium.launch();
+const page = await browser.newPage({ viewport: { width: 1440, height: 900 } });
+await page.goto("http://localhost:3000/this-page-does-not-exist", { waitUntil: "networkidle", timeout: 20000 }).catch(() => {});
+await page.waitForTimeout(1500);
+await page.screenshot({ path: "/tmp/not-found.png" });
+const mobile = await browser.newContext({ viewport: { width: 390, height: 844 } });
+const mp = await mobile.newPage();
+await mp.goto("http://localhost:3000/this-page-does-not-exist", { waitUntil: "networkidle", timeout: 20000 }).catch(() => {});
+await mp.waitForTimeout(1500);
+await mp.screenshot({ path: "/tmp/not-found-mobile.png", fullPage: true });
+await browser.close();
+console.log("done");

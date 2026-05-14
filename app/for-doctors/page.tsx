@@ -2,7 +2,6 @@ import ForDoctorsClient, { type LivePartner } from "./ForDoctorsClient";
 import { deriveAuState, fetchActiveHospitals } from "@/lib/hospitals";
 
 export const metadata = {
-  title: "For doctors, StatDoctor",
   description:
     "Built for the way doctors actually work, calendar, verification, notifications, and shifts that pay you fully.",
 };

@@ -17,6 +17,29 @@ export default function ChatWidget() {
   const scrollRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
+  // On mobile the bottom-right corner is always occupied by hero CTAs
+  // (full-width buttons), so the launcher collides with them at rest.
+  // Hide the pill until the user has scrolled past the hero; desktop
+  // always shows it. Re-evaluated on resize so flipping the device
+  // orientation does the right thing.
+  const [pillVisible, setPillVisible] = useState(false);
+  useEffect(() => {
+    const update = () => {
+      if (window.innerWidth >= 768) {
+        setPillVisible(true);
+      } else {
+        setPillVisible(window.scrollY > window.innerHeight * 0.6);
+      }
+    };
+    update();
+    window.addEventListener("scroll", update, { passive: true });
+    window.addEventListener("resize", update);
+    return () => {
+      window.removeEventListener("scroll", update);
+      window.removeEventListener("resize", update);
+    };
+  }, []);
+
   // ESC closes panel; lock body scroll on mobile only.
   useEffect(() => {
     if (!open) return;
@@ -59,16 +82,16 @@ export default function ChatWidget() {
     <>
       {/* Floating pill */}
       <AnimatePresence>
-        {!open && (
+        {!open && pillVisible && (
           <motion.button
             key="chat-bubble"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 10 }}
-            transition={{ delay: 0.8, duration: 0.5, ease: [0.2, 0.8, 0.2, 1] }}
+            transition={{ duration: 0.4, ease: [0.2, 0.8, 0.2, 1] }}
             onClick={() => setOpen(true)}
             aria-label="Open StatDoctor chat"
-            className="group fixed bottom-5 right-5 md:bottom-6 md:right-6 z-[95] flex items-center gap-2 h-12 pl-1 pr-4 rounded-full bg-ocean text-white shadow-[0_15px_45px_-10px_rgba(50,50,255,0.55)] hover:bg-ink transition-colors"
+            className="group fixed bottom-5 right-5 md:bottom-8 md:right-6 z-[95] flex items-center gap-2 h-12 pl-1 pr-4 rounded-full bg-ocean text-white shadow-[0_15px_45px_-10px_rgba(50,50,255,0.55)] hover:bg-ink transition-colors"
             data-hover
           >
             <DocAvatar size={40} />
