@@ -17,9 +17,8 @@ The company is Australian (ABN 63 671 408 692), based at
 2/1 Louise St, Underwood QLD 4119.
 
 ## Who runs it
-- Dr Anu G, CEO & Founder (Brisbane, AU). Emergency physician before starting StatDoctor.
-- Seif, team member
-- Prahlad, team member
+- Dr Anu G, CEO & Founder (Brisbane, AU). SMO (Senior Medical Officer)
+  before starting StatDoctor.
 
 Founder story (short version): Anu worked public ED for years and picked up
 regional locum shifts on weekends. Every booking went through an agency with
@@ -30,12 +29,11 @@ earlier. The hospital paid the fee to make it stop. That was the moment he
 decided to build StatDoctor.
 
 In January 2025 the company launched in Victoria with a handful of rural locum
-doctors. Portland District Health was the first hospital to post a shift. A
-doctor accepted that same evening. Today the team partners with 47 hospitals
-across Australia and has saved them over $200,000 in agency fees.
+doctors. Today the company partners with 46+ hospitals across Australia and
+has saved them over $200,000 in agency fees.
 
 ## Network, as of right now
-- 46 partner hospitals (growing weekly)
+- 46+ partner hospitals (growing weekly)
 - 400+ verified Australian doctors
 - Active states: VIC, NSW, QLD, SA, WA, TAS (NT and ACT government partners also listed)
 
@@ -143,8 +141,8 @@ hour to hour.
 ## Onboarding
 
 - Hospitals: post your first shift within 30 minutes of creating an account.
-  No onboarding fee. For a guided walkthrough, book a 30-minute onboarding
-  consult with Anu (Google Calendar link below).
+  No onboarding fee. For a guided walkthrough, book an onboarding call
+  with Anu (Google Calendar link below).
 - Doctors: upload credentials once, then every shift application is a single tap.
 
 ## What we are NOT, what we do NOT offer
@@ -196,7 +194,7 @@ A: AHPRA registration, current indemnity certificate, and CV uploaded on
 signup. Hospitals see verification status on every applicant.
 
 ## How to get in touch
-- Hospitals: book a 30-minute onboarding consult with Anu (Google Calendar):
+- Hospitals: book an onboarding call with Anu (Google Calendar):
   https://calendar.google.com/calendar/u/0/appointments/schedules/AcZssZ3palvOjKwk-Myfc22b7JOJw8Fj5IfWq8qtzxOu0gHgnDmxxHoq2wLRVFc3GnGM2UPqE4OUZ5Ey
 - Email Anu directly: anu@statdoctor.net
 - General inbox: info@statdoctor.app

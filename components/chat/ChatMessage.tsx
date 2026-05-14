@@ -105,7 +105,7 @@ export default function ChatMessage({
           className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-ink text-white text-[13px] font-semibold hover:bg-ocean transition-colors"
           data-hover
         >
-          Book a 30-min call with Anu
+          Book a call with Anu
           <span aria-hidden>→</span>
         </a>
       )}

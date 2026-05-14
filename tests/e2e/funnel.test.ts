@@ -90,12 +90,11 @@ describe("E2E: funnel detection (BOOK_DEMO)", () => {
   });
 
   itLive(
-    "uses 30-min language for the booking, not 15-min",
+    "does not specify a call duration (no 15-min, no 30-min)",
     async () => {
       const r = await asHospital("How can I get on a call with Anu?");
       expect(r.text).not.toMatch(/15[\s-]?min(ute)?/i);
-      // The bot may say "30-minute consult" or "30 min" or just "consult"; we
-      // only fail the test if it explicitly says 15.
+      expect(r.text).not.toMatch(/30[\s-]?min(ute)?/i);
     }
   );
 });
