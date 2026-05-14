@@ -5,9 +5,9 @@ import ChatMessage from "./ChatMessage";
 import { useChat } from "./useChat";
 
 const SUGGESTED_PROMPTS = [
-  "How does StatDoctor work for doctors?",
-  "What does it cost for hospitals?",
-  "I'd like to talk to your team.",
+  "I'm a doctor",
+  "I'm with a hospital or clinic",
+  "Just have a question",
 ];
 
 export default function ChatWidget() {
@@ -141,10 +141,9 @@ export default function ChatWidget() {
               {/* Seeded greeting */}
               <div className="flex flex-col items-start gap-2">
                 <div className="max-w-[92%] rounded-2xl rounded-bl-sm bg-bone border border-ink/8 px-4 py-2.5 text-[14px] leading-relaxed text-ink">
-                  Hi, I&apos;m the StatDoctor assistant. I can answer
-                  questions about how we work with doctors and hospitals, what
-                  we cost, and what a partnership looks like. What would you
-                  like to know?
+                  Hi, I&apos;m the StatDoctor assistant. So I can point you
+                  in the right direction, are you a doctor, or with a
+                  hospital or clinic?
                 </div>
               </div>
 

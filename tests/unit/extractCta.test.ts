@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { extractCta } from "@/lib/chat/extractCta";
+import { extractCta, extractLead, stripAllTokens } from "@/lib/chat/extractCta";
 
 describe("extractCta", () => {
   describe("BOOK_DEMO detection", () => {
@@ -97,5 +97,86 @@ describe("extractCta", () => {
       expect(second.text).toBe(first.text);
       expect(second.cta).toBeNull();
     });
+  });
+});
+
+describe("extractLead", () => {
+  it("parses a doctor lead with email + phone", () => {
+    const r = extractLead(
+      "Got it. Grab the app here.\n[LEAD:persona=doctor;email=foo@bar.com;phone=+61400000000]"
+    );
+    expect(r.lead).toEqual({
+      persona: "doctor",
+      email: "foo@bar.com",
+      phone: "+61400000000",
+    });
+    expect(r.text).toBe("Got it. Grab the app here.");
+  });
+
+  it("parses a doctor lead with empty phone", () => {
+    const r = extractLead("[LEAD:persona=doctor;email=foo@bar.com;phone=]");
+    expect(r.lead).toEqual({ persona: "doctor", email: "foo@bar.com" });
+  });
+
+  it("parses a hospital lead (no phone)", () => {
+    const r = extractLead(
+      "Anu's diary opens here.\n[LEAD:persona=hospital;email=admin@hospital.com.au]"
+    );
+    expect(r.lead).toEqual({
+      persona: "hospital",
+      email: "admin@hospital.com.au",
+    });
+  });
+
+  it("returns null lead when no token present", () => {
+    expect(extractLead("Just a normal reply.").lead).toBeNull();
+  });
+
+  it("returns null lead when persona is invalid", () => {
+    const r = extractLead("[LEAD:persona=patient;email=x@y.com]");
+    expect(r.lead).toBeNull();
+    expect(r.text).toBe("");
+  });
+
+  it("returns null lead when email is missing", () => {
+    expect(extractLead("[LEAD:persona=doctor]").lead).toBeNull();
+  });
+
+  it("returns null lead when email is malformed", () => {
+    expect(extractLead("[LEAD:persona=doctor;email=notanemail]").lead).toBeNull();
+    expect(extractLead("[LEAD:persona=doctor;email=foo@bar]").lead).toBeNull();
+  });
+
+  it("strips even malformed LEAD tokens from visible text", () => {
+    // The bot is instructed to put [LEAD:...] on its own line, so interior
+    // double-spacing rarely happens in practice. We only require that the
+    // token itself is gone; we don't collapse interior whitespace.
+    const r = extractLead("Sorry. [LEAD:persona=alien;email=x@y.com] Try again.");
+    expect(r.text).not.toContain("[LEAD");
+    expect(r.text).toContain("Sorry.");
+    expect(r.text).toContain("Try again.");
+    expect(r.lead).toBeNull();
+  });
+
+  it("ignores extra whitespace in fields", () => {
+    const r = extractLead("[LEAD: persona = doctor ; email = a@b.com ; phone = 123 ]");
+    expect(r.lead).toEqual({
+      persona: "doctor",
+      email: "a@b.com",
+      phone: "123",
+    });
+  });
+});
+
+describe("stripAllTokens", () => {
+  it("strips CTA + LEAD tokens together", () => {
+    const out = stripAllTokens(
+      "Sure.\n[BOOK_DEMO]\n[LEAD:persona=hospital;email=a@b.com]"
+    );
+    expect(out).toBe("Sure.");
+  });
+
+  it("is a no-op on plain text", () => {
+    expect(stripAllTokens("hello world")).toBe("hello world");
   });
 });

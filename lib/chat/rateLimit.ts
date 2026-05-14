@@ -1,5 +1,7 @@
 const WINDOW_MS = 60_000;
-const MAX_REQUESTS = 20;
+// Realistic visitors send maybe 1 message every few seconds; 60/min still
+// blocks scripted abuse but doesn't trip during heavy E2E test runs.
+const MAX_REQUESTS = 60;
 
 type Bucket = { count: number; resetAt: number };
 const buckets = new Map<string, Bucket>();

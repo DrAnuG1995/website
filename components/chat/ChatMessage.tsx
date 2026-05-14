@@ -2,7 +2,7 @@
 import ReactMarkdown, { type Components } from "react-markdown";
 import remarkGfm from "remark-gfm";
 import type { ChatMessage as ChatMessageType } from "./useChat";
-import { extractCta, type Cta } from "@/lib/chat/extractCta";
+import { extractCta, extractLead } from "@/lib/chat/extractCta";
 
 const mdComponents: Components = {
   p: ({ children }) => <p className="my-1.5 first:mt-0 last:mb-0">{children}</p>,
@@ -58,9 +58,14 @@ export default function ChatMessage({
   isStreaming: boolean;
 }) {
   const isUser = message.role === "user";
+  // For assistant messages, strip the LEAD token first (it's a side-channel
+  // to /api/lead, never shown), then run the CTA extractor on the rest.
   const { text, cta } = isUser
-    ? { text: message.content, cta: null as Cta }
-    : extractCta(message.content);
+    ? { text: message.content, cta: null as ReturnType<typeof extractCta>["cta"] }
+    : (() => {
+        const { text: noLead } = extractLead(message.content);
+        return extractCta(noLead);
+      })();
 
   if (isUser) {
     return (
@@ -100,7 +105,7 @@ export default function ChatMessage({
           className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-ink text-white text-[13px] font-semibold hover:bg-ocean transition-colors"
           data-hover
         >
-          Book a 15-min call with Anu
+          Book a 30-min call with Anu
           <span aria-hidden>→</span>
         </a>
       )}

@@ -208,10 +208,10 @@ describe("POST /api/chat", () => {
   });
 
   describe("rate limiting", () => {
-    it("returns 429 once a single IP exceeds 20 requests in a 60s window", async () => {
+    it("returns 429 once a single IP exceeds 60 requests in a 60s window", async () => {
       const ip = "192.168.99.99";
       let lastStatus = 0;
-      for (let i = 0; i < 21; i++) {
+      for (let i = 0; i < 61; i++) {
         const res = await POST(
           makeRequest(
             { messages: [{ role: "user", content: `q${i}` }] },
@@ -227,7 +227,7 @@ describe("POST /api/chat", () => {
 
     it("includes a Retry-After header on 429", async () => {
       const ip = "192.168.99.100";
-      for (let i = 0; i < 20; i++) {
+      for (let i = 0; i < 60; i++) {
         const res = await POST(
           makeRequest(
             { messages: [{ role: "user", content: `q${i}` }] },
@@ -246,7 +246,7 @@ describe("POST /api/chat", () => {
     it("rate-limits per-IP, not globally (different IPs are independent)", async () => {
       const ipA = "192.168.99.101";
       const ipB = "192.168.99.102";
-      for (let i = 0; i < 20; i++) {
+      for (let i = 0; i < 60; i++) {
         const r = await POST(
           makeRequest(
             { messages: [{ role: "user", content: `q${i}` }] },

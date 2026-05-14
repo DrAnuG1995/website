@@ -2,6 +2,10 @@
 # Last updated: 2026-05-14
 # This file is the single source of truth for the StatDoctor website chatbot.
 # Edit freely. Anything not in here, the bot will not say.
+#
+# IMPORTANT: The live "average rate" is injected from the CRM at request time
+# via fetchLiveStats(). Do NOT hardcode an average rate number in this file,
+# the bot is instructed to quote the live value.
 
 ## What StatDoctor is
 StatDoctor is Australia's first locum doctor marketplace. We connect doctors
@@ -34,32 +38,38 @@ across Australia and has saved them over $200,000 in agency fees.
 - 46 partner hospitals (growing weekly)
 - 400+ verified Australian doctors
 - Active states: VIC, NSW, QLD, SA, WA, TAS (NT and ACT government partners also listed)
-- Rates up to $500 per shift visible on the platform
+
+## Rates — what doctors actually earn
+- The average shift rate currently posted on StatDoctor is shown in the LIVE
+  STATS block (refreshed every 60 seconds). Always quote that live number.
+- Doctors can earn up to $500 MORE PER SHIFT on StatDoctor than they would
+  through a traditional locum agency, because there's no agency cut.
+- The rate the hospital posts is the rate the doctor receives. No commission.
 
 ## For DOCTORS, how it works
 
 Four steps, in the app:
 
-1. Browse, Real-time feed of every shift in your state. Filter by specialty,
+1. Browse: Real-time feed of every shift in your state. Filter by specialty,
    rate, location, and date.
-2. Rate, The rate is posted by the hospital, visible upfront. No agency
-   markup. No surprise on payday. (Example rate displayed in the app: $250/hr.)
-3. Apply, Two taps. Credentials prefilled from your profile. Most hospitals
+2. Rate: The rate is posted by the hospital, visible upfront. No agency
+   markup. No surprise on payday.
+3. Apply: Two taps. Credentials prefilled from your profile. Most hospitals
    confirm inside the hour.
-4. Paid, Money in your account within 48 hours of completing the shift.
+4. Paid: Money in your account within 48 hours of completing the shift.
    No invoicing.
 
 ## For HOSPITALS, how it works
 
 Four steps:
 
-1. Post, Post a shift in 90 seconds. Specialty, date, hours, rate, location.
+1. Post: Post a shift in 90 seconds. Specialty, date, hours, rate, location.
    Live to 400+ verified doctors immediately.
-2. Review, See applicants with credentials side-by-side: AHPRA registration,
+2. Review: See applicants with credentials side-by-side: AHPRA registration,
    indemnity, CV, ratings, history.
-3. Confirm, One tap to confirm. Doctor notified instantly. Most shifts
+3. Confirm: One tap to confirm. Doctor notified instantly. Most shifts
    confirmed inside 30 minutes.
-4. Manage, Track active, confirmed, and archived shifts in one dashboard.
+4. Manage: Track active, confirmed, and archived shifts in one dashboard.
    Settle in 48 hours. Doctor keeps 100% of the posted rate.
 
 Median time-to-fill is under 24 hours. Same-day urgent shifts often fill
@@ -130,10 +140,11 @@ For an up-to-date view of where shifts are actually live right now, the
 StatDoctor app is the source of truth, the feed is real-time and changes
 hour to hour.
 
-## Onboarding times
+## Onboarding
 
 - Hospitals: post your first shift within 30 minutes of creating an account.
-  No onboarding fee.
+  No onboarding fee. For a guided walkthrough, book a 30-minute onboarding
+  consult with Anu (Google Calendar link below).
 - Doctors: upload credentials once, then every shift application is a single tap.
 
 ## What we are NOT
@@ -162,6 +173,11 @@ to 10 hospitals. Flat annual fee. No per-shift, no per-seat, no buy-out fees.
 Q: What does it cost a doctor?
 A: Nothing. The hospital pays. The doctor keeps 100% of the posted rate.
 
+Q: How much do doctors actually earn?
+A: Average shift rate is in the LIVE STATS block (quote it live). Doctors can
+earn up to $500 more per shift on StatDoctor than through a traditional locum
+agency, because there is no agency cut.
+
 Q: Can a hospital hire a locum permanently?
 A: Yes. At no extra cost. Agencies charge 15-25% of first-year salary as a
 buy-out fee. We charge $0.
@@ -174,7 +190,7 @@ A: AHPRA registration, current indemnity certificate, and CV uploaded on
 signup. Hospitals see verification status on every applicant.
 
 ## How to get in touch
-- Book a 15-min call with Anu (Google Calendar):
+- Hospitals: book a 30-minute onboarding consult with Anu (Google Calendar):
   https://calendar.google.com/calendar/u/0/appointments/schedules/AcZssZ3palvOjKwk-Myfc22b7JOJw8Fj5IfWq8qtzxOu0gHgnDmxxHoq2wLRVFc3GnGM2UPqE4OUZ5Ey
 - Email Anu directly: anu@statdoctor.net
 - General inbox: info@statdoctor.app

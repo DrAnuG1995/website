@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
 import { rateLimit } from "@/lib/chat/rateLimit";
 
-const MAX = 20;
+const MAX = 60;
 const WINDOW_MS = 60_000;
 
 // Each test uses a unique IP key so module-level bucket state doesn't bleed.
