@@ -441,6 +441,83 @@ describe("Hallucination: lead emission rules", () => {
       }
     }
   );
+
+  itLive(
+    "gracefully accepts refusal: 'no thanks' drops the ask, no LEAD emitted",
+    async () => {
+      const r = await ask("no thanks, I'd rather not share that.", [
+        { role: "user", content: "I'm a doctor" },
+        {
+          role: "assistant",
+          content: "Got it. What would you like to know?",
+        },
+        { role: "user", content: "How do I sign up?" },
+        {
+          role: "assistant",
+          content:
+            "Want me to flag your interest to Anu? What's your name and the best email?",
+        },
+      ]);
+      // No email shared, so no LEAD token. Bot should NOT pester.
+      expect(r.text).not.toMatch(/\[LEAD:/);
+      // Bot should not ask for the email again in this same reply.
+      const reAskCount = (r.text.toLowerCase().match(/\bemail\b/g) ?? []).length;
+      expect(reAskCount).toBeLessThanOrEqual(1);
+    }
+  );
+
+  itLive(
+    "treats topic-change as implicit skip: bot pivots to new question, no LEAD",
+    async () => {
+      const r = await ask("Actually, how does the AHPRA verification work?", [
+        { role: "user", content: "I'm a doctor" },
+        {
+          role: "assistant",
+          content: "Got it. What would you like to know?",
+        },
+        { role: "user", content: "How do I sign up?" },
+        {
+          role: "assistant",
+          content:
+            "Want me to flag your sign-up? What's your name and the best email?",
+        },
+      ]);
+      // User changed topic mid-ask. Bot should answer the AHPRA question
+      // and NOT emit a fake LEAD.
+      expect(r.text).not.toMatch(/\[LEAD:/);
+      expect(r.text.toLowerCase()).toMatch(/ahpra|verif|registration|upload|credential/);
+    }
+  );
+
+  itLive(
+    "after refusal, does NOT re-ask for email on the next message",
+    async () => {
+      const r = await ask("Tell me how the payment cadence works.", [
+        { role: "user", content: "I'm a doctor" },
+        {
+          role: "assistant",
+          content: "Got it. What would you like to know?",
+        },
+        { role: "user", content: "How do I sign up?" },
+        {
+          role: "assistant",
+          content:
+            "Want me to flag your sign-up? What's your name and the best email?",
+        },
+        { role: "user", content: "no thanks" },
+        {
+          role: "assistant",
+          content:
+            "No worries, no need to share that. Anything else I can help with?",
+        },
+      ]);
+      // User already refused. The bot should NOT re-ask for email on the
+      // payment question.
+      const askedAgain = /(your )?email|reach you on|name and (the )?best email/i.test(r.text);
+      expect(askedAgain).toBe(false);
+      expect(r.text).not.toMatch(/\[LEAD:/);
+    }
+  );
 });
 
 // =====================================================================
