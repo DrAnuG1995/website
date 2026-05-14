@@ -81,7 +81,7 @@ export default function ChatMessage({
 
   return (
     <div className="flex flex-col items-start gap-2">
-      <div className="max-w-[92%] rounded-2xl rounded-bl-sm bg-bone border border-ink/8 px-4 py-2.5 text-[14px] leading-relaxed text-ink">
+      <div className="max-w-[92%] rounded-2xl rounded-bl-sm bg-lavender border border-ocean/10 px-4 py-2.5 text-[14px] leading-relaxed text-ink">
         {showCaret ? (
           <span className="inline-flex gap-1" aria-label="Thinking">
             <Dot />

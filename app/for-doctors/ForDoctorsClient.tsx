@@ -298,13 +298,13 @@ function PartnerNetwork({
             </AnimatePresence>
           </motion.div>
 
-          <div className="flex flex-wrap justify-center items-center gap-3">
-            {hasMore && (
+          {hasMore && (
+            <div className="text-center">
               <button
                 type="button"
                 onClick={() => setExpanded((e) => !e)}
                 aria-expanded={expanded}
-                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-ocean text-white text-[13px] font-semibold hover:bg-ink transition-colors"
+                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-lavender text-ink border border-ink/10 text-[13px] font-semibold hover:bg-ocean/10 hover:border-ink/20 transition-colors"
                 data-hover
               >
                 {expanded
@@ -317,16 +317,8 @@ function PartnerNetwork({
                   ↓
                 </span>
               </button>
-            )}
-            <a
-              href="/partners"
-              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full border border-ink/15 text-ink text-[13px] font-medium hover:bg-ink hover:text-white hover:border-ink transition-colors"
-              data-hover
-            >
-              Browse the full network
-              <span aria-hidden>→</span>
-            </a>
-          </div>
+            </div>
+          )}
         </motion.div>
       </div>
     </section>
@@ -347,7 +339,7 @@ function StatePill({
       onClick={onClick}
       className={`inline-flex items-center px-3.5 py-1.5 rounded-full text-[12px] md:text-[13px] font-medium border transition-colors ${
         active
-          ? "bg-ocean text-white border-ocean"
+          ? "bg-lavender text-ink border-ink/10"
           : "bg-white text-ink border-ink/15 hover:border-ink/40"
       }`}
       data-hover
