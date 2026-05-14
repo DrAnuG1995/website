@@ -176,6 +176,11 @@ const STATES: { code: AusState; label: string }[] = [
   { code: "NT", label: "Northern Territory" },
 ];
 
+// Default cards shown before the user expands the list. 8 = 2 desktop
+// rows (4-col grid) / 4 mobile rows (2-col), enough to read "real network"
+// without dumping 40+ logos before the next section gets a chance to load.
+const PREVIEW_LIMIT = 8;
+
 function PartnerNetwork({
   partnerCount,
   partners,
@@ -184,8 +189,11 @@ function PartnerNetwork({
   partners: LivePartner[];
 }) {
   const [filter, setFilter] = useState<AusState | "ALL">("ALL");
+  const [expanded, setExpanded] = useState(false);
   const visible =
     filter === "ALL" ? partners : partners.filter((p) => p.state === filter);
+  const displayed = expanded ? visible : visible.slice(0, PREVIEW_LIMIT);
+  const hasMore = visible.length > PREVIEW_LIMIT;
   const countFor = (code: AusState) =>
     partners.filter((p) => p.state === code).length;
 
@@ -234,7 +242,7 @@ function PartnerNetwork({
             className="flex flex-wrap justify-center gap-3 md:gap-4 mb-6"
           >
             <AnimatePresence mode="popLayout">
-              {visible.map((p) => {
+              {displayed.map((p) => {
                 // Every card is clickable. If the CRM has a stored
                 // website use it directly. Otherwise fall back to
                 // DuckDuckGo's "!ducky" bang, which redirects straight
@@ -290,7 +298,26 @@ function PartnerNetwork({
             </AnimatePresence>
           </motion.div>
 
-          <div className="text-center">
+          <div className="flex flex-wrap justify-center items-center gap-3">
+            {hasMore && (
+              <button
+                type="button"
+                onClick={() => setExpanded((e) => !e)}
+                aria-expanded={expanded}
+                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-ocean text-white text-[13px] font-semibold hover:bg-ink transition-colors"
+                data-hover
+              >
+                {expanded
+                  ? "Show fewer"
+                  : `Show all ${visible.length}`}
+                <span
+                  aria-hidden
+                  className={`transition-transform ${expanded ? "rotate-180" : ""}`}
+                >
+                  ↓
+                </span>
+              </button>
+            )}
             <a
               href="/partners"
               className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full border border-ink/15 text-ink text-[13px] font-medium hover:bg-ink hover:text-white hover:border-ink transition-colors"

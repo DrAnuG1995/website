@@ -22,6 +22,7 @@ export default function AboutClient() {
       <Story />
       <TravelAgentParallel />
       <PullQuote />
+      <Team />
       <Closing />
     </div>
   );
@@ -408,6 +409,135 @@ const pullQuoteBeat = {
     transition: { duration: 0.8, ease: [0.2, 0.8, 0.2, 1] },
   },
 };
+
+/* ---------- MEET THE TEAM ----------
+   Two-card row introducing Seif + Prahlad — the other half of the
+   "team of three" referenced in Chapter 03. Headshots aren't in the
+   repo yet; the tile gracefully falls back to an initial monogram on
+   a lavender/ocean wash so the section ships now and the photos drop
+   in later (just save them to /public/team/<slug>.jpg). */
+type TeamMember = {
+  name: string;
+  initials: string;
+  role: string;
+  bio: string;
+  photo?: string;
+  linkedin: string;
+};
+
+const TEAM: TeamMember[] = [
+  {
+    name: "Seif Othman",
+    initials: "SO",
+    role: "CTO",
+    bio: "Engineer with a Master's in IoT and full-stack software development, on top of a foundation in computer science and telecommunications. 2.5+ years building production IoT, web and mobile apps in Flutter, Angular, Node and related stacks.",
+    photo: "/team/seif.png",
+    linkedin: "https://www.linkedin.com/in/seif-o-212840134/",
+  },
+  {
+    name: "Prahlad Payda",
+    initials: "PP",
+    role: "Strategy & Growth",
+    bio: "Connector of dots, builder of momentum. Background spans strategy consulting, digital health and corporate innovation. From national healthcare reforms and connected-care strategies to advising startups on GTM, partnerships and early growth. Focused on the next wave: preventative, personalised, AI-powered care. Usually at Bronte for sunrise.",
+    photo: "/team/prahlad.png",
+    linkedin: "https://www.linkedin.com/in/prahladpayda/",
+  },
+];
+
+function Team() {
+  return (
+    <section className="relative bg-white py-20 md:py-28 px-6">
+      <div className="relative max-w-[820px] mx-auto">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-100px" }}
+          transition={{ duration: 0.7, ease: [0.2, 0.8, 0.2, 1] }}
+          className="max-w-2xl"
+        >
+          <div className="text-[10px] tracking-[0.22em] uppercase text-muted mb-4 inline-flex items-center gap-2">
+            <span className="w-1.5 h-1.5 rounded-full bg-ocean" />
+            Meet the team
+          </div>
+          <h2 className="display text-[clamp(28px,4vw,52px)] leading-[1.05]">
+            The other half of the{" "}
+            <span className="italic text-ocean">team of three</span>.
+          </h2>
+          <p className="mt-5 text-muted text-[15px] md:text-[17px] leading-relaxed max-w-prose">
+            StatDoctor stays small on purpose. Two people alongside Anu, both
+            full-stack on whatever the marketplace needs that week.
+          </p>
+        </motion.div>
+
+        <div className="mt-12 md:mt-16 grid grid-cols-1 gap-6 md:gap-7">
+          {TEAM.map((m, i) => (
+            <TeamCard key={m.name} member={m} index={i} />
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function TeamCard({ member, index }: { member: TeamMember; index: number }) {
+  return (
+    <motion.article
+      initial={{ opacity: 0, y: 24 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: "-80px" }}
+      transition={{
+        duration: 0.7,
+        delay: 0.1 + index * 0.08,
+        ease: [0.2, 0.8, 0.2, 1],
+      }}
+      className="group relative rounded-3xl overflow-hidden bg-gradient-to-br from-ocean to-[#1f1fcc] text-white shadow-[0_30px_60px_-25px_rgba(50,50,255,0.55)] hover:shadow-[0_40px_90px_-25px_rgba(50,50,255,0.7)] hover:-translate-y-1 transition-all duration-500 flex flex-col sm:flex-row sm:items-stretch"
+    >
+      <div className="relative aspect-square sm:aspect-auto sm:w-[240px] md:w-[260px] sm:shrink-0 overflow-hidden bg-bone">
+        {member.photo ? (
+          <Image
+            src={member.photo}
+            alt={member.name}
+            fill
+            sizes="(max-width: 640px) 100vw, 260px"
+            className="object-cover object-center"
+          />
+        ) : (
+          <div className="absolute inset-0 grid place-items-center bg-gradient-to-br from-ocean/90 to-electric/20">
+            <span
+              aria-hidden
+              className="display italic select-none leading-none text-white"
+              style={{ fontSize: "clamp(72px, 9vw, 128px)" }}
+            >
+              {member.initials}
+            </span>
+          </div>
+        )}
+      </div>
+
+      <div className="p-6 md:p-8 flex-1 flex flex-col justify-center">
+        <h3 className="display text-[clamp(22px,2.4vw,30px)] leading-tight text-white">
+          {member.name}
+        </h3>
+        <div className="mt-1 text-[11px] tracking-[0.22em] uppercase text-electric font-semibold">
+          {member.role}
+        </div>
+        <p className="mt-4 text-white/80 text-[14px] md:text-[15px] leading-relaxed">
+          {member.bio}
+        </p>
+        <a
+          href={member.linkedin}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="mt-5 inline-flex items-center gap-1.5 text-[12px] tracking-[0.18em] uppercase text-white/70 hover:text-electric transition-colors"
+          data-hover
+        >
+          LinkedIn
+          <span aria-hidden>↗</span>
+        </a>
+      </div>
+    </motion.article>
+  );
+}
 
 /* ---------- CLOSING CTA ----------
    Personal founder sign-off. Treats the end of the essay like the
