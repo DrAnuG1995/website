@@ -427,7 +427,7 @@ type TeamMember = {
 
 const TEAM: TeamMember[] = [
   {
-    name: "Seif Othman",
+    name: "Seif Ouselati",
     initials: "SO",
     role: "Chief Technology Officer",
     bio: "Seif leads the technology behind StatDoctor, building the systems powering faster, smarter healthcare workforce management. With a background across IoT, full-stack engineering and scalable product development, he has spent years turning complex operational problems into simple user experiences.\n\nWhat drew Seif to StatDoctor was the opportunity to work on technology with real-world impact. After seeing how outdated and fragmented many healthcare systems still are, he became focused on building tools that reduce admin, improve efficiency and give clinicians back valuable time.\n\nFrom AI-powered credentialling to workforce automation, Seif is helping shape the next generation of healthcare infrastructure through technology designed around the people actually using it.",
