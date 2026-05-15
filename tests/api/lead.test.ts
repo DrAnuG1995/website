@@ -155,6 +155,41 @@ describe("POST /api/lead", () => {
       expect(args.html).not.toContain("Name");
     });
 
+    it("classifies a hospital lead distinctly from a doctor lead", async () => {
+      const res = await POST(
+        makeRequest({
+          persona: "hospital",
+          name: "Priya Shah",
+          email: "priya@bendigohealth.org.au",
+        })
+      );
+      expect(res.status).toBe(200);
+      const args = mockSend.mock.calls[0][0];
+      // Subject is tagged hospital, not doctor.
+      expect(args.subject).toMatch(/hospital/i);
+      expect(args.subject).not.toMatch(/doctor/i);
+      expect(args.subject).toContain("Priya Shah");
+      // HTML body shows the Hospital badge, not the Doctor one.
+      expect(args.html).toMatch(/>\s*Hospital\s*</);
+      expect(args.html).not.toMatch(/>\s*Doctor\s*</);
+      expect(args.html).toContain("priya@bendigohealth.org.au");
+      expect(args.replyTo).toBe("priya@bendigohealth.org.au");
+    });
+
+    it("sends a hospital lead without a name (email-only soft path)", async () => {
+      const res = await POST(
+        makeRequest({
+          persona: "hospital",
+          email: "admin@cairnsclinic.com.au",
+        })
+      );
+      expect(res.status).toBe(200);
+      const args = mockSend.mock.calls[0][0];
+      expect(args.subject).toMatch(/hospital/i);
+      expect(args.subject).toContain("admin@cairnsclinic.com.au");
+      expect(args.html).toMatch(/>\s*Hospital\s*</);
+    });
+
     it("escapes HTML in conversation content (no XSS in email)", async () => {
       await POST(
         makeRequest({

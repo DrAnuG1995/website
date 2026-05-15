@@ -17,6 +17,14 @@ function getClientKey(req: NextRequest) {
   return req.headers.get("x-real-ip") ?? "anonymous";
 }
 
+// Warmup ping target — keeps the chat function from cold-starting between users.
+// Touches the heavy imports (OpenAI, prompt) so they're JIT'd in the lambda.
+export async function GET() {
+  void buildSystemPrompt;
+  void OpenAI;
+  return Response.json({ ok: true });
+}
+
 export async function POST(req: NextRequest) {
   if (!process.env.OPENAI_API_KEY) {
     return new Response(

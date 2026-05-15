@@ -206,7 +206,7 @@ export default function ChatWidget() {
                   onKeyDown={onKeyDown}
                   rows={1}
                   placeholder="Ask about pricing, coverage…"
-                  className="flex-1 resize-none bg-transparent outline-none text-[13px] leading-5 text-ink placeholder:text-muted max-h-24 py-1 my-0 block"
+                  className="flex-1 resize-none bg-transparent outline-none text-[16px] md:text-[13px] leading-5 text-ink placeholder:text-muted max-h-24 py-1 my-0 block"
                 />
                 <button
                   onClick={submit}

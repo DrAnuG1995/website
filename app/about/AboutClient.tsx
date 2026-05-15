@@ -430,7 +430,7 @@ const TEAM: TeamMember[] = [
     name: "Seif Othman",
     initials: "SO",
     role: "CTO",
-    bio: "Engineer with a Master's in IoT and full-stack software development, on top of a foundation in computer science and telecommunications. 2.5+ years building production IoT, web and mobile apps in Flutter, Angular, Node and related stacks.",
+    bio: "Seif leads the technology behind StatDoctor, building the systems powering faster, smarter healthcare workforce management. With a background across IoT, full-stack engineering and scalable product development, he has spent years turning complex operational problems into simple user experiences.\n\nWhat drew Seif to StatDoctor was the opportunity to work on technology with real-world impact. After seeing how outdated and fragmented many healthcare systems still are, he became focused on building tools that reduce admin, improve efficiency and give clinicians back valuable time.\n\nFrom AI-powered credentialling to workforce automation, Seif is helping shape the next generation of healthcare infrastructure through technology designed around the people actually using it.",
     photo: "/team/seif.png",
     linkedin: "https://www.linkedin.com/in/seif-o-212840134/",
   },
@@ -438,7 +438,7 @@ const TEAM: TeamMember[] = [
     name: "Prahlad Payda",
     initials: "PP",
     role: "Strategy & Growth",
-    bio: "Connector of dots, builder of momentum. Background spans strategy consulting, digital health and corporate innovation. From national healthcare reforms and connected-care strategies to advising startups on GTM, partnerships and early growth. Focused on the next wave: preventative, personalised, AI-powered care. Usually at Bronte for sunrise.",
+    bio: "Prahlad brings a rare mix of healthcare strategy, systems thinking and startup execution to StatDoctor. Having worked across organisations including Apple and Bupa, he has seen firsthand how difficult it is for large systems to adapt to changing workforce and patient needs.\n\nHis passion for healthcare reform comes from a belief that clinicians should spend less time fighting broken systems and more time caring for patients. At StatDoctor, he focuses on building partnerships, driving sustainable growth and helping shape technology that makes healthcare staffing simpler, faster and more human.",
     photo: "/team/prahlad.png",
     linkedin: "https://www.linkedin.com/in/prahladpayda/",
   },
@@ -521,9 +521,11 @@ function TeamCard({ member, index }: { member: TeamMember; index: number }) {
         <div className="mt-1 text-[11px] tracking-[0.22em] uppercase text-electric font-semibold">
           {member.role}
         </div>
-        <p className="mt-4 text-white/80 text-[14px] md:text-[15px] leading-relaxed">
-          {member.bio}
-        </p>
+        <div className="mt-4 space-y-3 text-white/80 text-[14px] md:text-[15px] leading-relaxed">
+          {member.bio.split(/\n\n+/).map((para, i) => (
+            <p key={i}>{para}</p>
+          ))}
+        </div>
         <a
           href={member.linkedin}
           target="_blank"

@@ -234,7 +234,7 @@ describe("E2E: lead capture", () => {
   );
 
   itLive(
-    "hospital: does NOT collect email; bot directs to the Calendar booking instead",
+    "hospital: shows [BOOK_DEMO] WITHOUT a LEAD token when the visitor hasn't given an email",
     async () => {
       const r = await ask("I'd like to book a demo with Anu.", [
         { role: "user", content: "I'm with a hospital" },
@@ -243,11 +243,48 @@ describe("E2E: lead capture", () => {
           content: "Got it. What would you like to know?",
         },
       ]);
-      // Bot must NOT emit a hospital LEAD token — Google Calendar captures
-      // hospital contact details at booking time, the bot doesn't duplicate.
+      // No email shared yet → no LEAD token.
       expect(r.text).not.toMatch(/\[LEAD:/);
-      // Bot SHOULD show the booking CTA.
+      // Booking CTA must be present.
       expect(r.text).toMatch(/\[[A-Za-z_]*_DEMO\]/);
+    }
+  );
+
+  itLive(
+    "hospital: emits [LEAD:persona=hospital;...] when the visitor opts for the soft path with name+email",
+    async () => {
+      const r = await ask(
+        "Flag my interest please. I'm Priya Shah, priya.shah@bendigohealth.org.au",
+        [
+          { role: "user", content: "I'm with a hospital" },
+          {
+            role: "assistant",
+            content:
+              "Happy to set up a call with Anu. Grab a slot directly via the link below, or share your name and email and he'll reach out to coordinate.\n[BOOK_DEMO]",
+          },
+        ]
+      );
+      expect(r.text).toMatch(
+        /\[LEAD:[^\]]*persona=hospital[^\]]*email=priya\.shah@bendigohealth\.org\.au/i
+      );
+      expect(r.text).toMatch(/\[LEAD:[^\]]*name=Priya\s+Shah/i);
+    }
+  );
+
+  itLive(
+    "hospital: emits [LEAD:persona=hospital;...] when only an email is given (no name)",
+    async () => {
+      const r = await ask("admin@cairnsclinic.com.au", [
+        { role: "user", content: "I'm with a hospital" },
+        {
+          role: "assistant",
+          content:
+            "Happy to set up a call with Anu. Grab a slot directly via the link below, or share your name and email and he'll reach out.\n[BOOK_DEMO]",
+        },
+      ]);
+      expect(r.text).toMatch(
+        /\[LEAD:[^\]]*persona=hospital[^\]]*email=admin@cairnsclinic\.com\.au/i
+      );
     }
   );
 
