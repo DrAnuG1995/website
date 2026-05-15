@@ -64,32 +64,47 @@ export default function CitySlideshow({
   return (
     <>
       <div className="absolute inset-0 overflow-hidden bg-ink">
-        {slides.map((s, i) => (
-          <motion.div
-            key={s.src}
-            className="absolute inset-0"
-            initial={false}
-            animate={{ opacity: i === active ? 1 : 0 }}
-            transition={{ duration: CROSSFADE_MS / 1000, ease: "easeInOut" }}
-          >
+        {slides.map((s, i) => {
+          // Only mount the actual <Image> for slides that are currently
+          // visible or about to become visible: the active one, the next
+          // (so the crossfade target is preloaded), and the previous (so
+          // its fade-out completes cleanly). Without this gate, all 17
+          // photos start fetching the moment the page mounts, costing
+          // multiple megabytes of bandwidth before any of them are seen.
+          const distance = (i - active + slides.length) % slides.length;
+          const shouldLoad =
+            distance === 0 ||
+            distance === 1 ||
+            distance === slides.length - 1;
+          return (
             <motion.div
-              className="relative w-full h-full"
-              initial={{ scale: 1.08 }}
-              animate={{ scale: i === active ? 1.2 : 1.08 }}
-              transition={{ duration: intervalMs / 1000, ease: "linear" }}
+              key={s.src}
+              className="absolute inset-0"
+              initial={false}
+              animate={{ opacity: i === active ? 1 : 0 }}
+              transition={{ duration: CROSSFADE_MS / 1000, ease: "easeInOut" }}
             >
-              <Image
-                src={s.src}
-                alt={s.alt}
-                fill
-                priority={i === 0}
-                sizes="100vw"
-                quality={72}
-                className="object-cover"
-              />
+              <motion.div
+                className="relative w-full h-full"
+                initial={{ scale: 1.08 }}
+                animate={{ scale: i === active ? 1.2 : 1.08 }}
+                transition={{ duration: intervalMs / 1000, ease: "linear" }}
+              >
+                {shouldLoad && (
+                  <Image
+                    src={s.src}
+                    alt={s.alt}
+                    fill
+                    priority={i === 0}
+                    sizes="100vw"
+                    quality={72}
+                    className="object-cover"
+                  />
+                )}
+              </motion.div>
             </motion.div>
-          </motion.div>
-        ))}
+          );
+        })}
       </div>
 
       {/* Region caption — crossfades with each slide. Bottom-right
