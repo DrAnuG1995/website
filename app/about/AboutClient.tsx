@@ -429,7 +429,7 @@ const TEAM: TeamMember[] = [
   {
     name: "Seif Othman",
     initials: "SO",
-    role: "CTO",
+    role: "Chief Technology Officer",
     bio: "Seif leads the technology behind StatDoctor, building the systems powering faster, smarter healthcare workforce management. With a background across IoT, full-stack engineering and scalable product development, he has spent years turning complex operational problems into simple user experiences.\n\nWhat drew Seif to StatDoctor was the opportunity to work on technology with real-world impact. After seeing how outdated and fragmented many healthcare systems still are, he became focused on building tools that reduce admin, improve efficiency and give clinicians back valuable time.\n\nFrom AI-powered credentialling to workforce automation, Seif is helping shape the next generation of healthcare infrastructure through technology designed around the people actually using it.",
     photo: "/team/seif.png",
     linkedin: "https://www.linkedin.com/in/seif-o-212840134/",
@@ -447,7 +447,7 @@ const TEAM: TeamMember[] = [
 function Team() {
   return (
     <section className="relative bg-white py-20 md:py-28 px-6">
-      <div className="relative max-w-[820px] mx-auto">
+      <div className="relative max-w-[1180px] mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -469,7 +469,7 @@ function Team() {
           </p>
         </motion.div>
 
-        <div className="mt-12 md:mt-16 grid grid-cols-1 gap-6 md:gap-7">
+        <div className="mt-12 md:mt-16 grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-7">
           {TEAM.map((m, i) => (
             <TeamCard key={m.name} member={m} index={i} />
           ))}
@@ -490,52 +490,52 @@ function TeamCard({ member, index }: { member: TeamMember; index: number }) {
         delay: 0.1 + index * 0.08,
         ease: [0.2, 0.8, 0.2, 1],
       }}
-      className="group relative rounded-3xl overflow-hidden bg-gradient-to-br from-ocean to-[#1f1fcc] text-white shadow-[0_30px_60px_-25px_rgba(50,50,255,0.55)] hover:shadow-[0_40px_90px_-25px_rgba(50,50,255,0.7)] hover:-translate-y-1 transition-all duration-500 flex flex-col sm:flex-row sm:items-stretch"
+      className="group relative rounded-3xl bg-gradient-to-br from-ocean to-[#1f1fcc] text-white shadow-[0_30px_60px_-25px_rgba(50,50,255,0.55)] hover:shadow-[0_40px_90px_-25px_rgba(50,50,255,0.7)] hover:-translate-y-1 transition-all duration-500 p-7 md:p-9 flex flex-col"
     >
-      <div className="relative aspect-square sm:aspect-auto sm:w-[240px] md:w-[260px] sm:shrink-0 overflow-hidden bg-bone">
+      <h3 className="display text-[clamp(24px,2.4vw,32px)] leading-tight text-white">
+        {member.name}
+      </h3>
+
+      <div className="mt-5 flex items-center gap-5">
         {member.photo ? (
-          <Image
-            src={member.photo}
-            alt={member.name}
-            fill
-            sizes="(max-width: 640px) 100vw, 260px"
-            className="object-cover object-center"
-          />
+          <div className="relative w-[124px] h-[124px] md:w-[140px] md:h-[140px] shrink-0 rounded-full overflow-hidden ring-1 ring-white/15 shadow-[0_10px_30px_-15px_rgba(0,0,0,0.45)]">
+            <Image
+              src={member.photo}
+              alt={member.name}
+              fill
+              sizes="140px"
+              className="object-cover object-top"
+            />
+          </div>
         ) : (
-          <div className="absolute inset-0 grid place-items-center bg-gradient-to-br from-ocean/90 to-electric/20">
-            <span
-              aria-hidden
-              className="display italic select-none leading-none text-white"
-              style={{ fontSize: "clamp(72px, 9vw, 128px)" }}
-            >
+          <div className="w-[124px] h-[124px] md:w-[140px] md:h-[140px] shrink-0 rounded-full grid place-items-center bg-gradient-to-br from-electric/30 to-white/10 ring-1 ring-white/15">
+            <span aria-hidden className="display italic text-white text-3xl">
               {member.initials}
             </span>
           </div>
         )}
+
+        <div className="min-w-0 flex flex-col">
+          <div className="text-[12px] md:text-[13px] tracking-[0.18em] uppercase text-electric font-semibold leading-tight">
+            {member.role}
+          </div>
+          <a
+            href={member.linkedin}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="mt-3 inline-flex items-center gap-1.5 text-[11px] tracking-[0.18em] uppercase text-white/70 hover:text-electric transition-colors self-start"
+            data-hover
+          >
+            LinkedIn
+            <span aria-hidden>↗</span>
+          </a>
+        </div>
       </div>
 
-      <div className="p-6 md:p-8 flex-1 flex flex-col justify-center">
-        <h3 className="display text-[clamp(22px,2.4vw,30px)] leading-tight text-white">
-          {member.name}
-        </h3>
-        <div className="mt-1 text-[11px] tracking-[0.22em] uppercase text-electric font-semibold">
-          {member.role}
-        </div>
-        <div className="mt-4 space-y-3 text-white/80 text-[14px] md:text-[15px] leading-relaxed">
-          {member.bio.split(/\n\n+/).map((para, i) => (
-            <p key={i}>{para}</p>
-          ))}
-        </div>
-        <a
-          href={member.linkedin}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="mt-5 inline-flex items-center gap-1.5 text-[12px] tracking-[0.18em] uppercase text-white/70 hover:text-electric transition-colors"
-          data-hover
-        >
-          LinkedIn
-          <span aria-hidden>↗</span>
-        </a>
+      <div className="mt-7 space-y-3.5 text-white/85 text-[14px] md:text-[15px] leading-relaxed">
+        {member.bio.split(/\n\n+/).map((para, i) => (
+          <p key={i}>{para}</p>
+        ))}
       </div>
     </motion.article>
   );
