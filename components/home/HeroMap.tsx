@@ -159,10 +159,41 @@ export default function HeroMap({
   const sectionRef = useRef<HTMLDivElement>(null);
   const mapContainer = useRef<HTMLDivElement>(null);
   const mapRef = useRef<google.maps.Map | null>(null);
-  const markersRef = useRef<{ marker: google.maps.marker.AdvancedMarkerElement; el: HTMLDivElement }[]>([]);
+  const markersRef = useRef<
+    { id: string; marker: google.maps.marker.AdvancedMarkerElement; el: HTMLDivElement }[]
+  >([]);
   const advCtorRef = useRef<typeof google.maps.marker.AdvancedMarkerElement | null>(null);
   const activeIdRef = useRef<string | null>(null);
   const idleTimerRef = useRef<number | null>(null);
+
+  // At low zoom levels (continent view), many hospital pins overlap on screen.
+  // DOM hit-testing routes the click to whichever marker has the highest CSS
+  // z-index — Google assigns that by latitude, so the southernmost pin in a
+  // cluster steals every click in the shared region, even when the user
+  // clearly aimed at the tip of another pin. Re-route the click to whichever
+  // pin's anchor (bottom-center of its DOM element) is geometrically nearest
+  // to the click point. Caps to ~36px so a stray map click never snaps to a
+  // far-away pin.
+  const NEAREST_PIN_PX = 36;
+  const findNearestPinId = (clickX: number, clickY: number): string | null => {
+    let bestId: string | null = null;
+    let bestSq = NEAREST_PIN_PX * NEAREST_PIN_PX;
+    for (const entry of markersRef.current) {
+      const r = entry.el.getBoundingClientRect();
+      // Anchor = tip of the teardrop (bottom-center), which is the geographic
+      // coordinate the marker represents.
+      const anchorX = r.left + r.width / 2;
+      const anchorY = r.bottom;
+      const dx = clickX - anchorX;
+      const dy = clickY - anchorY;
+      const sq = dx * dx + dy * dy;
+      if (sq < bestSq) {
+        bestSq = sq;
+        bestId = entry.id;
+      }
+    }
+    return bestId;
+  };
 
   const [crmHospitals, setCrmHospitals] = useState<MapHospital[]>(initial);
   const [shiftCounts, setShiftCounts] = useState<Record<string, number>>(initialShiftCounts ?? {});
@@ -180,8 +211,14 @@ export default function HeroMap({
     if (!h) return;
     activeIdRef.current = id;
     setActiveId(id);
-    mapRef.current.panTo({ lat: h.lat, lng: h.lng });
+    // Zoom in BEFORE re-centring. At overview zoom the visible viewport
+    // covers most of Australia, so centring on a single hospital would push
+    // the viewport edges past AU_BOUNDS and Google's `restriction` elastic
+    // snap-back yanks the centre to AU_CENTER. Zooming to 16 first shrinks
+    // the viewport to a city block — well inside bounds — so the subsequent
+    // setCenter is allowed to land where we asked.
     mapRef.current.setZoom(h.zoom ?? DEFAULT_HOSPITAL_ZOOM);
+    mapRef.current.setCenter({ lat: h.lat, lng: h.lng });
   };
 
   const clearIdleTimer = () => {
@@ -204,8 +241,11 @@ export default function HeroMap({
     if (!mapRef.current) return;
     activeIdRef.current = null;
     setActiveId(null);
-    mapRef.current.panTo(AU_CENTER);
+    // Reverse order: zoom OUT first, then centre. Same AU_BOUNDS reasoning
+    // — re-centring while still zoomed in on a hospital can briefly put the
+    // outer viewport across bounds and trigger the snap-back.
     mapRef.current.setZoom(zoomDefaultsRef.current.overview);
+    mapRef.current.setCenter(AU_CENTER);
   };
 
   // Init map (once)
@@ -300,13 +340,20 @@ export default function HeroMap({
       // Handle click on the DOM element directly — AdvancedMarkerElement's
       // own click listener requires gmpClickable + gmp-click event which is
       // less reliable. stopPropagation prevents the underlying map click.
+      // Re-route to the geographically nearest pin (see findNearestPinId)
+      // so overlapping markers at low zoom don't redirect the click to the
+      // wrong hospital.
       el.addEventListener("click", (e) => {
         e.stopPropagation();
-        focusHospital(h.id);
+        const targetId = findNearestPinId(e.clientX, e.clientY) ?? h.id;
+        focusHospital(targetId);
       });
-      el.addEventListener("mouseenter", () => setHoverId(h.id));
+      el.addEventListener("mouseenter", (e) => {
+        const hoveredId = findNearestPinId(e.clientX, e.clientY) ?? h.id;
+        setHoverId(hoveredId);
+      });
       el.addEventListener("mouseleave", () => setHoverId(null));
-      markersRef.current.push({ marker, el });
+      markersRef.current.push({ id: h.id, marker, el });
     });
   }, [pins, ready]);
 
@@ -397,7 +444,13 @@ export default function HeroMap({
     };
   }, []);
 
-  const focusPin = (hoverId ? pins.find((p) => p.id === hoverId) : null) ?? (activeId ? pins.find((p) => p.id === activeId) : null);
+  // `previewPin` drives the small top-right pill: hover preview wins, falls
+  // back to the active pin. `activePin` drives the bottom CTA card so the
+  // card never flips to a different hospital just because the user happened
+  // to hover-pass over another pin after clicking.
+  const activePin = activeId ? pins.find((p) => p.id === activeId) ?? null : null;
+  const hoverPin = hoverId ? pins.find((p) => p.id === hoverId) ?? null : null;
+  const previewPin = hoverPin ?? activePin;
   const keyMissing = !KEY;
   const partnerCount = pins.length;
 
@@ -476,9 +529,9 @@ export default function HeroMap({
           )}
 
           <AnimatePresence mode="wait">
-            {focusPin && (
+            {previewPin && (
               <motion.div
-                key={focusPin.id}
+                key={previewPin.id}
                 initial={{ opacity: 0, y: -8 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -8 }}
@@ -487,11 +540,11 @@ export default function HeroMap({
               >
                 <span className="w-2 h-2 rounded-full bg-electric shrink-0" />
                 <div className="text-[13px] md:text-[14px] truncate leading-tight">
-                  <span className="font-semibold">{focusPin.name}</span>
+                  <span className="font-semibold">{previewPin.name}</span>
                   <span className="text-muted text-[11px] md:text-[12px]">
                     {" · "}
-                    {focusPin.liveShifts > 0
-                      ? `${focusPin.liveShifts >= 10 ? "10+" : focusPin.liveShifts} live shift${focusPin.liveShifts === 1 ? "" : "s"}`
+                    {previewPin.liveShifts > 0
+                      ? `${previewPin.liveShifts >= 10 ? "10+" : previewPin.liveShifts} live shift${previewPin.liveShifts === 1 ? "" : "s"}`
                       : "No live shifts"}
                   </span>
                 </div>
@@ -507,8 +560,8 @@ export default function HeroMap({
             className="relative md:absolute left-0 right-0 md:left-5 md:right-auto md:bottom-5 z-10 max-w-none md:max-w-md md:w-[400px] p-5 rounded-none md:rounded-2xl bg-white md:bg-white/92 md:backdrop-blur-xl border-t md:border border-ink/12 shadow-none md:shadow-[0_30px_70px_-20px_rgba(26,26,46,0.25)]"
           >
             <AnimatePresence mode="wait" initial={false}>
-              {activeId && focusPin ? (
-                <HospitalCTA key={`cta-${focusPin.id}`} pin={focusPin} />
+              {activePin ? (
+                <HospitalCTA key={`cta-${activePin.id}`} pin={activePin} />
               ) : (
                 <HeroCTA key="hero" partnerCount={partnerCount} ready={ready} />
               )}

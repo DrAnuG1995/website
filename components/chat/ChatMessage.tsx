@@ -2,7 +2,7 @@
 import ReactMarkdown, { type Components } from "react-markdown";
 import remarkGfm from "remark-gfm";
 import type { ChatMessage as ChatMessageType } from "./useChat";
-import { extractCta, extractLead } from "@/lib/chat/extractCta";
+import { extractCta, extractLead, stripIncompleteToken } from "@/lib/chat/extractCta";
 
 const mdComponents: Components = {
   p: ({ children }) => <p className="my-1.5 first:mt-0 last:mb-0">{children}</p>,
@@ -60,11 +60,14 @@ export default function ChatMessage({
   const isUser = message.role === "user";
   // For assistant messages, strip the LEAD token first (it's a side-channel
   // to /api/lead, never shown), then run the CTA extractor on the rest.
+  // While streaming, also strip any in-progress `[TOKEN…` that hasn't closed
+  // its `]` yet, so the user doesn't see a partial token flash on screen.
   const { text, cta } = isUser
     ? { text: message.content, cta: null as ReturnType<typeof extractCta>["cta"] }
     : (() => {
         const { text: noLead } = extractLead(message.content);
-        return extractCta(noLead);
+        const cleaned = isStreaming ? stripIncompleteToken(noLead) : noLead;
+        return extractCta(cleaned);
       })();
 
   if (isUser) {

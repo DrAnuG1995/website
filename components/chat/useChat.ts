@@ -186,10 +186,18 @@ export function useChat() {
                   name: lead.name,
                   conversation,
                 }),
-              }).catch(() => {
-                // Non-fatal: the visitor still gets their CTA, we just don't
-                // notify Anu. The lead is in the chat transcript regardless.
-              });
+              })
+                .then(async (r) => {
+                  if (!r.ok) {
+                    const body = await r.text().catch(() => "");
+                    console.warn(
+                      `[chat] /api/lead failed (${r.status}): ${body}`
+                    );
+                  }
+                })
+                .catch((err) => {
+                  console.warn("[chat] /api/lead threw:", err);
+                });
             }
           }
         } catch {

@@ -77,3 +77,15 @@ export function stripAllTokens(raw: string): string {
     .replace(/\[LEAD:[^\]]+\]/g, "")
     .trim();
 }
+
+// Strips a trailing in-progress token like `[LEAD:persona=doctor;email=foo@`
+// or `[DOWNLOAD_AP` that hasn't streamed its closing `]` yet. Without this,
+// the partial token is briefly visible in the chat bubble until the closing
+// bracket arrives and the extractors fire — producing a "flash" of bracketed
+// junk that snaps away. Only safe to use while streaming.
+//
+// Anchored to known token starts (`[LEAD…` or `[<UPPERCASE>…`) so it leaves
+// ordinary markdown links like `[our pricing](url)` alone.
+export function stripIncompleteToken(raw: string): string {
+  return raw.replace(/\[(LEAD\b[^\]]*|[A-Z][A-Z_]*)$/, "");
+}

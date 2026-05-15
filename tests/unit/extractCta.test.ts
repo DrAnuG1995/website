@@ -1,5 +1,10 @@
 import { describe, it, expect } from "vitest";
-import { extractCta, extractLead, stripAllTokens } from "@/lib/chat/extractCta";
+import {
+  extractCta,
+  extractLead,
+  stripAllTokens,
+  stripIncompleteToken,
+} from "@/lib/chat/extractCta";
 
 describe("extractCta", () => {
   describe("BOOK_DEMO detection", () => {
@@ -185,6 +190,62 @@ describe("extractLead", () => {
       name: "Sam",
       email: "a@b.com",
     });
+  });
+});
+
+describe("stripIncompleteToken", () => {
+  it("strips a trailing in-progress LEAD token (no closing bracket yet)", () => {
+    const out = stripIncompleteToken(
+      "Thanks Sarah, Anu's team will be in touch.\n[LEAD:persona=doctor;name=Sarah;email=foo@bar"
+    );
+    expect(out).toBe("Thanks Sarah, Anu's team will be in touch.\n");
+    expect(out).not.toContain("[LEAD");
+  });
+
+  it("strips a partially-streamed [LEAD prefix (mid-keyword)", () => {
+    expect(stripIncompleteToken("Cheers.\n[LEAD")).toBe("Cheers.\n");
+    expect(stripIncompleteToken("Cheers.\n[LEA")).toBe("Cheers.\n");
+    expect(stripIncompleteToken("Cheers.\n[L")).toBe("Cheers.\n");
+  });
+
+  it("strips a partial [DOWNLOAD_APP token still streaming", () => {
+    expect(stripIncompleteToken("Active in VIC.\n[DOWNLOAD_APP")).toBe(
+      "Active in VIC.\n"
+    );
+    expect(stripIncompleteToken("Active in VIC.\n[DOWN")).toBe(
+      "Active in VIC.\n"
+    );
+    expect(stripIncompleteToken("Active in VIC.\n[D")).toBe("Active in VIC.\n");
+  });
+
+  it("strips a partial [BOOK_DEMO token still streaming", () => {
+    expect(stripIncompleteToken("Happy to chat.\n[BOOK_DEMO")).toBe(
+      "Happy to chat.\n"
+    );
+    expect(stripIncompleteToken("Happy to chat.\n[B")).toBe("Happy to chat.\n");
+  });
+
+  it("leaves COMPLETE tokens alone (extractCta/extractLead will handle them)", () => {
+    expect(stripIncompleteToken("x.\n[BOOK_DEMO]")).toBe("x.\n[BOOK_DEMO]");
+    expect(stripIncompleteToken("x.\n[DOWNLOAD_APP]")).toBe(
+      "x.\n[DOWNLOAD_APP]"
+    );
+    expect(
+      stripIncompleteToken("x.\n[LEAD:persona=doctor;email=a@b.com]")
+    ).toBe("x.\n[LEAD:persona=doctor;email=a@b.com]");
+  });
+
+  it("does NOT strip ordinary lowercase markdown links like [text](url)", () => {
+    expect(stripIncompleteToken("See [our pricing](url) for more.")).toBe(
+      "See [our pricing](url) for more."
+    );
+    // Even mid-stream of a markdown link, the lowercase first char protects it.
+    expect(stripIncompleteToken("See [our pricing")).toBe("See [our pricing");
+  });
+
+  it("is a no-op on plain text and empty strings", () => {
+    expect(stripIncompleteToken("hello world")).toBe("hello world");
+    expect(stripIncompleteToken("")).toBe("");
   });
 });
 
