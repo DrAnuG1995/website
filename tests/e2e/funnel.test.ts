@@ -297,6 +297,161 @@ describe("E2E: lead capture", () => {
   );
 });
 
+// These cases all come from a real visitor transcript that broke the funnel:
+// the bot pushed [BOOK_DEMO] on the persona reveal, misread "can he contact
+// me?" as a how-to-book question, and refused an email that was literally in
+// the user's message ("take my email: anu@monash.health.au"). Pin each
+// failure mode as an explicit regression test.
+describe("E2E: edge cases from real visitor transcripts", () => {
+  itLive(
+    "persona reveal alone does NOT trigger [BOOK_DEMO]",
+    async () => {
+      const r = await ask("I'm with a hospital or clinic");
+      expect(r.status).toBe(200);
+      // Just identified themselves — no question yet — no CTA.
+      expect(r.text).not.toMatch(/\[[A-Za-z_]*_DEMO\]/);
+      // Bot should invite a question.
+      expect(r.text.toLowerCase()).toMatch(
+        /what.*(know|like|help)|how can i help|happy to help/
+      );
+    }
+  );
+
+  itLive(
+    "first booking offer of a conversation mentions Anu's title (CEO)",
+    async () => {
+      const r = await asHospital("How much does it cost for a hospital?");
+      // Booking nudge should be present...
+      expect(r.text).toMatch(/\[[A-Za-z_]*_DEMO\]/);
+      // ...and identify Anu by role so the visitor knows who they'd meet.
+      expect(r.text).toMatch(/\bCEO\b/);
+    }
+  );
+
+  itLive(
+    "'can he contact me?' asks for email, doesn't inline a calendar URL or markdown link",
+    async () => {
+      const r = await ask("can he contact me?", [
+        { role: "user", content: "I'm with a hospital" },
+        {
+          role: "assistant",
+          content: "Got it. What would you like to know?",
+        },
+        { role: "user", content: "How much is it?" },
+        {
+          role: "assistant",
+          content:
+            "Single hospital plan starts from $10K/yr. Happy to set up an onboarding call with Anu, our CEO. Grab a slot via the link below, or share your name and email and he'll reach out.\n[BOOK_DEMO]",
+        },
+      ]);
+      // The bot must ASK for an email — that's the soft-path opt-in.
+      expect(r.text.toLowerCase()).toMatch(
+        /email|reach you|contact you|reach out to you/
+      );
+      // No markdown link to the calendar — that's what [BOOK_DEMO] is for.
+      expect(r.text).not.toMatch(/\]\(https?:\/\//);
+      // No literal calendar URL inlined.
+      expect(r.text).not.toMatch(/calendar\.google\.com/i);
+    }
+  );
+
+  itLive(
+    "'take my email: <addr>' is NOT a refusal — LEAD token must fire",
+    async () => {
+      const r = await ask("take my email: priya.test@bendigohealth.org.au", [
+        { role: "user", content: "I'm with a hospital" },
+        {
+          role: "assistant",
+          content: "Got it. What would you like to know?",
+        },
+        { role: "user", content: "How much is it?" },
+        {
+          role: "assistant",
+          content:
+            "From $10K/year. Happy to set up an onboarding call with Anu, our CEO.\n[BOOK_DEMO]",
+        },
+        { role: "user", content: "can he contact me?" },
+        {
+          role: "assistant",
+          content: "Of course. What's your name and the best email?",
+        },
+      ]);
+      // Email is present in the user message — LEAD must fire regardless of
+      // how "take my email" sounds. This was the bug in the real transcript.
+      expect(r.text).toMatch(
+        /\[LEAD:[^\]]*email=priya\.test@bendigohealth\.org\.au[^\]]*\]/i
+      );
+      // And must NOT use refusal phrasing when an email is in the message.
+      expect(r.text.toLowerCase()).not.toMatch(/no need to share/);
+      expect(r.text.toLowerCase()).not.toMatch(/no worries[^.]*share/);
+    }
+  );
+
+  itLive(
+    "casual-tone email offer ('eh, fine, take it: <addr>') still fires LEAD",
+    async () => {
+      const r = await ask("eh, fine, take it: contact@hospital.com.au", [
+        { role: "user", content: "I'm with a hospital" },
+        {
+          role: "assistant",
+          content: "Got it. What would you like to know?",
+        },
+        { role: "user", content: "How much is it?" },
+        {
+          role: "assistant",
+          content: "Single hospital from $10K/year.\n[BOOK_DEMO]",
+        },
+        { role: "user", content: "can he reach out?" },
+        {
+          role: "assistant",
+          content: "Sure. What's your name and the best email?",
+        },
+      ]);
+      expect(r.text).toMatch(
+        /\[LEAD:[^\]]*email=contact@hospital\.com\.au[^\]]*\]/i
+      );
+      expect(r.text.toLowerCase()).not.toMatch(/no need to share/);
+    }
+  );
+
+  itLive(
+    "bot never inlines the booking calendar URL or a markdown link to it",
+    async () => {
+      const r = await asHospital("How can I get a demo with Anu?");
+      // No markdown link — the [BOOK_DEMO] token is the only allowed surface
+      // for the booking URL, and it renders as a button via the website.
+      expect(r.text).not.toMatch(/\]\(https?:\/\//);
+      expect(r.text).not.toMatch(/calendar\.google\.com/i);
+    }
+  );
+
+  itLive(
+    "bare email message (no name, no preamble) still fires LEAD for hospital",
+    async () => {
+      const r = await ask("ops@countryhealth.org.au", [
+        { role: "user", content: "I'm with a hospital" },
+        {
+          role: "assistant",
+          content: "Got it. What would you like to know?",
+        },
+        { role: "user", content: "What's the pricing?" },
+        {
+          role: "assistant",
+          content: "From $10K/year for a single hospital.\n[BOOK_DEMO]",
+        },
+        { role: "user", content: "can he reach out?" },
+        {
+          role: "assistant",
+          content: "Sure, what's your name and best email?",
+        },
+      ]);
+      expect(r.text).toMatch(
+        /\[LEAD:[^\]]*email=ops@countryhealth\.org\.au[^\]]*\]/i
+      );
+    }
+  );
+});
+
 describe("E2E: factual recall from claude_chat.txt + live stats", () => {
   itLive("knows the doctor payout window is 48 hours", async () => {
     const r = await asDoctor("When do doctors get paid after a shift?");
