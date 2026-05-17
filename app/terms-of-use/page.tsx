@@ -12,7 +12,7 @@ export default function Page() {
         StatDoctor is an online marketplace connecting locum doctors with hospitals and clinics throughout
         Australia, operated by Statdoctor Australia Pty Ltd ACN 671 408 692. Users must read and agree to the
         most recent terms at{" "}
-        <a href="https://www.statdoctor.app/terms-of-use">https://www.statdoctor.app/terms-of-use</a>.
+        <a href="https://statdoctor.app/terms-of-use">https://statdoctor.app/terms-of-use</a>.
       </p>
 
       <h2>2. Agreement</h2>

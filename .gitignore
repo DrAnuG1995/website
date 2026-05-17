@@ -4,11 +4,14 @@ out
 .DS_Store
 *.log
 .env
+.env.example
 .env*.local
 .env*.backup
+claude_chat.txt
 .vercel
 scripts/screens/
 scripts/playwright-out/
+.screenshots/
 
 # Build artefacts
 tsconfig.tsbuildinfo

@@ -1,7 +1,6 @@
 import type { MetadataRoute } from "next";
 import { getAllPosts } from "@/lib/blog/posts-server";
-
-const SITE_URL = "https://statdoctor.app";
+import { SITE_URL } from "@/lib/site";
 
 const STATIC_ROUTES = [
   "",

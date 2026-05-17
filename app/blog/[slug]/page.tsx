@@ -8,8 +8,7 @@ import {
 } from "@/lib/blog/posts-server";
 import { hydrateSourceImages } from "@/lib/blog/media";
 import PostDetail from "@/components/blog/PostDetail";
-
-const SITE_URL = "https://statdoctor.app";
+import { SITE_URL } from "@/lib/site";
 
 export async function generateStaticParams() {
   return getAllSlugs().map((slug) => ({ slug }));
