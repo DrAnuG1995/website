@@ -161,22 +161,29 @@ export default function PostDetail({
   const contentSections = splitByH2(before);
 
   // Hero image — three-tier fallback so every article has a visual lead.
-  //   1. Cited source's OG photograph (best — Guardian/news with caption)
-  //   2. The Researcher's curated Unsplash hero, credited via image_credit
+  //   1. The curated `post.image_url` (Guardian thumb, Unsplash, etc.) —
+  //      these are real photos selected for the article, with `image_credit`
+  //   2. Cited source's OG photograph (only when no curated hero exists)
   //   3. Editorial typography hero (no image at all)
+  //
+  // Why this ordering: source OGs are often institutional logos (NSW Health
+  // lotus, AHPRA, ANZCA), which read as giant brand marks in the hero slot.
+  // Any curated photo we picked at generation time is a safer default. The
+  // earlier code restricted (1) to "unsplash.com" only — that silently fell
+  // through to (2) once we switched the pipeline to Guardian heroes.
   const isPhotoUrl = (u: string) =>
     !/(logo|favicon|brand-image|sprite|gravatar|emoji|social-share|og-default)/i.test(
       u,
     );
+  const unsplashHero = post.image_url
+    ? {
+        url: post.image_url,
+        credit: post.image_credit ?? "Photo",
+      }
+    : null;
   const sourcePhoto =
-    sourceImages.find((s) => s.imageUrl && isPhotoUrl(s.imageUrl)) ?? null;
-
-  const unsplashHero =
-    !sourcePhoto && post.image_url && post.image_url.includes("unsplash.com")
-      ? {
-          url: post.image_url,
-          credit: post.image_credit ?? "Photo via Unsplash",
-        }
+    !unsplashHero
+      ? sourceImages.find((s) => s.imageUrl && isPhotoUrl(s.imageUrl)) ?? null
       : null;
 
   const mdComponents: Components = {
@@ -336,10 +343,53 @@ export default function PostDetail({
         );
       }
 
-      if (text.match(/\[STAT:/i)) {
-        const match = text.match(/\[STAT:\s*([^\]]+)\]\s*([\s\S]*)/);
-        const value = match?.[1]?.trim() ?? "";
-        const rest = match?.[2]?.trim() ?? "";
+      // [BIG STAT] **value** label — Publisher (Year)
+      //   …same visual treatment as [STAT: value]. The pipeline emits
+      //   [BIG STAT]; the older format is [STAT:]; both render the same card.
+      //
+      // For BIG STAT we can't pull the value from `text` (asterisks are
+      // already gone — markdown turned **A$6,000** into a <strong>). So we
+      // grab the first <strong> descendant and use its text as the value.
+      if (text.match(/\[(?:BIG\s+STAT|STAT:)/i)) {
+        let value = "";
+        let rest = "";
+
+        const colonMatch = text.match(/\[STAT:\s*([^\]]+)\]\s*([\s\S]*)/i);
+        if (colonMatch) {
+          value = colonMatch[1].trim();
+          rest = colonMatch[2].trim();
+        } else {
+          // Find the first <strong> in the rendered children — that's the value.
+          const findStrongText = (
+            node: React.ReactNode,
+          ): string | null => {
+            if (!React.isValidElement(node)) return null;
+            const el = node as React.ReactElement;
+            if (el.type === "strong") return extractNodeText(el);
+            const inner = React.Children.toArray(
+              (el.props as { children?: React.ReactNode }).children,
+            );
+            for (const child of inner) {
+              const found = findStrongText(child);
+              if (found) return found;
+            }
+            return null;
+          };
+          for (const child of React.Children.toArray(children)) {
+            const v = findStrongText(child);
+            if (v) {
+              value = v.trim();
+              break;
+            }
+          }
+          // Strip "[BIG STAT] " + the bolded value text out of the flattened
+          // text so what's left is the label + source.
+          rest = text
+            .replace(/\[BIG\s+STAT\]\s*/i, "")
+            .replace(value, "")
+            .trim();
+        }
+
         const parts = rest.split(/—|–|\|/).map((s) => s.trim());
         const mainLabel = parts[0] ?? "";
         const sourceText = parts[1] ?? "";
@@ -459,37 +509,10 @@ export default function PostDetail({
 
     ol: ({ children }) => <ol className="post-numbered-list">{children}</ol>,
 
-    ul: ({ children }) => {
-      const items = React.Children.toArray(children);
-      const boldCount = items.filter((child) => {
-        if (!React.isValidElement(child)) return false;
-        const liChildren = React.Children.toArray(
-          ((child as React.ReactElement).props as {
-            children?: React.ReactNode;
-          }).children,
-        );
-        const firstChild = liChildren[0];
-        if (
-          !React.isValidElement(firstChild) ||
-          (firstChild as React.ReactElement).type !== "p"
-        )
-          return false;
-        const pChildren = React.Children.toArray(
-          ((firstChild as React.ReactElement).props as {
-            children?: React.ReactNode;
-          }).children,
-        );
-        return (
-          React.isValidElement(pChildren[0]) &&
-          (pChildren[0] as React.ReactElement).type === "strong"
-        );
-      }).length;
-
-      if (boldCount >= 2) {
-        return <ul className="post-checklist not-prose">{children}</ul>;
-      }
-      return <ul className="post-bullets">{children}</ul>;
-    },
+    // Always plain bullets. The previous heuristic upgraded any list whose
+    // items led with **bold** to a "checklist" style, which made KEY FACTS
+    // callouts (always bold-led) render with weird double-dot markers.
+    ul: ({ children }) => <ul className="post-bullets">{children}</ul>,
 
     li: ({ children }) => {
       const childArray = React.Children.toArray(children);
@@ -691,7 +714,7 @@ export default function PostDetail({
                 {pillarLabel} · {post.reading_time_minutes} min read
               </span>
 
-              <h1 className="display text-[clamp(40px,6.5vw,88px)] text-white mb-4 leading-[0.98] max-w-3xl">
+              <h1 className="display text-[clamp(26px,3.8vw,48px)] text-white mb-4 leading-[1.08] max-w-3xl">
                 {post.title}
               </h1>
 
@@ -768,28 +791,58 @@ export default function PostDetail({
               </figcaption>
             </figure>
           ) : unsplashHero ? (
-            <figure className="article-hero-img-wrap mb-8">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={unsplashHero.url}
-                alt={post.og_image_alt ?? post.title}
-                className="article-hero-img"
-                loading="eager"
-              />
-              <figcaption className="article-hero-img-caption">
-                <span className="hero-credit-label">Image</span>
-                <a
-                  href="https://unsplash.com/?utm_source=statdoctor&utm_medium=referral"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="hero-credit-publisher"
-                >
-                  Unsplash
-                </a>
-                <span className="hero-credit-sep">·</span>
-                <span className="hero-credit-title">{unsplashHero.credit}</span>
-              </figcaption>
-            </figure>
+            (() => {
+              // Pick the right credit label for whatever host supplied the
+              // hero — Guardian thumbs and Unsplash photos both flow through
+              // here. Defaults to plain "Photo" so we never mis-attribute.
+              const heroHost = (() => {
+                try {
+                  return new URL(unsplashHero.url).hostname;
+                } catch {
+                  return "";
+                }
+              })();
+              const isGuardian = /guim\.co\.uk$/.test(heroHost);
+              const isUnsplash = /unsplash\.com$/.test(heroHost);
+              const publisherLabel = isGuardian
+                ? "The Guardian"
+                : isUnsplash
+                  ? "Unsplash"
+                  : "Photo";
+              const publisherHref = isGuardian
+                ? "https://www.theguardian.com/"
+                : isUnsplash
+                  ? "https://unsplash.com/?utm_source=statdoctor&utm_medium=referral"
+                  : null;
+              return (
+                <figure className="article-hero-img-wrap mb-8">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={unsplashHero.url}
+                    alt={post.og_image_alt ?? post.title}
+                    className="article-hero-img"
+                    loading="eager"
+                  />
+                  <figcaption className="article-hero-img-caption">
+                    <span className="hero-credit-label">Image</span>
+                    {publisherHref ? (
+                      <a
+                        href={publisherHref}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="hero-credit-publisher"
+                      >
+                        {publisherLabel}
+                      </a>
+                    ) : (
+                      <span className="hero-credit-publisher">{publisherLabel}</span>
+                    )}
+                    <span className="hero-credit-sep">·</span>
+                    <span className="hero-credit-title">{unsplashHero.credit}</span>
+                  </figcaption>
+                </figure>
+              );
+            })()
           ) : (
             // Editorial typography hero — used when no source has a photograph
             // (gov-only citations, AHPRA/AIHW/etc.). Keeps every article visually

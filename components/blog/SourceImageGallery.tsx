@@ -1,3 +1,6 @@
+"use client";
+
+import { useEffect, useRef, useState } from "react";
 import type { Source } from "@/lib/blog/posts";
 
 export type InlineImage = { src: string; caption: string };
@@ -6,6 +9,57 @@ export type SourceWithImage = Source & {
   imageUrl: string | null;
   inlineImages: InlineImage[];
 };
+
+/**
+ * Per-card image cell. Uses local state so that if the scraped OG image
+ * 404s, is blocked, or is just slow (ACRRM, ANZCA, etc. respond in ≥10s),
+ * we swap to the publisher-name placeholder instead of leaving a broken
+ * or perpetually-loading glyph in the gallery.
+ */
+function SourceCardImage({
+  src,
+  alt,
+  publisher,
+}: {
+  src: string | null;
+  alt: string;
+  publisher: string;
+}) {
+  const [broken, setBroken] = useState(false);
+  const imgRef = useRef<HTMLImageElement | null>(null);
+
+  // 5 s grace: if the image hasn't reported `complete` yet, treat as broken.
+  // Covers slow third-party hosts that never fire onload/onerror in time.
+  useEffect(() => {
+    if (!src || broken) return;
+    const timer = window.setTimeout(() => {
+      const img = imgRef.current;
+      if (!img || !img.complete || img.naturalWidth === 0) {
+        setBroken(true);
+      }
+    }, 5_000);
+    return () => window.clearTimeout(timer);
+  }, [src, broken]);
+
+  if (!src || broken) {
+    return (
+      <div className="source-gallery-img-placeholder">
+        <span className="source-gallery-img-publisher">{publisher}</span>
+      </div>
+    );
+  }
+  return (
+    // eslint-disable-next-line @next/next/no-img-element
+    <img
+      ref={imgRef}
+      src={src}
+      alt={alt}
+      className="source-gallery-img"
+      loading="lazy"
+      onError={() => setBroken(true)}
+    />
+  );
+}
 
 export default function SourceImageGallery({
   sources,
@@ -36,17 +90,11 @@ export default function SourceImageGallery({
             rel="noopener noreferrer"
             className="source-gallery-card"
           >
-            {src.imageUrl ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                src={src.imageUrl}
-                alt={src.title}
-                className="source-gallery-img"
-                loading="lazy"
-              />
-            ) : (
-              <div className="source-gallery-img-placeholder">📰</div>
-            )}
+            <SourceCardImage
+              src={src.imageUrl}
+              alt={src.title}
+              publisher={src.publisher}
+            />
             <div className="source-gallery-body">
               <span className="source-gallery-publisher">
                 Source: {src.publisher}
