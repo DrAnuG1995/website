@@ -7,7 +7,6 @@ out
 .env.example
 .env*.local
 .env*.backup
-claude_chat.txt
 .vercel
 scripts/screens/
 scripts/playwright-out/
